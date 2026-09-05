@@ -8,8 +8,8 @@
 
 <section id="beranda" class="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
   <!-- Background decorative elements -->
-  <div class="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-  <div class="absolute bottom-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
+  <div class="absolute top-20 right-20 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
+  <div class="absolute bottom-10 left-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl"></div>
 
   <div class="container mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 relative z-10">
     <div class="max-w-4xl">

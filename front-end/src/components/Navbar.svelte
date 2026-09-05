@@ -23,11 +23,7 @@
 </script>
 
 <header
-  class="fixed top-0 left-0 right-0 z-40 transition-all duration-300"
-  class:bg-white/90={scrolled}
-  class:backdrop-blur-xl={scrolled}
-  class:shadow-sm={scrolled}
-  class:bg-transparent={!scrolled}
+  class={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-xl shadow-sm' : 'bg-transparent'}`}
 >
   <nav class="container mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
     <a href="#beranda" class="flex items-center gap-3 group">
