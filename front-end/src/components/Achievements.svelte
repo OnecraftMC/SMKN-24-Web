@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Trophy from 'lucide-svelte/icons/trophy';
-  import Star from 'lucide-svelte/icons/star';
-  import Medal from 'lucide-svelte/icons/medal';
+  import Trophy from 'lucide-svelte';
+  import Star from 'lucide-svelte';
+  import Medal from 'lucide-svelte';
 
   const achievements = [
     { title: 'Juara 1 Lomba Kompetensi Siswa Nasional TKJ', level: 'Nasional', year: 2025, category: 'Akademik' },

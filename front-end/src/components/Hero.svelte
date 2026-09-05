@@ -1,9 +1,9 @@
 <script lang="ts">
-  import ArrowRight from 'lucide-svelte/icons/arrow-right';
-  import Sparkles from 'lucide-svelte/icons/sparkles';
-  import BookOpen from 'lucide-svelte/icons/book-open';
-  import Users from 'lucide-svelte/icons/users';
-  import Award from 'lucide-svelte/icons/award';
+  import ArrowRight from 'lucide-svelte';
+  import Sparkles from 'lucide-svelte';
+  import BookOpen from 'lucide-svelte';
+  import Users from 'lucide-svelte';
+  import Award from 'lucide-svelte';
 </script>
 
 <section id="beranda" class="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">

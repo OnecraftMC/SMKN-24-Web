@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GraduationCap from 'lucide-svelte/icons/graduation-cap';
+  import GraduationCap from 'lucide-svelte';
 </script>
 
 <footer class="bg-foreground text-white py-12">
