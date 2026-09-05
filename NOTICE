@@ -1,0 +1,13 @@
+NOTICE — SMK Negeri 24 Jakarta Website
+
+Project ini menggunakan komponen pihak ketiga yang dilisensikan di bawah Apache License 2.0 dan MIT License:
+
+- ElysiaJS Project — MIT License
+- Drizzle ORM Project — Apache License 2.0
+- OpenAI SDK — Apache License 2.0
+- Svelte Project — MIT License
+- Vite Project — MIT License
+- Tailwind CSS — MIT License
+
+Portions of this work are licensed under the Apache License, Version 2.0.
+Lihat file LICENSE untuk detail lengkap.
