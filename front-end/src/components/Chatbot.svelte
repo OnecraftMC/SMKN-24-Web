@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MessageCircle, X, Send } from 'lucide-svelte';
+  import { MessageCircle, X, Send } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let isOpen = false;
@@ -87,3 +87,4 @@
     </div>
   </div>
 {/if}
+

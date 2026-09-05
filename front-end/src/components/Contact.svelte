@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPin, Mail, Phone, Clock } from 'lucide-svelte';
+  import { MapPin, Mail, Phone, Clock } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let formData = { name: '', email: '', subject: '', message: '' };
@@ -105,3 +105,4 @@
     </div>
   </div>
 </section>
+

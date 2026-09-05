@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menu, X, GraduationCap } from 'lucide-svelte';
+  import { Menu, X, GraduationCap } from '@lucide/svelte';
   import { onMount } from 'svelte';
 
   let isOpen = false;
@@ -83,3 +83,4 @@
     </div>
   {/if}
 </header>
+

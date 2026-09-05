@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MapPin, Wrench, Wifi, Book } from 'lucide-svelte';
+  import { MapPin, Wrench, Wifi, Book } from '@lucide/svelte';
 
   const facilities = [
     { name: 'Laboratorium Komputer', description: 'Fasilitas PC modern dengan spesifikasi terbaru untuk praktik TKJ dan multimedia', icon: '🖥️' },
@@ -32,3 +32,4 @@
     </div>
   </div>
 </section>
+
