@@ -28,7 +28,7 @@
         <p class="section-subtitle mb-8">Kami siap membantu menjawab pertanyaan Anda tentang SMK Negeri 24 Jakarta.</p>
 
         <div class="space-y-6">
-          <a href="#" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
+          <a href="/" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
               <MapPin class="w-6 h-6 text-primary" />
             </div>
@@ -38,7 +38,7 @@
             </div>
           </a>
 
-          <a href="#" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
+          <a href="/" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
               <Mail class="w-6 h-6 text-primary" />
             </div>
@@ -48,7 +48,7 @@
             </div>
           </a>
 
-          <a href="#" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
+          <a href="/" class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-border hover:border-primary/30 hover:shadow-md transition-all group">
             <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
               <Phone class="w-6 h-6 text-primary" />
             </div>
@@ -105,4 +105,6 @@
     </div>
   </div>
 </section>
+
+
 

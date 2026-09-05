@@ -1,5 +1,5 @@
 <script lang="ts">
-  import GraduationCap from '@lucide/svelte';
+  import { GraduationCap } from '@lucide/svelte';
 </script>
 
 <footer class="bg-foreground text-white py-12">
@@ -21,10 +21,12 @@
     <div class="border-t border-white/10 mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
       <span>© 2026 SMK Negeri 24 Jakarta. Seluruh hak cipta dilindungi.</span>
       <div class="flex gap-6">
-        <a href="#" class="hover:text-white transition-colors">Kebijakan Privasi</a>
-        <a href="#" class="hover:text-white transition-colors">Syarat & Ketentuan</a>
+        <a href="/" class="hover:text-white transition-colors">Kebijakan Privasi</a>
+        <a href="/" class="hover:text-white transition-colors">Syarat & Ketentuan</a>
       </div>
     </div>
   </div>
 </footer>
+
+
 

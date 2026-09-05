@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Trophy from '@lucide/svelte';
-  import Star from '@lucide/svelte';
-  import Medal from '@lucide/svelte';
+  import { Trophy } from '@lucide/svelte';
+  import { Star } from '@lucide/svelte';
+  import { Medal } from '@lucide/svelte';
 
   const achievements = [
     { title: 'Juara 1 Lomba Kompetensi Siswa Nasional TKJ', level: 'Nasional', year: 2025, category: 'Akademik' },
@@ -38,4 +38,5 @@
     </div>
   </div>
 </section>
+
 
