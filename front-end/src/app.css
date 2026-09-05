@@ -129,10 +129,6 @@ a {
   @apply badge bg-primary/10 text-primary;
 }
 
-.badge-primary {
-  @apply badge bg-primary/10 text-primary;
-}
-
 .badge-secondary {
   @apply badge bg-secondary/10 text-secondary;
 }
@@ -141,22 +137,16 @@ a {
   @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-3;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  
-  .animate-fade-in {
-    animation: fadeIn 0.5s ease-out;
-  }
-  
-  .animate-slide-up {
-    animation: slideUp 0.6s ease-out;
-  }
-  
-  .animate-scale-in {
-    animation: scaleIn 0.4s ease-out;
-  }
+@utility animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@utility animate-slide-up {
+  animation: slideUp 0.6s ease-out;
+}
+
+@utility animate-scale-in {
+  animation: scaleIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
