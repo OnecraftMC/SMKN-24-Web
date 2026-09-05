@@ -116,8 +116,17 @@ a {
   @apply block text-sm font-medium text-foreground mb-2;
 }
 
-.badge {
-  @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+@utility badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-primary {
+  @apply badge bg-primary/10 text-primary;
 }
 
 .badge-primary {
