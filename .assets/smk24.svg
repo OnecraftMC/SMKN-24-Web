@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@800&amp;display=swap');
+
+    .text-main {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-weight: 800;
+      font-size: 72px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      fill: transparent;
+      stroke: #38BDF8;
+      stroke-width: 1.5;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: draw 2.5s ease-out forwards, fillIn 1.5s ease-in 2s forwards;
+    }
+
+    .text-sub {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      letter-spacing: 8px;
+      fill: #F59E0B;
+      opacity: 0;
+      animation: fadeIn 1s ease-out 3s forwards;
+    }
+
+    .grid-line {
+      stroke: #1E3A8A;
+      stroke-width: 0.5;
+      opacity: 0.2;
+    }
+
+    .node {
+      fill: #38BDF8;
+      animation: pulse 3s infinite ease-in-out;
+    }
+
+    .shimmer-rect {
+      fill: url(#shimmerGradient);
+      animation: shimmerMove 4s infinite linear;
+    }
+
+    @keyframes draw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes fillIn {
+      from { fill: transparent; }
+      to { fill: #0F172A; stroke: #38BDF8; stroke-width: 0.5; }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 0.8; }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.3; }
+      50% { transform: scale(1.5); opacity: 0.8; }
+    }
+
+    @keyframes shimmerMove {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .text-main { fill: transparent; }
+      @keyframes fillIn {
+        from { fill: transparent; }
+        to { fill: #F8FAFC; stroke: #38BDF8; stroke-width: 0.5; }
+      }
+    }
+  </style>
+
+  <defs>
+    <linearGradient id="shimmerGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+    
+    <mask id="textMask">
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="text-main" id="text_0_lf3vt">
+        SMKN 24 JAKARTA
+      </text>
+    </mask>
+  </defs>
+
+  <!-- Background Decorative Elements -->
+  <g class="grid" id="g_1_lf3vt">
+    <line x1="0" y1="40" x2="800" y2="40" class="grid-line" id="line_2_lf3vt"/>
+    <line x1="0" y1="160" x2="800" y2="160" class="grid-line" id="line_3_lf3vt"/>
+    <circle cx="40" cy="40" r="3" class="node" id="circle_4_lf3vt"/>
+    <circle cx="760" cy="160" r="3" class="node" style="animation-delay: 1s;" id="circle_5_lf3vt"/>
+    <circle cx="760" cy="40" r="2" class="node" style="animation-delay: 0.5s;" id="circle_6_lf3vt"/>
+    <circle cx="40" cy="160" r="2" class="node" style="animation-delay: 1.5s;" id="circle_7_lf3vt"/>
+  </g>
+
+  <!-- Main Text -->
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" class="text-main" id="text_8_lf3vt">
+    SMKN 24 JAKARTA
+  </text>
+
+  <!-- Shimmer Effect Overlay -->
+  <rect x="0" y="60" width="800" height="80" mask="url(#textMask)" class="shimmer-rect" id="rect_9_lf3vt"/>
+
+  <!-- Subtitle -->
+  <text x="50%" y="145" text-anchor="middle" class="text-sub" id="text_10_lf3vt">
+    EXCELLENCE • INTEGRITY • INNOVATION
+  </text>
+
+  <!-- Accent Lines -->
+  <line x1="350" y1="160" x2="450" y2="160" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" id="line_11_lf3vt">
+    <animate attributeName="x1" from="400" to="300" dur="1s" begin="3s" fill="freeze"/>
+    <animate attributeName="x2" from="400" to="500" dur="1s" begin="3s" fill="freeze"/>
+    <animate attributeName="opacity" from="0" to="1" dur="1s" begin="3s" fill="freeze"/>
+  </line>
+</svg>
