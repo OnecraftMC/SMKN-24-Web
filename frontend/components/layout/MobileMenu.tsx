@@ -3,9 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+interface NavLink {
+  href: string;
+  label: string;
+  icon: string;
+}
+
 interface MobileMenuProps {
   isOpen: boolean;
   onClose: () => void;
+  navLinks: NavLink[];
 }
 
 export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {

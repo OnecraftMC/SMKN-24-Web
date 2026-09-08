@@ -68,13 +68,13 @@ export default function JadwalMatriks() {
             <tbody>
               <tr className="border-b border-surface-container">
                 <td className="px-4 py-3 font-bold bg-surface-container-low">Pagi</td>
-                {data.pagi.map((item, idx) => (
+                {data.pagi.map((item: string, idx: number) => (
                   <td key={idx} className="px-4 py-3"><span className="font-bold text-primary">{item}</span></td>
                 ))}
               </tr>
               <tr>
                 <td className="px-4 py-3 font-bold bg-surface-container-low">Siang</td>
-                {data.siang.map((item, idx) => (
+                {data.siang.map((item: string, idx: number) => (
                   <td key={idx} className="px-4 py-3">
                     <span className="font-bold text-primary">{item}</span>
                     <br/><span className="text-xs text-on-surface-variant">Praktik Kejuruan</span>

@@ -11,12 +11,12 @@ export default function FormBK() {
     catatan: ''
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     alert(`Pengajuan konsultasi BK diterima untuk ${formData.nama} dengan topik ${formData.topik}`);
     // Reset form
@@ -89,7 +89,7 @@ export default function FormBK() {
             onChange={handleChange}
             className="w-full text-sm rounded-xl border border-surface-container bg-surface-container-low px-3 py-2 text-on-surface"
             placeholder="Tuliskan kendala atau preferensi jadwal bimbingan..."
-            rows="2"
+            rows={2}
           ></textarea>
         </div>
         <button

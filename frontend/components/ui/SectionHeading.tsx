@@ -1,4 +1,10 @@
-export default function SectionHeading({ label, title, description }) {
+interface SectionHeadingProps {
+  label: string;
+  title: string;
+  description?: string;
+}
+
+export default function SectionHeading({ label, title, description }: SectionHeadingProps) {
   return (
     <div className="space-y-2">
       <span className="font-label-md uppercase tracking-wider text-secondary font-bold">{label}</span>
