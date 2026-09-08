@@ -25,7 +25,7 @@ export default function FasilitasKampus() {
       <div className="max-w-container-max mx-auto space-y-space-xl">
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Sarana &amp; Prasarana</span>
-          <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Fasilitas Kampus Modern</h2>
+          <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Fasilitas SMKN 24 Jakarta</h2>
           <p className="font-body-md text-on-surface-variant">
             Dirancang higienis, aman, dan berstandar internasional demi menunjang kenyamanan belajar, riset, dan eksplorasi bakat.
           </p>

@@ -46,6 +46,13 @@ export default function Navbar() {
               Terakreditasi A
             </span>
             <span className="hidden sm:inline text-surface-container-high">BAN-S/M</span>
+            <Link
+              href="/login"
+              className="hidden sm:inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold shadow-sm hover:bg-secondary-fixed-dim transition-all"
+            >
+              <span>Login</span>
+              <span className="material-symbols-outlined text-[16px]">login</span>
+            </Link>
           </div>
         </div>
       </div>
@@ -87,9 +94,9 @@ export default function Navbar() {
             </Link>
           ))}
           <Link
-            href="/profil#fasilitas"
+            href="/fasilitas"
             className={`nav-tab-btn px-4 py-2 rounded-lg font-label-md text-label-md transition-all ${
-              pathname === "/profil"
+              pathname === "/fasilitas"
                 ? "bg-surface-container text-primary shadow-sm font-bold"
                 : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
             }`}

@@ -16,7 +16,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     { href: "/profil", label: "Profil Sekolah", icon: "domain" },
     { href: "/akademik", label: "Akademik & Jadwal", icon: "calendar_month" },
     { href: "/kabar", label: "Kabar & Galeri", icon: "newspaper" },
-    { href: "/profil#fasilitas", label: "Fasilitas & Kampus", icon: "apartment" },
+    { href: "/fasilitas", label: "Fasilitas & Kampus", icon: "apartment" },
   ];
 
   if (!isOpen) return null;
@@ -24,7 +24,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   return (
     <div className="lg:hidden border-t border-surface-container bg-surface-container-lowest px-margin-mobile py-space-sm shadow-xl space-y-1">
       {navLinks.map((link) => {
-        const isActive = link.href === pathname || (link.href.startsWith("/profil#") && pathname === "/profil");
+        const isActive = link.href === pathname;
         return (
           <Link
             key={link.href}

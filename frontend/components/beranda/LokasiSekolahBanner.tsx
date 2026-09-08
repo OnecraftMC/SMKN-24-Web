@@ -12,7 +12,7 @@ export default function LokasiSekolahBanner() {
               <span>Lokasi Kampus Kami</span>
             </div>
             <h2 className="font-headline-lg text-headline-lg text-on-primary font-bold tracking-tight">
-              Kunjungi Kampus SMK Negeri 24 Jakarta
+              Kunjungi SMK Negeri 24 Jakarta
             </h2>
             <p className="font-body-lg text-body-lg text-primary-fixed max-w-2xl font-normal leading-relaxed">
               Jl. Bambu Hitam No. 3, RT.3/RW.1, Bambu Apus, Kec. Cipayung, Jakarta Timur 13890. Silakan

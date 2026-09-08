@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+/template and promt
 
 # debug
 npm-debug.log*

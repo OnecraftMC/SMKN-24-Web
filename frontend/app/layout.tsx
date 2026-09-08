@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
+import { Footer } from '@/components/ui/footer-section';
 import ChatbotWidget from '@/components/chatbot/ChatbotWidget';
+import LoadingScreenProvider from '@/components/ui/LoadingScreenProvider';
 
 export const metadata: Metadata = {
   title: 'SMK Negeri 24 Jakarta',
@@ -20,10 +21,12 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
       </head>
       <body className="bg-surface text-on-surface">
-        <Navbar />
-        <main className="pt-[112px] md:pt-[120px] lg:pt-[132px] min-h-screen">{children}</main>
-        <Footer />
-        <ChatbotWidget />
+        <LoadingScreenProvider>
+          <Navbar />
+          <main className="pt-[112px] md:pt-[120px] lg:pt-[132px] min-h-screen">{children}</main>
+          <Footer />
+          <ChatbotWidget />
+        </LoadingScreenProvider>
       </body>
     </html>
   );

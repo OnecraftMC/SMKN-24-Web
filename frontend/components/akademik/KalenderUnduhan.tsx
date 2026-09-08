@@ -1,47 +1,78 @@
+"use client";
+
+import { useState } from "react";
+
 const dokumenData = [
-  { id: 1, title: "Kalender Pendidikan 2025/2026", type: "PDF" },
-  { id: 2, title: "Kurikulum Merdeka � Struktur Kurikulum", type: "PDF" },
-  { id: 3, title: "Jadwal Ujian Akhir Semester Ganjil", type: "PDF" },
-  { id: 4, title: "Buku Panduan PKL 2025", type: "PDF" },
+  {
+    id: 1,
+    judul: "Kalender Pendidikan Tahun Ajaran 2025/2026",
+    deskripsi: "Dokumen • Diperbarui Sesuai Kalender Disdik DKI Jakarta",
+    icon: "description",
+  },
+  {
+    id: 2,
+    judul: "Panduan Kurikulum Merdeka SMK 5 Kompetensi Keahlian",
+    deskripsi: "Dokumen • Perhotelan, Boga, Busana, RPL, Pariwisata",
+    icon: "menu_book",
+  },
+  {
+    id: 3,
+    judul: "Pedoman Praktik Kerja Lapangan (PKL)",
+    deskripsi: "Dokumen • Skema Link and Match Dunia Usaha & Industri",
+    icon: "assignment",
+  },
 ];
 
 export default function KalenderUnduhan() {
-  const unduhDokumen = (judul) => {
+  const [downloading, setDownloading] = useState<number | null>(null);
+
+  const handleDownload = (judul: string, id: number) => {
+    setDownloading(id);
     const isi = `SMK NEGERI 24 JAKARTA\nJl. Bambu Hitam No. 3, Bambu Apus, Cipayung, Jakarta Timur 13890\n\n${judul}\n\nDokumen resmi versi lengkap tersedia di Tata Usaha sekolah atau dapat diminta melalui email humassmkn24jakarta@gmail.com / telepon (021) 844-1976.`;
-    const blob = new Blob([isi], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([isi], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = judul.replace(/\s+/g, '_') + '.txt';
+    a.download = judul.replace(/\s+/g, "_") + ".txt";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    setDownloading(null);
   };
 
   return (
-    <div className="space-y-space-lg">
+    <div className="lg:col-span-7 space-y-space-lg">
       <div>
-        <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Unduhan &amp; Kalender</span>
-        <h3 className="font-headline-md text-headline-md text-primary font-bold">Dokumen &amp; Jadwal Akademik</h3>
+        <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Pusat Arsip</span>
+        <h3 className="font-headline-md font-bold text-primary">Dokumen &amp; Silabus Pembelajaran</h3>
       </div>
-      <ul className="space-y-space-sm">
-        {dokumenData.map((doc) => (
-          <li key={doc.id} className="bg-surface-container-lowest rounded-xl p-space-md border border-surface-container shadow-sm flex items-center justify-between hover:shadow-md transition-all">
-            <div>
-              <span className="font-title-sm font-bold text-primary">{doc.title}</span>
-              <span className="ml-2 px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed text-xs font-bold">{doc.type}</span>
+      <div className="space-y-3">
+        {dokumenData.map((item) => (
+          <div
+            key={item.id}
+            className="p-space-md rounded-2xl bg-surface-container-lowest border border-surface-container flex items-center justify-between hover:shadow-md transition-all"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
+                <span className="material-symbols-outlined text-[24px]">{item.icon}</span>
+              </div>
+              <div>
+                <h4 className="font-title-md font-bold text-primary">{item.judul}</h4>
+                <p className="text-xs text-on-surface-variant">{item.deskripsi}</p>
+              </div>
             </div>
             <button
-              onClick={() => unduhDokumen(doc.title)}
-              className="flex items-center gap-1 text-secondary font-bold hover:underline text-sm"
+              onClick={() => handleDownload(item.judul, item.id)}
+              disabled={downloading === item.id}
+              className="px-3 py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm font-bold flex items-center gap-1 hover:bg-secondary-fixed-dim transition-colors disabled:opacity-50"
             >
-              <span className="material-symbols-outlined text-[18px]">download</span>
-              <span>Unduh</span>
+              <span className="material-symbols-outlined text-[16px]">download</span>
+              {downloading === item.id ? "..." : "Unduh"}
             </button>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
