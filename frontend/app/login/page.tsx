@@ -3,9 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/ui/Reveal";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,8 +21,8 @@ export default function LoginPage() {
       return;
     }
     setError(false);
-    // Demo: redirect ke dashboard atau alert
-    alert("Login berhasil (demo) — akan diarahkan ke dashboard");
+    // Redirect ke dashboard admin
+    router.push("/admin");
   };
 
   return (

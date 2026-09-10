@@ -14,7 +14,7 @@ const highlights = [
   {
     icon: "military_tech",
     label: "Akreditasi",
-    value: "A (2021)",
+    value: "A",
     desc: "Predikat 'A' Unggul Nasional",
   },
   {

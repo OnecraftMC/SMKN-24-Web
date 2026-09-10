@@ -9,7 +9,7 @@ export default function LokasiSekolahBanner() {
           <div className="lg:col-span-5 space-y-space-md">
             <div className="inline-flex items-center gap-2 px-space-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold">
               <span className="material-symbols-outlined text-[16px]">location_on</span>
-              <span>Lokasi Kampus Kami</span>
+              <span>Lokasi Sekolah Kami</span>
             </div>
             <h2 className="font-headline-lg text-headline-lg text-on-primary font-bold tracking-tight">
               Kunjungi SMK Negeri 24 Jakarta

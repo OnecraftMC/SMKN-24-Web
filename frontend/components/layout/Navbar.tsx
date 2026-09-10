@@ -15,6 +15,8 @@ export default function Navbar() {
     { href: "/profil", label: "Profil", icon: "domain" },
     { href: "/akademik", label: "Akademik", icon: "calendar_month" },
     { href: "/kabar", label: "Galeri", icon: "newspaper" },
+    { href: "/jurusan", label: "Jurusan", icon: "school" },
+    { href: "/berita", label: "Berita", icon: "article" },
   ];
 
   const isActive = (href: string) => {
@@ -73,7 +75,7 @@ export default function Navbar() {
               SMKN 24 Jakarta
             </span>
             <span className="font-label-sm text-label-sm text-on-surface-variant font-normal leading-none hidden sm:inline">
-              Nusantara • Unggul &amp; Berkarakter
+              Sekolah • Unggul &amp; Berkarakter
             </span>
           </span>
         </Link>

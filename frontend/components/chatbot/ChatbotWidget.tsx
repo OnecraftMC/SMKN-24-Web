@@ -18,7 +18,7 @@ export default function ChatbotWidget() {
     setMessages(prev => [...prev, newMessage]);
     // Simulate bot response
     setTimeout(() => {
-      setMessages(prev => [...prev, { id: Date.now(), sender: "bot", text: "Terima kasih atas pesan Anda. Tim kami akan segera merespons." }]);
+      setMessages(prev => [...prev, { id: Date.now(), sender: "bot", text: "Baik, pertanyaan anda sedang di proses." }]);
     }, 1000);
   };
 

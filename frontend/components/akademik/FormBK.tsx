@@ -29,7 +29,7 @@ export default function FormBK() {
         <span className="material-symbols-outlined text-[24px]">support_agent</span>
         <span className="font-label-md uppercase tracking-wider">Bimbingan Konseling</span>
       </div>
-      <h3 className="font-headline-md text-headline-md text-primary font-bold mb-4">Konsultasi &amp; Bimbingan Karir</h3>
+      <h3 className="font-headline-md text-headline-md text-primary font-bold mb-4">Konsultasi &amp; Bimbingan Konseling</h3>
       <form onSubmit={handleSubmit} className="space-y-space-md">
         <div>
           <label className="block text-xs font-bold text-primary mb-1">Nama Lengkap</label>

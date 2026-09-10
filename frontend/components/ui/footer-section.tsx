@@ -30,6 +30,8 @@ const quickLinks = [
   { title: 'Kabar', href: '/kabar' },
   { title: 'Lokasi Sekolah', href: '/#lokasi-sekolah' },
   { title: 'Fasilitas', href: '/profil#fasilitas' },
+  { title: 'Berita', href: '/berita' },
+  { title: 'Jurusan', href: '/jurusan' },
 ];
 
 const studyPrograms = [
@@ -119,7 +121,7 @@ export function Footer() {
           </p>
         </AnimatedContainer>
 
-        {/* Tiga kolom lainnya: akses cepat, program keahlian, koneksi */}
+        {/* Tiga kolom lainnya: , program keahlian, koneksi */}
         <div className="mt-6 grid grid-cols-2 gap-6 md:grid-cols-3 xl:col-span-2 xl:mt-0">
           {footerSections.map((section, index) => (
             <AnimatedContainer key={section.label} delay={0.1 + index * 0.1}>

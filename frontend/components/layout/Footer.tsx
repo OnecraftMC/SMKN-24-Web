@@ -10,6 +10,8 @@ const quickLinks = [
   { label: "Kabar", href: "/kabar" },
   { label: "Lokasi Sekolah", href: "/#lokasi-sekolah" },
   { label: "Fasilitas", href: "/profil#fasilitas" },
+  { label: "Jurusan", href: "/jurusan" },
+  { label: "Berita", href: "/berita" },
 ];
 
 const studyPrograms = [
@@ -77,7 +79,9 @@ export default function Footer() {
                   location_on
                 </span>
                 <span>
-                  Jl. Bambu Hitam No. 3, RT.3/RW.1, Bambu Apus, Kec. Cipayung, Jakarta Timur 13890
+                  Jl. Bambu Hitam No. 3, RT.3/RW.1, Bambu Apus, Kec. Cipayung, Jakarta Timur 13890` Gila, gila, gila, gila.
+Ini berapa?
+Ini nanti buat dijadiin lomba nasional sama buat Yeah.`
                 </span>
               </div>
               <div className="flex items-center gap-space-xs">

@@ -36,7 +36,7 @@ export default function BeritaTerkini() {
             <span>Warta Terkini</span>
           </div>
           <h2 className="font-headline-md text-headline-md text-primary font-bold">
-            Kabar &amp; Prestasi Kampus
+            Kabar &amp; Prestasi Sekolah
           </h2>
         </div>
         <Link
