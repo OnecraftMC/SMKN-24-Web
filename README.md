@@ -9,7 +9,7 @@ Website publik dan dashboard admin SMK Negeri 24 Jakarta. Repository ini menggun
 - `apps/main-web`: website utama publik.
 - `apps/admin`: dashboard administrasi yang mengakses API `main-web`.
 
-## Prasyarat
+## _Prasyarat_
 
 Pastikan perangkat sudah memiliki Git, Node.js 20 atau lebih baru, npm, dan akun GitHub jika ingin melakukan push ke repository publik.
 
@@ -156,7 +156,7 @@ git push origin main
 ```
 
 Ganti `USERNAME/NAMA-REPOSITORY` dengan alamat repository GitHubmu. Sebelum menjalankan `git add .`, pastikan tidak ada `.env.local`, password, API key, atau credential lain yang muncul pada `git status`.
-jika anda belum memiliki git, cek di [Periksa-instalasi]("Periksa Instalasi")
+jika anda belum memiliki git, cek di [Prasyarat](#Prasyarat)
 
 ## Deploy
 
