@@ -155,7 +155,8 @@ git commit -m "Update project"
 git push origin main
 ```
 
-Ganti `USERNAME/NAMA-REPOSITORY` dengan alamat repository GitHub Anda. Sebelum menjalankan `git add .`, pastikan tidak ada `.env.local`, password, API key, atau credential lain yang muncul pada `git status`.
+Ganti `USERNAME/NAMA-REPOSITORY` dengan alamat repository GitHubmu. Sebelum menjalankan `git add .`, pastikan tidak ada `.env.local`, password, API key, atau credential lain yang muncul pada `git status`.
+jika anda belum memiliki git, cek di [Periksa-instalasi]("Periksa Instalasi")
 
 ## Deploy
 
