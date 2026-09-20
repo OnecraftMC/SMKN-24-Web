@@ -46,6 +46,28 @@ npm install
 
 Tidak perlu menjalankan `npm install` dari root karena file `package.json` berada di masing-masing aplikasi.
 
+## Instalasi shadcn/ui
+
+Jalankan inisialisasi shadcn/ui satu kali dari folder aplikasi yang akan menggunakannya. Script di setiap `package.json` menjalankan perintah `npx shadcn@latest init`.
+
+Untuk website utama:
+
+```bash
+cd apps/main-web
+npm install
+npm run shadcn:init
+```
+
+Untuk dashboard admin:
+
+```bash
+cd apps/admin
+npm install
+npm run shadcn:init
+```
+
+Ikuti inisiasi shadcn/ui sampai selesai. Jalankan perintah dari folder aplikasi terkait agar `components.json`, dependensi, dan konfigurasi dibuat pada aplikasi yang benar. Perintah ini tidak perlu dijalankan setiap kali development server dimulai.
+
 ## Environment Variable
 
 Dashboard admin memerlukan URL website utama. Dari folder `apps/admin`, salin file contoh.

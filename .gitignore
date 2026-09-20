@@ -36,6 +36,9 @@ pnpm-debug.log*
 *.tsbuildinfo
 .eslintcache
 /apps/main-web/template and promt
+template login admin.txt
+komponen navbar.md
+template dashboard admin.txt
 
 # Local certificates and private keys
 *.pem

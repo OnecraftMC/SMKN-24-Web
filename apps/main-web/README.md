@@ -14,6 +14,32 @@ pnpm dev
 bun dev
 ```
 
+## Instalasi shadcn/ui
+
+Setelah masuk ke folder `apps/main-web` dan menjalankan `npm install`, jalankan inisialisasi satu kali:
+
+```bash
+npm run shadcn:init
+```
+
+Script tersebut menjalankan `npx shadcn@latest init`. Ikuti prompt interaktif sampai selesai agar konfigurasi dan dependensi dibuat untuk website utama. Jangan menjalankan perintah ini dari root repository atau dari folder `apps/admin`.
+
+## Instalasi Dependensi UI
+
+Khusus untuk website utama, jalankan dari folder `apps/main-web`:
+
+```bash
+npm run ui:install
+```
+
+Script tersebut menjalankan:
+
+```bash
+npm i clsx lucide-react motion tailwind-merge
+```
+
+Perintah ini tidak perlu dijalankan dari folder `apps/admin`.
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.

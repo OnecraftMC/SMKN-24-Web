@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
+import PillNavIndicator from "./PillNavIndicator";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -81,31 +82,10 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <nav className="hidden lg:flex items-center gap-1">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`nav-tab-btn px-4 py-2 rounded-lg font-label-md text-label-md transition-all font-bold ${
-                isActive(link.href)
-                  ? "bg-surface-container text-primary shadow-sm"
-                  : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
-          <Link
-            href="/fasilitas"
-            className={`nav-tab-btn px-4 py-2 rounded-lg font-label-md text-label-md transition-all ${
-              pathname === "/fasilitas"
-                ? "bg-surface-container text-primary shadow-sm font-bold"
-                : "text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
-            }`}
-          >
-            Fasilitas
-          </Link>
-        </nav>
+        <PillNavIndicator
+          className="hidden lg:flex"
+          items={[...navLinks, { href: "/fasilitas", label: "Fasilitas" }]}
+        />
 
         <div className="flex items-center gap-space-sm">
           <a

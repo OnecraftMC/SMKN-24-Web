@@ -1,0 +1,6 @@
+# Larang akses langsung ke file .env dan .sql
+<FilesMatch "\.(env|sql|md)$">
+Require all denied
+</FilesMatch>
+
+Options -Indexes
