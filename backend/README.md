@@ -26,6 +26,9 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
      tempat menaruh API Key untuk fitur AI Chatbot.
    - Set `AI_PROVIDER` sesuai provider yang dipakai: `openai`, `gemini`, atau `anthropic`.
    - Ganti `JWT_SECRET` dengan string acak & rahasia.
+   - Set `APP_ENV=production` di server publik. Bila `APP_ENV=production` dan
+     `JWT_SECRET` masih kosong/default, seluruh endpoint menolak melayani request
+     (fail-fast) agar token tidak bisa dipalsukan.
 4. Buka `config/database.php` dan sesuaikan `DB_HOST`, `DB_USER`, `DB_PASS` jika
    berbeda dari default XAMPP (`root` / password kosong).
 5. Pastikan folder `uploads/` bisa ditulis oleh web server:
@@ -36,14 +39,30 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    frontend Next.js Anda (misalnya `http://localhost:3000` untuk development,
    atau domain produksi).
 
-## 3. Login Admin Default
+## 3. Membuat Akun Admin Pertama
 
-- Username: `admin`
-- Password: `admin123`
+`database.sql` **tidak lagi** menyisipkan akun admin default. Kredensial default
+yang mudah ditebak (dan hash lama yang tidak dapat diverifikasi) sudah dihapus,
+sehingga tidak ada akun yang salah dipakai tanpa sengaja.
 
-**Segera ganti password ini setelah instalasi** (update langsung di tabel
-`admin_users` dengan hash baru dari `password_hash()`, atau buat endpoint
-ganti password sendiri).
+Setelah import database, jalankan dari folder `backend`:
+
+```bash
+php tools/create-admin.php admin "PasswordKuatAnda" "Administrator Sekolah"
+```
+
+Perintah tersebut membuat akun baru atau memperbarui password akun yang sudah ada
+(hash dibuat dengan `password_hash()`, jadi pasti terverifikasi oleh login).
+Password minimal 8 karakter.
+
+Jika hanya butuh hash untuk `UPDATE` manual pada tabel `admin_users`:
+
+```bash
+php tools/hash-password.php "PasswordKuatAnda"
+```
+
+Kedua skrip hanya dapat dijalankan dari command line (`tools/.htaccess` menolak
+akses lewat browser). Jangan pernah menyimpan password asli di dalam repository.
 
 ## 4. Struktur Folder
 
@@ -63,6 +82,7 @@ backend/
 │   ├── jwt.php            <- JWT auth admin
 │   └── upload.php         <- upload gambar
 ├── uploads/               <- file gambar ter-upload (publik, tanpa eksekusi PHP)
+├── tools/                 <- skrip CLI (create-admin.php, hash-password.php)
 └── api/
     ├── auth/
     │   ├── login.php       POST   -> login admin, dapat JWT token
