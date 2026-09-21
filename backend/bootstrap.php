@@ -16,7 +16,16 @@ require_once __DIR__ . '/helpers/upload.php';
 applyCors();
 
 set_exception_handler(function (Throwable $e) {
-    jsonError('Terjadi kesalahan pada server', 500, [
-        'detail' => $e->getMessage(),
-    ]);
+    // Detail teknis hanya masuk ke log server — jangan dibocorkan ke klien.
+    error_log('[SMKN24] ' . get_class($e) . ': ' . $e->getMessage()
+        . ' @ ' . $e->getFile() . ':' . $e->getLine());
+    jsonError('Terjadi kesalahan pada server', 500);
 });
+
+// Di produksi, rahasia wajib diisi. Jangan pernah melayani request dengan nilai default.
+if (APP_ENV === 'production') {
+    if (JWT_SECRET === '' || str_starts_with(JWT_SECRET, 'ganti-dengan-secret')) {
+        error_log('[SMKN24] JWT_SECRET belum diisi di .env — server menolak melayani request.');
+        jsonError('Konfigurasi server belum lengkap. Hubungi administrator.', 500);
+    }
+}

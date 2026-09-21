@@ -14,6 +14,14 @@ require_once __DIR__ . '/env.php';
 loadEnv(__DIR__ . '/../.env');
 
 // -----------------------------------------------------------------------------
+// Lingkungan aplikasi
+// -----------------------------------------------------------------------------
+// "local"      -> pengembangan di komputer sendiri (default).
+// "production" -> server publik. Wajib diisi di .env; JWT_SECRET harus diisi juga,
+//                kalau tidak seluruh endpoint ditolak (lihat bootstrap.php).
+define('APP_ENV', env('APP_ENV', 'local'));
+
+// -----------------------------------------------------------------------------
 // AI Chatbot Provider Configuration
 // -----------------------------------------------------------------------------
 // Pilih provider: "openai" atau "gemini" atau "anthropic"

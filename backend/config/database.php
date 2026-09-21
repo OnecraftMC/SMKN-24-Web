@@ -25,12 +25,11 @@ function getDB(): PDO
         try {
             $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
         } catch (PDOException $e) {
+            // Detail teknis hanya ke log server (dapat memuat host/driver/nama database).
+            error_log('[SMKN24] Koneksi database gagal: ' . $e->getMessage());
             http_response_code(500);
             header('Content-Type: application/json');
-            echo json_encode([
-                'error' => 'Koneksi database gagal',
-                'detail' => $e->getMessage(),
-            ]);
+            echo json_encode(['error' => 'Koneksi database gagal']);
             exit;
         }
     }

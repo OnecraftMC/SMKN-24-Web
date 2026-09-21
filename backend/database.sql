@@ -19,11 +19,15 @@ CREATE TABLE IF NOT EXISTS admin_users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- Default admin: username = admin | password = admin123 (GANTI setelah instalasi!)
-INSERT INTO admin_users (username, password, nama, role) VALUES
-('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Administrator', 'admin')
-ON DUPLICATE KEY UPDATE username = username;
--- NB: hash di atas adalah bcrypt untuk "admin123"
+-- Akun admin TIDAK di-seed oleh skema ini.
+-- Alasan: hash bawaan sebelumnya tidak dapat diverifikasi (diduga bcrypt untuk
+-- "password", bukan "admin123" seperti komentar lamanya), sehingga kredensial
+-- default yang menyesatkan dan mudah ditebak sengaja dihapus.
+--
+-- Buat akun admin pertama SETELAH import, dari folder backend:
+--   php tools/create-admin.php admin "PasswordKuatAnda" "Administrator Sekolah"
+-- Butuh hash saja (untuk UPDATE manual)? Jalankan:
+--   php tools/hash-password.php "PasswordKuatAnda"
 
 -- -----------------------------------------------------------------------------
 -- Berita

@@ -34,9 +34,10 @@ try {
     $reply = generateAiReply($message, $history, $context);
 } catch (Throwable $e) {
     // Jika API key belum diisi / request ke provider gagal, tetap beri jawaban fallback
+    // Detail teknis cukup masuk log server — pengunjung publik hanya melihat pesan umum.
+    error_log('[SMKN24] Chat AI gagal: ' . $e->getMessage());
     $reply = "Maaf, asisten AI sedang tidak dapat diakses saat ini. "
-        . "Silakan hubungi bagian Tata Usaha SMKN 24 Jakarta untuk informasi lebih lanjut. "
-        . "(Detail teknis: " . $e->getMessage() . ")";
+        . "Silakan hubungi bagian Tata Usaha SMKN 24 Jakarta untuk informasi lebih lanjut.";
 }
 
 saveMessage($db, $sessionId, 'bot', $reply);
