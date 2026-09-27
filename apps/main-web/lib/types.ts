@@ -222,3 +222,21 @@ export interface ChatMessage {
   sender: 'user' | 'bot';
   text: string;
 }
+
+// ---------------------------------------------------------------------------
+// Jurusan (Kompetensi Keahlian)
+// ---------------------------------------------------------------------------
+// Dipakai di: apps/main-web/lib/data.ts (jurusanData),
+//   apps/main-web/components/jurusan/DaftarJurusan.tsx
+// `key` sengaja sama dengan JurusanKey (= ENUM kolom `jadwal.jurusan` di
+// backend) supaya kartu bisa menautkan ke /jurusan/<key> tanpa peta tambahan.
+
+export interface Jurusan {
+  key: JurusanKey;
+  nama: string;
+  deskripsi: string;
+  /** Nama ikon Material Symbols (font sudah dimuat di app/layout.tsx). */
+  ikon: string;
+  /** Kosong sampai foto kegiatan resmi ada di public/images/jurusan/<key>.jpg. */
+  gambar?: string;
+}

@@ -40,13 +40,15 @@ export interface BeritaDTO {
   id: number;
   judul: string;
   kategori: string;
-  /** Terformat ulang oleh backend, mis. "28 October 2024" (B2: akan menjadi ISO). */
+  /** String tampil dari backend, mis. "28 October 2024". Jangan dipakai untuk input date. */
   tanggal: string;
+  /** ISO "YYYY-MM-DD" untuk form edit; sejak perbaikan B2 dikirim backend. */
+  tanggalIso?: string;
   gambar: string | null;
   ringkasan: string | null;
   isi: string | null;
   status: BeritaStatus | null;
-  /** Flag highlight/headline. Belum dijamin tunggal oleh backend (B6). */
+  /** Flag highlight. Sejak B6 backend menegakkan hanya satu berita utama. */
   utama: boolean;
 }
 
@@ -58,7 +60,10 @@ export interface PengumumanDTO {
   id: number;
   judul: string;
   isi: string | null;
+  /** String tampil (bulan Inggris). Pakai `tanggalIso` untuk form. */
   tanggal: string;
+  /** ISO "YYYY-MM-DD" (perbaikan B2). */
+  tanggalIso?: string;
   kategori: string;
   penting: boolean;
   gambar: string | null;
@@ -72,7 +77,7 @@ export interface PengumumanDTO {
   actionIcon: string | null;
   /** Varian kartu beranda, mis. "secondary" | "default". */
   variant: string | null;
-  /** Belum dikirim oleh GET (perbaikan B3), padahal POST/PUT menerimanya. */
+  /** Sejak perbaikan B3 ikut dikirim pada response GET. */
   tampilBeranda?: boolean;
 }
 
@@ -95,9 +100,9 @@ export interface AgendaDTO {
   gambar: string | null;
   /** Diturunkan backend dari tgl_mulai untuk kartu beranda. */
   day: number;
-  /** Singkatan bulan bahasa Inggris, mis. "DEC" (B2: perlu versi Indonesia). */
+  /** Singkatan bulan bahasa Inggris, mis. "DEC" (frontend memformat sendiri jika perlu). */
   month: string;
-  /** Belum dikirim oleh GET, padahal POST/PUT menerimanya. */
+  /** Sejak perbaikan B3 ikut dikirim pada response GET. */
   tampilBeranda?: boolean;
 }
 

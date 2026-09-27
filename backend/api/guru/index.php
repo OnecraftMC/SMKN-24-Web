@@ -80,6 +80,12 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
+    // Eksistensi dicek dulu: rowCount() bisa 0 saat update tanpa perubahan,
+    // yang sebelumnya salah dilaporkan sebagai 404 "tidak ditemukan".
+    $exists = $db->prepare('SELECT id FROM guru WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Data guru tidak ditemukan', 404);
+
     $stmt = $db->prepare(
         'UPDATE guru SET nama=?, jabatan=?, deskripsi=?, kategori=?, gambar=?, urutan=? WHERE id=?'
     );
@@ -89,7 +95,6 @@ function handleUpdate(PDO $db): void
         $id,
     ]);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
     jsonResponse(['message' => 'Data guru berhasil diperbarui']);
 }
 
@@ -109,6 +114,15 @@ function validate(array $body): void
     foreach (['nama', 'jabatan', 'kategori'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
     }
+
+    // urutan guru bebas >= 0, tetapi harus bilangan bulat valid.
+    if (isset($body['urutan']) && $body['urutan'] !== '' && $body['urutan'] !== null) {
+        if (!is_numeric($body['urutan'])
+            || (int)$body['urutan'] != $body['urutan']
+            || (int)$body['urutan'] < 0) {
+            jsonError("Field 'urutan' harus bilangan bulat 0 atau lebih", 400);
+        }
+    }
 }
 
 function formatRow(array $row): array
@@ -120,5 +134,8 @@ function formatRow(array $row): array
         'deskripsi' => $row['deskripsi'],
         'kategori' => $row['kategori'],
         'gambar' => $row['gambar'],
+        // B4: ikut dikirim agar admin bisa mengurutkan; sebelumnya hanya
+        // diterima POST/PUT tapi tidak pernah dikembalikan oleh GET.
+        'urutan' => (int)$row['urutan'],
     ];
 }

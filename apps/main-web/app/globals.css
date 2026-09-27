@@ -9,18 +9,24 @@
 /* Token visual (warna, radius, spacing, tipografi) ada di
    packages/shared/tokens.css — diimpor di atas, dipakai bersama apps/admin. */
 
-
-@media (prefers-color-scheme: white) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme inline {
+  --font-headline-md: var(--font-plus-jakarta);
+  --font-title-md: var(--font-plus-jakarta);
+  --font-body-sm: var(--font-plus-jakarta);
+  --font-label-md: var(--font-plus-jakarta);
+  --font-headline-lg: var(--font-plus-jakarta);
+  --font-headline-sm: var(--font-plus-jakarta);
+  --font-label-sm: var(--font-plus-jakarta);
+  --font-headline-lg-mobile: var(--font-plus-jakarta);
+  --font-display-hero: var(--font-plus-jakarta);
+  --font-body-md: var(--font-plus-jakarta);
+  --font-display-hero-mobile: var(--font-plus-jakarta);
+  --font-body-lg: var(--font-plus-jakarta);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ========== Loading Animation Keyframes ========== */

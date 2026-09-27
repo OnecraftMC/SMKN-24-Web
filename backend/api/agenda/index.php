@@ -81,6 +81,12 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
+    // Eksistensi dicek dulu; rowCount() 0 saat nilai tidak berubah (mis. toggle
+    // tampilBeranda yang sudah sesuai) bukan 404 — sebelumnya bisa melempar error palsu.
+    $exists = $db->prepare('SELECT id FROM agenda WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Agenda tidak ditemukan', 404);
+
     $stmt = $db->prepare(
         'UPDATE agenda SET judul=?, tgl_mulai=?, tgl_selesai=?, waktu=?, lokasi=?, badge=?, deskripsi=?, gambar=?, tampil_beranda=?
          WHERE id=?'
@@ -93,7 +99,6 @@ function handleUpdate(PDO $db): void
         $id,
     ]);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
     jsonResponse(['message' => 'Agenda berhasil diperbarui']);
 }
 
@@ -112,6 +117,22 @@ function validate(array $body): void
 {
     foreach (['judul', 'tglMulai'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
+    }
+
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$body['tglMulai'])) {
+        jsonError("Field 'tglMulai' harus berformat YYYY-MM-DD", 400);
+    }
+
+    // Validasi rentang tanggal — sebelumnya tidak ada di backend (perbaikan B5),
+    // sehingga tanggal selesai yang mendahului tanggal mulai bisa tersimpan.
+    $tglSelesai = $body['tglSelesai'] ?? null;
+    if ($tglSelesai !== null && $tglSelesai !== '') {
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$tglSelesai)) {
+            jsonError("Field 'tglSelesai' harus berformat YYYY-MM-DD", 400);
+        }
+        if ($tglSelesai < $body['tglMulai']) {
+            jsonError('Tanggal selesai tidak boleh mendahului tanggal mulai', 400);
+        }
     }
 }
 
@@ -135,5 +156,7 @@ function formatRow(array $row): array
         'gambar' => $row['gambar'],
         'day' => (int)date('d', strtotime($row['tgl_mulai'])),
         'month' => strtoupper(date('M', strtotime($row['tgl_mulai']))),
+        // Belum pernah dikirim ke klien (perbaikan B3 untuk agenda).
+        'tampilBeranda' => (bool)$row['tampil_beranda'],
     ];
 }

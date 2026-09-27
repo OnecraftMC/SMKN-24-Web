@@ -82,22 +82,39 @@ function handleCreate(PDO $db): void
 
     $gambar = $body['gambar'] ?? null;
 
-    $stmt = $db->prepare(
-        'INSERT INTO berita (judul, kategori, tanggal, gambar, ringkasan, isi, status, utama)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
-    );
-    $stmt->execute([
-        $body['judul'],
-        $body['kategori'],
-        $body['tanggal'],
-        $gambar,
-        $body['ringkasan'] ?? '',
-        $body['isi'] ?? null,
-        $body['status'] ?? 'terbit',
-        !empty($body['utama']) ? 1 : 0,
-    ]);
+    $db->beginTransaction();
+    try {
+        // Kebijakan satu highlight (B6): berita utama lain dimatikan dalam
+        // transaksi yang sama supaya tidak pernah ada dua headline aktif.
+        if (!empty($body['utama'])) {
+            $db->exec('UPDATE berita SET utama = 0 WHERE utama = 1');
+        }
 
-    jsonResponse(['id' => (int)$db->lastInsertId(), 'message' => 'Berita berhasil ditambahkan'], 201);
+        $stmt = $db->prepare(
+            'INSERT INTO berita (judul, kategori, tanggal, gambar, ringkasan, isi, status, utama)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)'
+        );
+        $stmt->execute([
+            $body['judul'],
+            $body['kategori'],
+            $body['tanggal'],
+            $gambar,
+            $body['ringkasan'] ?? '',
+            $body['isi'] ?? null,
+            $body['status'] ?? 'terbit',
+            !empty($body['utama']) ? 1 : 0,
+        ]);
+
+        $id = (int)$db->lastInsertId();
+        $db->commit();
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $e;
+    }
+
+    jsonResponse(['id' => $id, 'message' => 'Berita berhasil ditambahkan'], 201);
 }
 
 function handleUpdate(PDO $db): void
@@ -110,24 +127,42 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validateBerita($body);
 
-    $stmt = $db->prepare(
-        'UPDATE berita SET judul = ?, kategori = ?, tanggal = ?, gambar = ?, ringkasan = ?, isi = ?, status = ?, utama = ?
-         WHERE id = ?'
-    );
-    $stmt->execute([
-        $body['judul'],
-        $body['kategori'],
-        $body['tanggal'],
-        $body['gambar'] ?? null,
-        $body['ringkasan'] ?? '',
-        $body['isi'] ?? null,
-        $body['status'] ?? 'terbit',
-        !empty($body['utama']) ? 1 : 0,
-        $id,
-    ]);
+    $db->beginTransaction();
+    try {
+        $exists = $db->prepare('SELECT id FROM berita WHERE id = ?');
+        $exists->execute([$id]);
+        if (!$exists->fetch()) {
+            $db->rollBack();
+            jsonError('Berita tidak ditemukan', 404);
+        }
 
-    if ($stmt->rowCount() === 0) {
-        jsonError('Berita tidak ditemukan atau tidak ada perubahan', 404);
+        if (!empty($body['utama'])) {
+            $db->prepare('UPDATE berita SET utama = 0 WHERE utama = 1 AND id <> ?')
+                ->execute([$id]);
+        }
+
+        $stmt = $db->prepare(
+            'UPDATE berita SET judul = ?, kategori = ?, tanggal = ?, gambar = ?, ringkasan = ?, isi = ?, status = ?, utama = ?
+             WHERE id = ?'
+        );
+        $stmt->execute([
+            $body['judul'],
+            $body['kategori'],
+            $body['tanggal'],
+            $body['gambar'] ?? null,
+            $body['ringkasan'] ?? '',
+            $body['isi'] ?? null,
+            $body['status'] ?? 'terbit',
+            !empty($body['utama']) ? 1 : 0,
+            $id,
+        ]);
+
+        $db->commit();
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) {
+            $db->rollBack();
+        }
+        throw $e;
     }
 
     jsonResponse(['message' => 'Berita berhasil diperbarui']);
@@ -158,6 +193,15 @@ function validateBerita(array $body): void
             jsonError("Field '$field' wajib diisi", 400);
         }
     }
+
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$body['tanggal'])) {
+        jsonError("Field 'tanggal' harus berformat YYYY-MM-DD", 400);
+    }
+
+    if (isset($body['status']) && $body['status'] !== ''
+        && !in_array($body['status'], ['draft', 'terbit'], true)) {
+        jsonError("Field 'status' harus 'draft' atau 'terbit'", 400);
+    }
 }
 
 function formatRow(array $row): array
@@ -167,6 +211,9 @@ function formatRow(array $row): array
         'judul' => $row['judul'],
         'kategori' => $row['kategori'],
         'tanggal' => date('d F Y', strtotime($row['tanggal'])),
+        // ISO mentah untuk form admin: komponen tampil memakai `tanggal`,
+        // input type="date" memakai `tanggalIso` (lihat laporan inspeksi B2).
+        'tanggalIso' => substr((string)$row['tanggal'], 0, 10),
         'gambar' => $row['gambar'],
         'ringkasan' => $row['ringkasan'],
         'isi' => $row['isi'] ?? null,

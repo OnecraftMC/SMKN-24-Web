@@ -4,6 +4,13 @@ import Navbar from '@/components/layout/Navbar';
 import { Footer } from '@/components/ui/footer-section';
 import ChatbotWidget from '@/components/chatbot/ChatbotWidget';
 import LoadingScreenProvider from '@/components/ui/LoadingScreenProvider';
+import { Plus_Jakarta_Sans } from 'next/font/google';
+
+const jakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'SMK Negeri 24 Jakarta',
@@ -16,9 +23,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id">
+    <html lang="id" className={jakartaSans.variable}>
       <head>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+        />
       </head>
       <body className="bg-surface text-on-surface">
         <LoadingScreenProvider>

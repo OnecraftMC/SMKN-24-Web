@@ -13,6 +13,30 @@ export const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/backend"
 ).replace(/\/+$/, "");
 
+/** Origin backend tanpa path — dipakai menyusun URL file upload. */
+export const API_ORIGIN = (() => {
+  try {
+    return new URL(API_BASE_URL).origin;
+  } catch {
+    return API_BASE_URL;
+  }
+})();
+
+/**
+ * URL gambar yang disimpan backend berbentuk path relatif
+ * (`/backend/uploads/xxx.jpg`), jadi perlu ditempel ke origin backend.
+ * URL absolut/data-URI dikembalikan apa adanya.
+ */
+export function assetUrl(path: string | null | undefined): string | null {
+  if (!path) {
+    return null;
+  }
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("/logo")) {
+    return path;
+  }
+  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
+}
+
 export const TOKEN_STORAGE_KEY = "smkn24-admin-token";
 
 export class ApiError extends Error {
@@ -116,6 +140,59 @@ export async function apiRequest<T>(
       "Respons server tidak berformat JSON. Periksa log backend.",
       response.status,
     );
+  }
+
+  return parsed as T;
+}
+
+/**
+ * Upload file multipart (mis. gambar). Tidak memakai apiRequest karena body
+ * harus FormData tanpa header Content-Type manual (boundary diisi browser).
+ */
+export async function apiUpload<T>(
+  path: string,
+  formData: FormData,
+  options: { token?: string | null; signal?: AbortSignal } = {},
+): Promise<T> {
+  const token = options.token === undefined ? getStoredToken() : options.token;
+
+  const headers: Record<string, string> = { Accept: "application/json" };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers,
+      body: formData,
+      signal: options.signal,
+      cache: "no-store",
+    });
+  } catch {
+    throw new ApiError(
+      `Tidak dapat menghubungi server di ${API_BASE_URL}. Periksa koneksi, URL backend, dan CORS.`,
+      0,
+    );
+  }
+
+  const rawBody = await response.text();
+  let parsed: unknown = null;
+  if (rawBody) {
+    try {
+      parsed = JSON.parse(rawBody);
+    } catch {
+      parsed = null;
+    }
+  }
+
+  if (!response.ok) {
+    throw new ApiError(readErrorMessage(parsed, response.status), response.status);
+  }
+
+  if (parsed === null) {
+    throw new ApiError("Respons server tidak berformat JSON. Periksa log backend.", response.status);
   }
 
   return parsed as T;

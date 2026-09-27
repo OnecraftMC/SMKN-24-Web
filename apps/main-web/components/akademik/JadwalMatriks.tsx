@@ -1,91 +1,80 @@
 "use client";
 
 import { useState } from "react";
-import type { JurusanKey, JadwalData } from "@/lib/types";
 
-const JADWAL_DATA: JadwalData = {
-  perhotelan: {
-    pagi: ['Front Office', 'Housekeeping', 'F&B Service', 'Bahasa Inggris Profesi', 'Tata Graha'],
-    siang: ['Praktik Hotel Training', 'Praktik Hotel Training', 'Simulasi Check-in/out', 'Etika Pelayanan Tamu', 'Praktik Tata Hidang']
-  },
-  boga: {
-    pagi: ['Pengolahan Makanan Indonesia', 'Pengolahan Kue & Roti', 'Sanitasi Hygiene', 'Bahasa Inggris Profesi', 'Pengolahan Makanan Kontinental'],
-    siang: ['Praktik Dapur Produksi', 'Praktik Dapur Produksi', 'Pengelolaan Usaha Boga', 'Plating & Garnish', 'Praktik Pastry']
-  },
-  busana: {
-    pagi: ['Dasar Pola', 'Desain Busana', 'Tekstil', 'Bahasa Inggris Profesi', 'Menjahit Busana Custom'],
-    siang: ['Praktik Menjahit', 'Praktik Menjahit', 'Pembuatan Pola Industri', 'Grading & Finishing', 'Praktik Produksi Garmen']
-  },
-  pplg: {
-    pagi: ['Pemrograman Web', 'Basis Data', 'Pemrograman Berorientasi Objek', 'Bahasa Inggris Profesi', 'Pengembangan Gim'],
-    siang: ['Praktik Lab Komputer', 'Praktik Lab Komputer', 'Proyek Aplikasi Mobile', 'Jaringan Dasar', 'Praktik UI/UX']
-  },
-  pariwisata: {
-    pagi: ['Pengetahuan Pariwisata', 'Pemanduan Wisata', 'Ticketing & Reservasi', 'Bahasa Inggris Profesi', 'Geografi Pariwisata'],
-    siang: ['Praktik Tur Simulasi', 'Praktik Tur Simulasi', 'Pengelolaan Biro Perjalanan', 'Public Speaking', 'Studi Ekskursi']
-  }
-};
+export type JadwalMatriksData = {
+  id: number;
+  jurusan: string;
+  tingkat: string;
+  hari: string;
+  jam_mulai: string;
+  jam_selesai: string;
+  mata_pelajaran: string;
+  guru: string;
+  ruang: string;
+}[];
 
-export default function JadwalMatriks() {
-  const [jurusan, setJurusan] = useState<JurusanKey>('perhotelan');
-  const data = JADWAL_DATA[jurusan] || JADWAL_DATA.perhotelan;
+export default function JadwalMatriks({
+  jadwal,
+  error,
+}: {
+  jadwal: JadwalMatriksData;
+  error: string | null;
+}) {
+  const jurusanList = Array.from(new Set(jadwal.map((item) => item.jurusan)));
+  const [selectedJurusan, setSelectedJurusan] = useState(jurusanList[0] ?? "");
+  const filtered = jadwal.filter((item) => item.jurusan === selectedJurusan);
 
   return (
-    <div className="w-full py-space-3xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
-      <div className="max-w-container-max mx-auto space-y-space-xl">
-        <div>
-          <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Jadwal Pelajaran</span>
-          <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Matriks Jadwal Interaktif</h2>
-        </div>
+    <section className="max-w-5xl mx-auto py-16 px-4">
+      <h2 className="text-3xl font-bold mb-2">Jadwal Pelajaran</h2>
+      <p className="text-gray-600 mb-6">Jadwal pembelajaran berdasarkan program keahlian.</p>
 
-        <div className="flex flex-wrap items-center gap-space-md mb-4">
-          <label htmlFor="jurusan-select" className="font-label-sm font-bold text-primary">Pilih Program Keahlian:</label>
+      {jurusanList.length > 0 && (
+        <label className="mb-6 flex flex-col gap-2 font-medium">
+          Program Keahlian
           <select
-            id="jurusan-select"
-            value={jurusan}
-            onChange={(e) => setJurusan(e.target.value as JurusanKey)}
-            className="px-4 py-2 rounded-lg border border-surface-container bg-surface-container-low text-on-surface"
+            value={selectedJurusan}
+            onChange={(event) => setSelectedJurusan(event.target.value)}
+            className="max-w-md rounded-lg border border-gray-300 bg-white px-4 py-3"
           >
-            <option value="perhotelan">Perhotelan</option>
-            <option value="boga">Kuliner (Tata Boga)</option>
-            <option value="busana">Tata Busana</option>
-            <option value="pplg">Rekayasa Perangkat Lunak</option>
-            <option value="pariwisata">Usaha Layanan Pariwisata</option>
+            {jurusanList.map((jurusan) => <option key={jurusan}>{jurusan}</option>)}
           </select>
-        </div>
+        </label>
+      )}
 
-        <div className="overflow-x-auto rounded-2xl border border-surface-container shadow-sm">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-primary text-surface">
+      {filtered.length > 0 ? (
+        <div className="overflow-x-auto rounded-xl border border-gray-200">
+          <table className="w-full min-w-[720px] text-left text-sm">
+            <thead className="bg-primary text-white">
               <tr>
-                <th className="px-4 py-3 font-label-sm font-bold">Sesi</th>
-                <th className="px-4 py-3 font-label-sm font-bold">Pukul 07.30 - 08.30</th>
-                <th className="px-4 py-3 font-label-sm font-bold">Pukul 08.30 - 09.30</th>
-                <th className="px-4 py-3 font-label-sm font-bold">Pukul 09.30 - 10.30</th>
-                <th className="px-4 py-3 font-label-sm font-bold">Pukul 10.30 - 11.30</th>
-                <th className="px-4 py-3 font-label-sm font-bold">Pukul 11.30 - 12.30</th>
+                <th className="p-3">Hari</th>
+                <th className="p-3">Waktu</th>
+                <th className="p-3">Tingkat</th>
+                <th className="p-3">Mata Pelajaran</th>
+                <th className="p-3">Guru</th>
+                <th className="p-3">Ruang</th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-surface-container">
-                <td className="px-4 py-3 font-bold bg-surface-container-low">Pagi</td>
-                {data.pagi.map((item: string, idx: number) => (
-                  <td key={idx} className="px-4 py-3"><span className="font-bold text-primary">{item}</span></td>
-                ))}
-              </tr>
-              <tr>
-                <td className="px-4 py-3 font-bold bg-surface-container-low">Siang</td>
-                {data.siang.map((item: string, idx: number) => (
-                  <td key={idx} className="px-4 py-3">
-                    <span className="font-bold text-primary">{item}</span>
-                    <br/><span className="text-xs text-on-surface-variant">Praktik Kejuruan</span>
-                  </td>
-                ))}
-              </tr>
+              {filtered.map((item) => (
+                <tr key={item.id} className="border-t border-gray-200">
+                  <td className="p-3">{item.hari}</td>
+                  <td className="p-3">{item.jam_mulai}–{item.jam_selesai}</td>
+                  <td className="p-3">{item.tingkat}</td>
+                  <td className="p-3">{item.mata_pelajaran}</td>
+                  <td className="p-3">{item.guru}</td>
+                  <td className="p-3">{item.ruang}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
+      ) : (
+        <p className="rounded-xl border border-gray-200 p-6 text-gray-600" role="status">
+          {error ? `Jadwal belum dapat dimuat: ${error}` : "Belum ada jadwal pembelajaran."}
+        </p>
+      )}
+    </section>
   );
 }

@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
 import PillNavIndicator from "./PillNavIndicator";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const pathname = usePathname();
+  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
 
   const navLinks = [
     { href: "/", label: "Beranda", icon: "home" },
@@ -18,12 +17,8 @@ export default function Navbar() {
     { href: "/kabar", label: "Galeri", icon: "newspaper" },
     { href: "/jurusan", label: "Jurusan", icon: "school" },
     { href: "/berita", label: "Berita", icon: "article" },
+    { href: "/fasilitas", label: "Fasilitas", icon: "apartment" },
   ];
-
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
-  };
 
   return (
     <header className="fixed top-0 left-0 right-0 w-full z-50 bg-surface-container-lowest/95 backdrop-blur-xl shadow-[0_1px_8px_rgba(15,41,74,0.06)]">
@@ -49,13 +44,13 @@ export default function Navbar() {
               Terakreditasi A
             </span>
             <span className="hidden sm:inline text-surface-container-high">BAN-S/M</span>
-            <Link
-              href="/login"
+            <a
+              href={adminUrl}
               className="hidden sm:inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold shadow-sm hover:bg-secondary-fixed-dim transition-all"
             >
               <span>Login</span>
               <span className="material-symbols-outlined text-[16px]">login</span>
-            </Link>
+            </a>
           </div>
         </div>
       </div>
@@ -84,7 +79,7 @@ export default function Navbar() {
         {/* Desktop nav links */}
         <PillNavIndicator
           className="hidden lg:flex"
-          items={[...navLinks, { href: "/fasilitas", label: "Fasilitas" }]}
+          items={navLinks}
         />
 
         <div className="flex items-center gap-space-sm">

@@ -84,6 +84,12 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
+    // Eksistensi dicek dulu; rowCount() 0 saat nilai tidak berubah (mis. toggle
+    // tampilBeranda yang sudah sesuai) bukan 404 — sebelumnya bisa melempar error palsu.
+    $exists = $db->prepare('SELECT id FROM pengumuman WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Pengumuman tidak ditemukan', 404);
+
     $stmt = $db->prepare(
         'UPDATE pengumuman SET judul=?, isi=?, tanggal=?, kategori=?, penting=?, gambar=?, badge=?, status=?, link_label=?, link_href=?, icon=?, action_icon=?, variant=?, tampil_beranda=?
          WHERE id=?'
@@ -98,7 +104,6 @@ function handleUpdate(PDO $db): void
         $id,
     ]);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
     jsonResponse(['message' => 'Pengumuman berhasil diperbarui']);
 }
 
@@ -118,6 +123,10 @@ function validate(array $body): void
     foreach (['judul', 'tanggal', 'kategori'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
     }
+
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$body['tanggal'])) {
+        jsonError("Field 'tanggal' harus berformat YYYY-MM-DD", 400);
+    }
 }
 
 function formatRow(array $row): array
@@ -127,6 +136,8 @@ function formatRow(array $row): array
         'judul' => $row['judul'],
         'isi' => $row['isi'],
         'tanggal' => date('d F Y', strtotime($row['tanggal'])),
+        // ISO mentah untuk form admin (B2); `tanggal` tetap untuk tampilan.
+        'tanggalIso' => substr((string)$row['tanggal'], 0, 10),
         'kategori' => $row['kategori'],
         'penting' => (bool)$row['penting'],
         'gambar' => $row['gambar'],
@@ -137,5 +148,8 @@ function formatRow(array $row): array
         'icon' => $row['icon'],
         'actionIcon' => $row['action_icon'],
         'variant' => $row['variant'],
+        // Sebelumnya tidak dikirim ke klien sehingga toggle "tampil di beranda"
+        // tidak bisa dibaca admin (perbaikan B3).
+        'tampilBeranda' => (bool)$row['tampil_beranda'],
     ];
 }

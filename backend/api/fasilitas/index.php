@@ -66,10 +66,14 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
+    // Eksistensi dicek dulu; rowCount() 0 saat tidak ada perubahan bukan 404.
+    $exists = $db->prepare('SELECT id FROM fasilitas WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Fasilitas tidak ditemukan', 404);
+
     $stmt = $db->prepare('UPDATE fasilitas SET judul=?, deskripsi=?, gambar=? WHERE id=?');
     $stmt->execute([$body['judul'], $body['deskripsi'] ?? '', $body['gambar'] ?? null, $id]);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
     jsonResponse(['message' => 'Fasilitas berhasil diperbarui']);
 }
 

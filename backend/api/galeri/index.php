@@ -75,10 +75,14 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
+    // Eksistensi dicek dulu; rowCount() 0 saat tidak ada perubahan bukan 404.
+    $exists = $db->prepare('SELECT id FROM galeri WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Galeri tidak ditemukan', 404);
+
     $stmt = $db->prepare('UPDATE galeri SET judul=?, kategori=?, gambar=? WHERE id=?');
     $stmt->execute([$body['judul'], $body['kategori'], $body['gambar'], $id]);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
     jsonResponse(['message' => 'Galeri berhasil diperbarui']);
 }
 

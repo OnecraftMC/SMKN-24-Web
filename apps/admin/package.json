@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:backend": "php -S localhost:8000 -t ../../backend",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

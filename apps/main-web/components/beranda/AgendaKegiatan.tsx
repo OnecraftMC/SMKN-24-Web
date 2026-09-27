@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { agendaBerandaData as agendaData } from "@/lib/data";
+import type { AgendaView } from "../../../../packages/shared/mappers";
 
-export default function AgendaKegiatan() {
+export default function AgendaKegiatan({
+  agenda,
+  error,
+}: {
+  agenda: AgendaView[];
+  error: string | null;
+}) {
   return (
     <section className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
@@ -24,7 +30,7 @@ export default function AgendaKegiatan() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
-          {agendaData.map((item) => (
+          {agenda.map((item) => (
             <div
               key={item.id}
               className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all flex items-start gap-space-md border border-surface-container"
@@ -50,6 +56,11 @@ export default function AgendaKegiatan() {
               </div>
             </div>
           ))}
+          {agenda.length === 0 && (
+            <p className="md:col-span-3 rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+              {error ? `Agenda belum dapat dimuat: ${error}` : "Belum ada agenda yang ditampilkan."}
+            </p>
+          )}
         </div>
       </div>
     </section>

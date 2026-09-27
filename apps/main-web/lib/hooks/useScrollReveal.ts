@@ -7,7 +7,7 @@ export function useScrollReveal<T extends HTMLElement>(options?: {
   rootMargin?: string;
 }) {
   const ref = useRef<T | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     const element = ref.current;
@@ -20,6 +20,11 @@ export function useScrollReveal<T extends HTMLElement>(options?: {
     if (prefersReducedMotion) {
       const frame = requestAnimationFrame(() => setIsVisible(true));
       return () => cancelAnimationFrame(frame);
+    }
+
+    if (!("IntersectionObserver" in window)) return;
+    if (element.getBoundingClientRect().top >= window.innerHeight) {
+      setIsVisible(false);
     }
 
     const observer = new IntersectionObserver(

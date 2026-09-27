@@ -15,23 +15,16 @@ interface MobileMenuProps {
   navLinks: NavLink[];
 }
 
-export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProps) {
   const pathname = usePathname();
-
-  const navLinks = [
-    { href: "/", label: "Beranda", icon: "home" },
-    { href: "/profil", label: "Profil Sekolah", icon: "domain" },
-    { href: "/akademik", label: "Akademik & Jadwal", icon: "calendar_month" },
-    { href: "/kabar", label: "Kabar & Galeri", icon: "newspaper" },
-    { href: "/fasilitas", label: "Fasilitas & Kampus", icon: "apartment" },
-  ];
+  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || 'http://localhost:3001';
 
   if (!isOpen) return null;
 
   return (
     <div className="lg:hidden border-t border-surface-container bg-surface-container-lowest px-margin-mobile py-space-sm shadow-xl space-y-1">
       {navLinks.map((link) => {
-        const isActive = link.href === pathname;
+        const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
         return (
           <Link
             key={link.href}
@@ -53,6 +46,13 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         target="_blank"
       >
         SPMB Online
+      </a>
+      <a
+        href={adminUrl}
+        onClick={onClose}
+        className="block w-full text-center mt-2 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md font-bold"
+      >
+        Login Admin
       </a>
       <Link
         href="/#lokasi-sekolah"

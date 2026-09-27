@@ -36,7 +36,9 @@ function handleGet(PDO $db): void
     if (isset($_GET['admin'])) {
         requireAuth();
         $stmt = $db->query('SELECT * FROM jadwal ORDER BY jurusan, sesi, urutan');
-        jsonResponse($stmt->fetchAll());
+        // Baris PDO mentah mengirim id/urutan sebagai string — petakan dulu
+        // agar cocok dengan kontrak DTO admin (temuan A19, laporan inspeksi).
+        jsonResponse(array_map('formatAdminRow', $stmt->fetchAll()));
         return;
     }
 
@@ -73,6 +75,12 @@ function handleUpsert(PDO $db): void
     if (!in_array($body['sesi'], ['pagi', 'siang'], true)) {
         jsonError('Sesi harus pagi atau siang', 400);
     }
+    // urutan = posisi kolom ke-0..4 pada matriks 5 kolom; tolak nilai di luar
+    // rentang atau bukan bilangan bulat sebelum menyentuh kolom INT.
+    if (!preg_match('/^\d+$/', (string)$body['urutan'])
+        || (int)$body['urutan'] < 0 || (int)$body['urutan'] > 4) {
+        jsonError("Field 'urutan' harus integer antara 0 dan 4", 400);
+    }
 
     $stmt = $db->prepare(
         'INSERT INTO jadwal (jurusan, sesi, urutan, mapel, jam, waktu, guru)
@@ -96,4 +104,23 @@ function handleDelete(PDO $db): void
     $stmt->execute([$id]);
     if ($stmt->rowCount() === 0) jsonError('Data jadwal tidak ditemukan', 404);
     jsonResponse(['message' => 'Jadwal berhasil dihapus']);
+}
+
+/**
+ * Bentuk baris jadwal untuk konsumen admin (`?admin=1`).
+ * PDO mengembalikan id/urutan sebagai string; petakan ke integer agar cocok
+ * dengan JadwalRowDTO di aplikasi admin (temuan A19).
+ */
+function formatAdminRow(array $row): array
+{
+    return [
+        'id' => (int)$row['id'],
+        'jurusan' => $row['jurusan'],
+        'sesi' => $row['sesi'],
+        'urutan' => (int)$row['urutan'],
+        'mapel' => $row['mapel'],
+        'jam' => $row['jam'],
+        'waktu' => $row['waktu'],
+        'guru' => $row['guru'],
+    ];
 }

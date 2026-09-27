@@ -1,7 +1,13 @@
 import Link from "next/link";
-import { pengumumanBerandaData as pengumumanData } from "@/lib/data";
+import type { PengumumanView } from "../../../../packages/shared/mappers";
 
-export default function PapanPengumuman() {
+export default function PapanPengumuman({
+  pengumuman,
+  error,
+}: {
+  pengumuman: PengumumanView[];
+  error: string | null;
+}) {
   return (
     <div className="lg:col-span-5 space-y-space-lg">
       <div>
@@ -15,7 +21,7 @@ export default function PapanPengumuman() {
       </div>
 
       <div className="space-y-space-sm">
-        {pengumumanData.map((item) => (
+        {pengumuman.map((item) => (
           <div
             key={item.id}
             className={`p-space-md rounded-2xl ${
@@ -32,7 +38,7 @@ export default function PapanPengumuman() {
                     : "bg-primary text-surface"
                 }`}
               >
-                {item.badge}
+                {item.badge || item.kategori}
               </span>
               {item.status && (
                 <span className="font-body-sm text-body-sm text-secondary font-bold text-xs">
@@ -44,18 +50,25 @@ export default function PapanPengumuman() {
             <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
               {item.deskripsi}
             </p>
-            <Link
-              href={item.linkHref}
-              className="mt-space-sm pt-space-xs flex items-center justify-between text-xs text-secondary font-bold cursor-pointer"
-            >
-              <span className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">{item.icon}</span>
-                {item.linkLabel}
-              </span>
-              <span className="material-symbols-outlined text-[18px]">{item.actionIcon}</span>
-            </Link>
+            {item.linkHref && item.linkLabel && (
+              <Link
+                href={item.linkHref}
+                className="mt-space-sm pt-space-xs flex items-center justify-between text-xs text-secondary font-bold cursor-pointer"
+              >
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">{item.icon || "info"}</span>
+                  {item.linkLabel}
+                </span>
+                <span className="material-symbols-outlined text-[18px]">{item.actionIcon || "arrow_forward"}</span>
+              </Link>
+            )}
           </div>
         ))}
+        {pengumuman.length === 0 && (
+          <p className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+            {error ? `Pengumuman belum dapat dimuat: ${error}` : "Belum ada pengumuman aktif."}
+          </p>
+        )}
       </div>
     </div>
   );

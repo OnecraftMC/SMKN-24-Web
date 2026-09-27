@@ -1,3 +1,5 @@
+import type { Jurusan } from "./types";
+
 export const beritaData = [
   {
     id: 1,
@@ -176,5 +178,43 @@ export const galeriData = [
     judul: "Upacara Hari Kebangkitan Nasional",
     kategori: "Kegiatan",
     gambar: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAKaA+gDASIAAhEBAxEB/8QAHQAAAQUBAQEBAAAAAAAAAAAABQIDBAYHAQAICf/EAEwQAAIBAwMCBAQCBwYFAwICCwECAwAEEQUSIQYxEyJBUQcUYXEygRUjQlKRobEIJDNicsEWJTQ10UPh8ReT/8QAIBAAAgMBAQEBAQEAAAAAAAAAAAECAxEEBQYHEAAICAwEAAgMBAAM=",
+  },
+];
+
+export const jurusanData: Jurusan[] = [
+  {
+    key: "perhotelan",
+    nama: "Perhotelan",
+    deskripsi:
+      "Front office, housekeeping, dan F&B service dengan praktik di kamar simulasi standar hotel bintang.",
+    ikon: "hotel",
+  },
+  {
+    key: "boga",
+    nama: "Kuliner (Tata Boga)",
+    deskripsi:
+      "Pengolahan makanan Indonesia dan kontinental, pastry, serta sanitasi hygiene di dapur produksi.",
+    ikon: "restaurant",
+  },
+  {
+    key: "busana",
+    nama: "Tata Busana",
+    deskripsi:
+      "Dasar pola, desain busana, sampai produksi garmen di ruang busana dan sanggar jahit.",
+    ikon: "checkroom",
+  },
+  {
+    key: "pplg",
+    nama: "Rekayasa Perangkat Lunak",
+    deskripsi:
+      "Pemrograman web, basis data, dan pengembangan gim di laboratorium komputer yang terhubung jaringan.",
+    ikon: "code",
+  },
+  {
+    key: "pariwisata",
+    nama: "Usaha Layanan Pariwisata",
+    deskripsi:
+      "Pemanduan wisata, ticketing & reservasi, serta pengelolaan biro perjalanan.",
+    ikon: "travel_explore",
   },
 ];

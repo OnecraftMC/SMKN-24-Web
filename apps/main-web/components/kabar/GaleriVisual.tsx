@@ -1,15 +1,15 @@
 import Image from "next/image";
+import type { GaleriView } from "../../../../packages/shared/mappers";
 
-const galeriData = [
-  {
-    id: 1,
-    title: "Upacara Hari Kebangkitan Nasional",
-    category: "kegiatan",
-    image: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAKaA+gDASIAAhEBAxEB/8QAHQAAAQUBAQEBAAAAAAAAAAAABQIDBAYHAQAICf/EAEwQAAIBAwMCBAQCBwYFAwICCwECAwAEEQUSIQYxEyJBUQcUYXEygRUjQlKRobEIJDNicsEWJTQ10UPh8ReT/8QAIBAAAgMBAQEBAQEAAAAAAAAAAAECAxEEBQYHEAAICAwEAAgMBAAM=",
-  },
-];
+export default function GaleriVisual({
+  galeri,
+  error,
+}: {
+  galeri: GaleriView[];
+  error: string | null;
+}) {
+  const columns = galeri.length >= 4 ? "md:grid-cols-4" : "md:grid-cols-2";
 
-export default function GaleriVisual() {
   return (
     <div className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
@@ -19,18 +19,27 @@ export default function GaleriVisual() {
             <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Dokumentasi Momen Emas Siswa</h2>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {galeriData.map((item) => (
-            <div key={item.id} className="galeri-card group relative rounded-3xl overflow-hidden aspect-[3/4] border border-surface-container shadow-md cursor-pointer">
-<Image
+        <div className={`grid grid-cols-1 ${columns} gap-4`}>
+          {galeri.map((item) => (
+            <div key={item.id} className="galeri-card group relative rounded-3xl overflow-hidden aspect-[3/4] border border-surface-container shadow-md">
+              <Image
                 src={item.image}
                 alt={item.title}
-                width={300}
-                height={400}
+                width={600}
+                height={800}
+                sizes={galeri.length >= 4 ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 50vw"}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
+              <span className="absolute bottom-0 inset-x-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
+                {item.title}
+              </span>
             </div>
           ))}
+          {galeri.length === 0 && (
+            <p className="col-span-full rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+              {error ? `Galeri belum dapat dimuat: ${error}` : "Belum ada dokumentasi."}
+            </p>
+          )}
         </div>
       </div>
     </div>

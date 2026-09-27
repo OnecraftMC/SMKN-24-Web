@@ -13,11 +13,24 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
 
 1. Salin folder `backend/` ini ke server (contoh: `htdocs/backend` di XAMPP/Laragon,
    atau `public_html/backend` di hosting).
-2. Buat database dan import skema:
-   ```bash
-   mysql -u root -p -e "CREATE DATABASE smkn24 CHARACTER SET utf8mb4"
-   mysql -u root -p smkn24 < database.sql
-   ```
+  Untuk development tanpa Apache, jalankan dari folder `apps/admin`:
+  ```bash
+  npm run dev:backend
+  ```
+  Perintah ini menyajikan backend di `http://localhost:8000`; sesuaikan
+  `NEXT_PUBLIC_API_URL` pada `apps/admin/.env.local` bila memakai URL lain.
+2. Buat database, lalu import skema:
+   - Lokal (XAMPP/Laragon):
+     ```bash
+     mysql -u root -p -e "CREATE DATABASE smkn24 CHARACTER SET utf8mb4"
+     mysql -u root -p smkn24 < database.sql
+     ```
+   - Shared hosting (mis. Hostinger): buat database dari hPanel, lalu import
+     `database.sql` lewat phpMyAdmin dengan database tersebut terpilih.
+     Sebelum import, **hapus dua baris pembuka** pada `database.sql`
+     (`CREATE DATABASE ...` dan `USE ...`) — shared hosting menolak perintah
+     pembuatan database dari user biasa. Pastikan collation database
+     `utf8mb4_unicode_ci`.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
@@ -29,8 +42,21 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    - Set `APP_ENV=production` di server publik. Bila `APP_ENV=production` dan
      `JWT_SECRET` masih kosong/default, seluruh endpoint menolak melayani request
      (fail-fast) agar token tidak bisa dipalsukan.
-4. Buka `config/database.php` dan sesuaikan `DB_HOST`, `DB_USER`, `DB_PASS` jika
-   berbeda dari default XAMPP (`root` / password kosong).
+   - Isi bagian **`DB_*`** sesuai tempat database berada (komentar lengkap ada di
+     `.env.example`):
+     - Lokal: `DB_HOST=localhost`, `DB_NAME=smkn24`, `DB_USER=root`,
+       `DB_PASS=` kosong (default XAMPP).
+     - Hostinger, PHP di hosting yang sama: `DB_HOST=localhost`,
+       `DB_NAME=u104889167_admin_dash_24`, `DB_USER=u104889167_admin24`,
+       `DB_PASS=` password database dari hPanel.
+      - Hostinger, remote dari komputer lain: aktifkan **Remote MySQL** di hPanel
+        (Websites → Dashboard → sidebar "Remote MySQL"), whitelist IP publik
+        komputer Anda, pilih database, lalu pakai `DB_HOST` = hostname MySQL yang
+        tampil di halaman itu (format `srv*.hstgr.io`, bukan URL phpMyAdmin) dan
+        `DB_PORT=3306`. Ingat: IP ISP bisa berubah sehingga whitelist perlu
+        diperbarui.
+4. Kredensial database dibaca dari `.env` (langkah 3) — `config/database.php`
+   tidak perlu diubah lagi.
 5. Pastikan folder `uploads/` bisa ditulis oleh web server:
    ```bash
    chmod -R 755 uploads
@@ -38,6 +64,14 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
 6. Buka `config/config.php` bagian `ALLOWED_ORIGINS` dan tambahkan domain
    frontend Next.js Anda (misalnya `http://localhost:3000` untuk development,
    atau domain produksi).
+7. Uji koneksi database (lokal maupun remote):
+   ```bash
+   php tools/check-db.php
+   ```
+   Sukses menampilkan versi MySQL; gagal menampilkan penyebabnya (host/port
+   salah, whitelist Remote MySQL belum memuat IP Anda, user/password salah).
+   Port 3306 juga bisa diuji terpisah dari Windows:
+   `Test-NetConnection <host> -Port 3306`.
 
 ## 3. Membuat Akun Admin Pertama
 
