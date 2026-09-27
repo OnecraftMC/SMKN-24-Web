@@ -3,15 +3,20 @@ import JadwalMatriks from '@/components/akademik/JadwalMatriks';
 import KalenderUnduhan from '@/components/akademik/KalenderUnduhan';
 import FormBK from '@/components/akademik/FormBK';
 import { Reveal } from '@/components/ui/Reveal';
+import { backendAktif, getJadwal } from '@/lib/api';
+import { JADWAL_KOSONG, jadwalContoh } from '@/lib/fallback';
 
-export default function AkademikPage() {
+export default async function AkademikPage() {
+  const jadwalRes = await getJadwal();
+  const jadwal = jadwalRes.data ?? (!backendAktif() ? jadwalContoh() : JADWAL_KOSONG);
+
   return (
     <>
       <Reveal>
         <AkademikBanner />
       </Reveal>
       <Reveal>
-        <JadwalMatriks />
+        <JadwalMatriks jadwal={jadwal} error={jadwalRes.error} />
       </Reveal>
       <Reveal>
         <div className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">

@@ -1,18 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import type { JurusanKey } from "@/lib/types";
 
-export type JadwalMatriksData = {
-  id: number;
-  jurusan: string;
-  tingkat: string;
-  hari: string;
-  jam_mulai: string;
-  jam_selesai: string;
-  mata_pelajaran: string;
-  guru: string;
-  ruang: string;
-}[];
+/**
+ * Bentuk data mengikuti kontrak backend `GET api/jadwal/index.php`:
+ * `{ [jurusan]: { pagi: string[]; siang: string[] } }`.
+ * (Bentuk row-based dengan kolom hari/tingkat/ruang tidak ada di tabel `jadwal`.)
+ */
+export type JadwalMatriksData = Record<JurusanKey, { pagi: string[]; siang: string[] }>;
+
+const LABEL: Record<JurusanKey, string> = {
+  perhotelan: "Perhotelan",
+  boga: "Kuliner (Tata Boga)",
+  busana: "Tata Busana",
+  pplg: "Rekayasa Perangkat Lunak",
+  pariwisata: "Usaha Layanan Pariwisata",
+};
+
+const SESI = [
+  { key: "pagi", judul: "Sesi Pagi" },
+  { key: "siang", judul: "Sesi Siang" },
+] as const;
 
 export default function JadwalMatriks({
   jadwal,
@@ -21,60 +30,77 @@ export default function JadwalMatriks({
   jadwal: JadwalMatriksData;
   error: string | null;
 }) {
-  const jurusanList = Array.from(new Set(jadwal.map((item) => item.jurusan)));
-  const [selectedJurusan, setSelectedJurusan] = useState(jurusanList[0] ?? "");
-  const filtered = jadwal.filter((item) => item.jurusan === selectedJurusan);
+  const jurusanList = (Object.keys(jadwal) as JurusanKey[]).filter(
+    (key) => jadwal[key]?.pagi.length || jadwal[key]?.siang.length,
+  );
+  const [selectedJurusan, setSelectedJurusan] = useState<JurusanKey | "">(jurusanList[0] ?? "");
+  const sesi = selectedJurusan ? jadwal[selectedJurusan] : null;
 
   return (
-    <section className="max-w-5xl mx-auto py-16 px-4">
-      <h2 className="text-3xl font-bold mb-2">Jadwal Pelajaran</h2>
-      <p className="text-gray-600 mb-6">Jadwal pembelajaran berdasarkan program keahlian.</p>
-
-      {jurusanList.length > 0 && (
-        <label className="mb-6 flex flex-col gap-2 font-medium">
-          Program Keahlian
-          <select
-            value={selectedJurusan}
-            onChange={(event) => setSelectedJurusan(event.target.value)}
-            className="max-w-md rounded-lg border border-gray-300 bg-white px-4 py-3"
-          >
-            {jurusanList.map((jurusan) => <option key={jurusan}>{jurusan}</option>)}
-          </select>
-        </label>
-      )}
-
-      {filtered.length > 0 ? (
-        <div className="overflow-x-auto rounded-xl border border-gray-200">
-          <table className="w-full min-w-[720px] text-left text-sm">
-            <thead className="bg-primary text-white">
-              <tr>
-                <th className="p-3">Hari</th>
-                <th className="p-3">Waktu</th>
-                <th className="p-3">Tingkat</th>
-                <th className="p-3">Mata Pelajaran</th>
-                <th className="p-3">Guru</th>
-                <th className="p-3">Ruang</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((item) => (
-                <tr key={item.id} className="border-t border-gray-200">
-                  <td className="p-3">{item.hari}</td>
-                  <td className="p-3">{item.jam_mulai}–{item.jam_selesai}</td>
-                  <td className="p-3">{item.tingkat}</td>
-                  <td className="p-3">{item.mata_pelajaran}</td>
-                  <td className="p-3">{item.guru}</td>
-                  <td className="p-3">{item.ruang}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
+      <div className="max-w-container-max mx-auto space-y-space-xl">
+        <div className="space-y-2">
+          <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Akademik</span>
+          <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">
+            Jadwal Mata Pelajaran
+          </h2>
+          <p className="font-body-md text-on-surface-variant">
+            Jadwal pembelajaran per program keahlian, sesuai data dari sekolah.
+          </p>
         </div>
-      ) : (
-        <p className="rounded-xl border border-gray-200 p-6 text-gray-600" role="status">
-          {error ? `Jadwal belum dapat dimuat: ${error}` : "Belum ada jadwal pembelajaran."}
-        </p>
-      )}
-    </section>
+
+        {sesi ? (
+          <>
+            <label className="flex max-w-md flex-col gap-2 font-label-md text-label-md text-primary">
+              Program Keahlian
+              <select
+                value={selectedJurusan}
+                onChange={(event) => setSelectedJurusan(event.target.value as JurusanKey)}
+                className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
+              >
+                {jurusanList.map((key) => (
+                  <option key={key} value={key}>
+                    {LABEL[key]}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter-md">
+              {SESI.map((sesiItem) => (
+                <section
+                  key={sesiItem.key}
+                  className="overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm"
+                >
+                  <h3 className="bg-primary px-space-md py-space-sm font-title-md text-title-md text-surface">
+                    {sesiItem.judul}
+                  </h3>
+                  <ol className="divide-y divide-surface-container">
+                    {sesi[sesiItem.key].map((mapel, index) => (
+                      <li
+                        key={mapel}
+                        className="flex items-center gap-3 px-space-md py-space-sm font-body-sm text-body-sm text-on-surface-variant"
+                      >
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container font-label-sm text-label-sm text-primary">
+                          {index + 1}
+                        </span>
+                        {mapel}
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              ))}
+            </div>
+          </>
+        ) : (
+          <p
+            className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-lg font-body-md text-on-surface-variant"
+            role="status"
+          >
+            {error ? `Jadwal belum dapat dimuat: ${error}` : "Belum ada jadwal pembelajaran."}
+          </p>
+        )}
+      </div>
+    </div>
   );
 }

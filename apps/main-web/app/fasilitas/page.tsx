@@ -1,7 +1,13 @@
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
 import { Reveal } from '@/components/ui/Reveal';
+import { backendAktif, getFasilitas } from '@/lib/api';
+import { fasilitasContoh } from '@/lib/fallback';
 
-export default function FasilitasPage() {
+export default async function FasilitasPage() {
+  const fasilitasRes = await getFasilitas();
+  const tanpaBackend = !backendAktif();
+  const fasilitas = fasilitasRes.data ?? (tanpaBackend ? fasilitasContoh() : []);
+
   return (
     <>
       <Reveal>
@@ -21,7 +27,7 @@ export default function FasilitasPage() {
         </div>
       </Reveal>
       <Reveal>
-        <FasilitasKampus />
+        <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} />
       </Reveal>
     </>
   );

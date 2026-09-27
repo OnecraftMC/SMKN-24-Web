@@ -17,10 +17,11 @@ import {
   type GuruDTO,
   type GuruView,
   type JadwalDTO,
-  type JurusanKey,
   type PengumumanDTO,
   type PengumumanView,
 } from "../../../packages/shared/mappers";
+// JurusanKey tinggal di shared/types.ts (enum jadwal di backend), bukan di mappers.
+import type { JurusanKey } from "../../../packages/shared/types";
 
 export interface ApiResult<T> {
   data: T | null;
@@ -74,10 +75,15 @@ function backendUrl(): string {
   return backendBaseUrl() ?? "http://invalid.local";
 }
 
+/** True bila BACKEND_URL terisi dan valid — dipakai halaman untuk memilih sumber data. */
+export function backendAktif(): boolean {
+  return backendBaseUrl() !== null;
+}
+
 export async function getBerita(options: { utama?: boolean; limit?: number } = {}): Promise<ApiResult<BeritaView[]>> {
   const query = options.utama ? "?utama=1" : "";
   const result = await request<BeritaDTO[]>(`api/berita/index.php${query}`);
-  if (!result.data) return result;
+  if (!result.data) return { data: null, error: result.error };
   const data = result.data.map((item) => mapBerita(item, backendUrl()));
   return { data: options.limit ? data.slice(0, options.limit) : data, error: null };
 }
@@ -86,7 +92,7 @@ export async function getBeritaById(id: number): Promise<ApiResult<BeritaView>> 
   const result = await request<BeritaDTO>(`api/berita/index.php?id=${id}`);
   return result.data
     ? { data: mapBerita(result.data, backendUrl()), error: null }
-    : result;
+    : { data: null, error: result.error };
 }
 
 export async function getPengumuman(options: { beranda?: boolean } = {}): Promise<ApiResult<PengumumanView[]>> {
@@ -95,38 +101,40 @@ export async function getPengumuman(options: { beranda?: boolean } = {}): Promis
   );
   return result.data
     ? { data: result.data.map((item) => mapPengumuman(item, backendUrl())), error: null }
-    : result;
+    : { data: null, error: result.error };
 }
 
 export async function getAgenda(): Promise<ApiResult<AgendaView[]>> {
   const result = await request<AgendaDTO[]>("api/agenda/index.php?beranda=1");
-  return result.data ? { data: result.data.map(mapAgenda), error: null } : result;
+  return result.data
+    ? { data: result.data.map(mapAgenda), error: null }
+    : { data: null, error: result.error };
 }
 
 export async function getGuru(): Promise<ApiResult<GuruView[]>> {
   const result = await request<GuruDTO[]>("api/guru/index.php");
   return result.data
     ? { data: result.data.map((item) => mapGuru(item, backendUrl())), error: null }
-    : result;
+    : { data: null, error: result.error };
 }
 
 export async function getFasilitas(): Promise<ApiResult<FasilitasView[]>> {
   const result = await request<FasilitasDTO[]>("api/fasilitas/index.php");
   return result.data
     ? { data: result.data.map((item) => mapFasilitas(item, backendUrl())), error: null }
-    : result;
+    : { data: null, error: result.error };
 }
 
 export async function getGaleri(): Promise<ApiResult<GaleriView[]>> {
   const result = await request<GaleriDTO[]>("api/galeri/index.php");
   return result.data
     ? { data: result.data.map((item) => mapGaleri(item, backendUrl())), error: null }
-    : result;
+    : { data: null, error: result.error };
 }
 
 export async function getJadwal(
   jurusan?: JurusanKey,
-): Promise<ApiResult<JadwalDTO | Record<JurusanKey, JadwalDTO>>> {
+): Promise<ApiResult<Record<JurusanKey, JadwalDTO>>> {
   const query = jurusan ? `?jurusan=${encodeURIComponent(jurusan)}` : "";
   return request(`api/jadwal/index.php${query}`);
 }
