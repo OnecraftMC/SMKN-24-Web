@@ -14,6 +14,18 @@ pnpm dev
 bun dev
 ```
 
+## Konfigurasi Environment
+
+Salin `.env.example` menjadi `.env.local` di folder `apps/main-web`, lalu sesuaikan URL:
+
+- `BACKEND_URL` adalah origin backend PHP dan hanya digunakan di server.
+- `NEXT_PUBLIC_ADMIN_URL` adalah URL dashboard admin untuk tombol login; default lokal `http://localhost:3001`.
+- `ADMIN_ORIGIN` mendokumentasikan origin admin untuk konfigurasi monorepo.
+
+Jangan commit `.env.local` atau nilai rahasia. Konten publik diambil dari backend; jika backend belum tersedia, halaman menampilkan status kosong/error, bukan mengklaim data contoh sebagai data sekolah.
+
+Backend lokal dapat dijalankan dari root repository dengan `php -S localhost:8000 -t backend`; pastikan database PHP dikonfigurasi dan berjalan.
+
 ## Instalasi shadcn/ui
 
 Setelah masuk ke folder `apps/main-web` dan menjalankan `npm install`, jalankan inisialisasi satu kali:
@@ -44,7 +56,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to self-host the brand font Plus Jakarta Sans.
 
 ## Learn More
 

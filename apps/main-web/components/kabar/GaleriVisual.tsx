@@ -22,14 +22,20 @@ export default function GaleriVisual({
         <div className={`grid grid-cols-1 ${columns} gap-4`}>
           {galeri.map((item) => (
             <div key={item.id} className="galeri-card group relative rounded-3xl overflow-hidden aspect-[3/4] border border-surface-container shadow-md">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={600}
-                height={800}
-                sizes={galeri.length >= 4 ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 50vw"}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+              {item.image ? (
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={600}
+                  height={800}
+                  sizes={galeri.length >= 4 ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 50vw"}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-surface-container-high text-primary" aria-hidden="true">
+                  <span className="material-symbols-outlined text-4xl">photo_library</span>
+                </div>
+              )}
               <span className="absolute bottom-0 inset-x-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
                 {item.title}
               </span>

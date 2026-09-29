@@ -3,20 +3,17 @@ import FeaturedNews from '@/components/kabar/FeaturedNews';
 import GaleriVisual from '@/components/kabar/GaleriVisual';
 import FormAspirasi from '@/components/kabar/FormAspirasi';
 import { Reveal } from '@/components/ui/Reveal';
-import { backendAktif, getBerita, getGaleri } from '@/lib/api';
-import { beritaUtamaContoh, galeriContoh } from '@/lib/fallback';
+import { getBerita, getGaleri } from '@/lib/api';
 
 export default async function KabarPage() {
   const [utamaRes, galeriRes] = await Promise.all([
     getBerita({ utama: true }),
     getGaleri(),
   ]);
-  const tanpaBackend = !backendAktif();
-
   // FeaturedNews menerima satu berita, jadi ambil entri pertama hasil ?utama=1.
-  const utama = (utamaRes.data ?? (tanpaBackend ? [beritaUtamaContoh()] : []))[0] ?? null;
-  const galeri = galeriRes.data ?? (tanpaBackend ? galeriContoh() : []);
-  const galeriError = galeriRes.error ?? (tanpaBackend ? 'Galeri belum diisi — backend belum dikonfigurasi (BACKEND_URL).' : null);
+  const utama = utamaRes.data?.[0] ?? null;
+  const galeri = galeriRes.data ?? [];
+  const galeriError = galeriRes.error;
 
   return (
     <>

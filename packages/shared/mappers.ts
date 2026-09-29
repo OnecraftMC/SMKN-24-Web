@@ -112,7 +112,7 @@ export interface GaleriView {
   id: number;
   title: string;
   category: string;
-  image: string;
+  image: string | null;
 }
 
 export function assetUrl(path: string | null, backendUrl: string): string | null {
@@ -207,6 +207,6 @@ export function mapGaleri(item: GaleriDTO, backendUrl: string): GaleriView {
     id: item.id,
     title: item.judul,
     category: item.kategori,
-    image: assetUrl(item.gambar, backendUrl) ?? item.gambar,
+    image: assetUrl(item.gambar, backendUrl),
   };
 }

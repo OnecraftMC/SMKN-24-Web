@@ -12,21 +12,17 @@ export default function LoadingScreenProvider({ children }: LoadingScreenProvide
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let alreadyShown = false;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
     try {
-      alreadyShown = sessionStorage.getItem('smkn24-splash-shown') === '1';
+      if (sessionStorage.getItem('smkn24-splash-shown') === '1') return;
+      sessionStorage.setItem('smkn24-splash-shown', '1');
     } catch {
-      alreadyShown = false;
+      // Splash remains usable when browser storage is disabled.
     }
-    if (!reducedMotion && !alreadyShown) {
-      setIsLoading(true);
-      try {
-        sessionStorage.setItem('smkn24-splash-shown', '1');
-      } catch {
-        // Splash remains usable when browser storage is disabled.
-      }
-    }
+
+    const frame = window.requestAnimationFrame(() => setIsLoading(true));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const handleLoadingComplete = () => {

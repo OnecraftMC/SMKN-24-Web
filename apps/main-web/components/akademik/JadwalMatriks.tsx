@@ -8,7 +8,7 @@ import type { JurusanKey } from "@/lib/types";
  * `{ [jurusan]: { pagi: string[]; siang: string[] } }`.
  * (Bentuk row-based dengan kolom hari/tingkat/ruang tidak ada di tabel `jadwal`.)
  */
-export type JadwalMatriksData = Record<JurusanKey, { pagi: string[]; siang: string[] }>;
+export type JadwalMatriksData = Partial<Record<JurusanKey, { pagi: string[]; siang: string[] }>>;
 
 const LABEL: Record<JurusanKey, string> = {
   perhotelan: "Perhotelan",

@@ -3,12 +3,11 @@ import JadwalMatriks from '@/components/akademik/JadwalMatriks';
 import KalenderUnduhan from '@/components/akademik/KalenderUnduhan';
 import FormBK from '@/components/akademik/FormBK';
 import { Reveal } from '@/components/ui/Reveal';
-import { backendAktif, getJadwal } from '@/lib/api';
-import { JADWAL_KOSONG, jadwalContoh } from '@/lib/fallback';
+import { getJadwal } from '@/lib/api';
 
 export default async function AkademikPage() {
   const jadwalRes = await getJadwal();
-  const jadwal = jadwalRes.data ?? (!backendAktif() ? jadwalContoh() : JADWAL_KOSONG);
+  const jadwal = jadwalRes.data ?? {};
 
   return (
     <>

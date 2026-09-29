@@ -26,6 +26,7 @@ import type { JurusanKey } from "../../../packages/shared/types";
 export interface ApiResult<T> {
   data: T | null;
   error: string | null;
+  status?: number | null;
 }
 
 const TIMEOUT_MS = 5000;
@@ -44,7 +45,7 @@ function backendBaseUrl(): string | null {
 async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T>> {
   const baseUrl = backendBaseUrl();
   if (!baseUrl) {
-    return { data: null, error: "Backend belum dikonfigurasi. Atur BACKEND_URL." };
+    return { data: null, error: "Backend belum dikonfigurasi. Atur BACKEND_URL.", status: null };
   }
 
   try {
@@ -54,30 +55,42 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
       signal: AbortSignal.timeout(TIMEOUT_MS),
       next: init?.method ? undefined : { revalidate: 60 },
     });
-    const body: unknown = await response.json().catch(() => null);
+    let body: unknown = null;
+    try {
+      body = await response.json();
+    } catch {
+      if (response.ok) {
+        return {
+          data: null,
+          error: "Backend mengirim respons JSON yang tidak valid.",
+          status: response.status,
+        };
+      }
+    }
     if (!response.ok) {
       const message =
         typeof body === "object" && body !== null && "error" in body && typeof body.error === "string"
           ? body.error
           : `Backend merespons HTTP ${response.status}.`;
-      return { data: null, error: message };
+      return { data: null, error: message, status: response.status };
     }
-    return { data: body as T, error: null };
+    return { data: body as T, error: null, status: response.status };
   } catch (error) {
     const message = error instanceof Error && error.name === "TimeoutError"
       ? "Backend tidak merespons dalam 5 detik."
       : "Tidak dapat menghubungi backend. Periksa koneksi dan konfigurasi.";
-    return { data: null, error: message };
+    return { data: null, error: message, status: null };
   }
 }
 
 function backendUrl(): string {
-  return backendBaseUrl() ?? "http://invalid.local";
+  const value = backendBaseUrl();
+  if (!value) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
+  return value;
 }
 
-/** True bila BACKEND_URL terisi dan valid — dipakai halaman untuk memilih sumber data. */
-export function backendAktif(): boolean {
-  return backendBaseUrl() !== null;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 export async function getBerita(options: { utama?: boolean; limit?: number } = {}): Promise<ApiResult<BeritaView[]>> {
@@ -91,8 +104,8 @@ export async function getBerita(options: { utama?: boolean; limit?: number } = {
 export async function getBeritaById(id: number): Promise<ApiResult<BeritaView>> {
   const result = await request<BeritaDTO>(`api/berita/index.php?id=${id}`);
   return result.data
-    ? { data: mapBerita(result.data, backendUrl()), error: null }
-    : { data: null, error: result.error };
+    ? { data: mapBerita(result.data, backendUrl()), error: null, status: result.status }
+    : { data: null, error: result.error, status: result.status };
 }
 
 export async function getPengumuman(options: { beranda?: boolean } = {}): Promise<ApiResult<PengumumanView[]>> {
@@ -168,39 +181,82 @@ export async function proxyPublicPost(
   endpoint: "bk" | "chat",
   payload: unknown,
 ): Promise<Response> {
-  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+  if (!isRecord(payload)) {
     return Response.json({ error: "Format permintaan tidak valid." }, { status: 400 });
   }
 
-  const body = payload as Record<string, unknown>;
+  const body = payload;
+  let requestBody: Record<string, string>;
   if (endpoint === "bk") {
-    const fields = ["nama", "kelas", "keperluan", "pesan"] as const;
-    if (fields.some((field) => typeof body[field] !== "string" || !body[field].trim())) {
+    const { nama, kelas, noHp, keperluan, pesan } = body;
+    if (
+      typeof nama !== "string" || !nama.trim() ||
+      typeof kelas !== "string" || !kelas.trim() ||
+      typeof keperluan !== "string" || !keperluan.trim() ||
+      typeof pesan !== "string" || !pesan.trim()
+    ) {
       return Response.json({ error: "Lengkapi nama, kelas, topik, dan pesan." }, { status: 400 });
     }
-    if (["nama", "kelas", "noHp", "keperluan", "pesan"].some(
-      (field) => body[field] !== undefined && (typeof body[field] !== "string" || body[field].length > 2000),
-    )) {
+    if (
+      nama.length > 2000 ||
+      kelas.length > 2000 ||
+      keperluan.length > 2000 ||
+      pesan.length > 2000 ||
+      (noHp !== undefined && (typeof noHp !== "string" || noHp.length > 40))
+    ) {
       return Response.json({ error: "Data formulir melebihi batas yang diizinkan." }, { status: 400 });
     }
-  } else if (
-    typeof body.message !== "string" ||
-    !body.message.trim() ||
-    body.message.length > 2000 ||
-    (body.sessionId !== undefined &&
-      (typeof body.sessionId !== "string" || body.sessionId.length > 64))
-  ) {
-    return Response.json({ error: "Pesan chatbot tidak valid atau terlalu panjang." }, { status: 400 });
+    requestBody = {
+      nama: nama.trim(),
+      kelas: kelas.trim(),
+      keperluan: keperluan.trim(),
+      pesan: pesan.trim(),
+      ...(typeof noHp === "string" ? { noHp: noHp.trim() } : {}),
+    };
+  } else {
+    const { message, sessionId } = body;
+    if (
+      typeof message !== "string" ||
+      !message.trim() ||
+      message.length > 2000 ||
+      (sessionId !== undefined && (typeof sessionId !== "string" || sessionId.length > 64))
+    ) {
+      return Response.json({ error: "Pesan chatbot tidak valid atau terlalu panjang." }, { status: 400 });
+    }
+    requestBody = {
+      message: message.trim(),
+      ...(typeof sessionId === "string" ? { sessionId } : {}),
+    };
   }
 
-  const result = await request<unknown>(`api/${endpoint}/index.php`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-  if (result.error) {
-    const status = result.error.includes("belum dikonfigurasi") ? 503 : 502;
-    return Response.json({ error: result.error }, { status });
+  const baseUrl = backendBaseUrl();
+  if (!baseUrl) {
+    return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
   }
-  return Response.json(result.data, { status: 200 });
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}/api/${endpoint}/index.php`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      return Response.json({ error: "Backend tidak merespons dalam 5 detik." }, { status: 504 });
+    }
+    return Response.json(
+      { error: "Tidak dapat menghubungi backend. Periksa koneksi dan konfigurasi." },
+      { status: 502 },
+    );
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    headers: {
+      "Content-Type": response.headers.get("Content-Type") ?? "application/json",
+    },
+  });
 }

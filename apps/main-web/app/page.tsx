@@ -6,24 +6,19 @@ import PapanPengumuman from '@/components/beranda/PapanPengumuman';
 import AgendaKegiatan from '@/components/beranda/AgendaKegiatan';
 import LokasiSekolahBanner from '@/components/beranda/LokasiSekolahBanner';
 import { Reveal } from '@/components/ui/Reveal';
-import { backendAktif, getAgenda, getBerita, getPengumuman } from '@/lib/api';
-import { agendaContoh, beritaContoh, pengumumanContoh } from '@/lib/fallback';
+import { getAgenda, getBerita, getPengumuman } from '@/lib/api';
 
-// Tanpa BACKEND_URL, request() tidak menyentuh jaringan dan mengembalikan
-// error "belum dikonfigurasi"; halaman lalu memakai data arsip lib/data.ts
-// supaya beranda tidak kosong. Bila backend hidup tapi gagal, error aslinya
-// diteruskan ke komponen (komponen menampilkan status, bukan data palsu).
+// Backend adalah sumber kebenaran; setiap bagian menampilkan error/konfigurasi
+// kosong, bukan menggantinya dengan konten contoh arsip.
 export default async function Home() {
   const [beritaRes, pengumumanRes, agendaRes] = await Promise.all([
-    getBerita({ limit: 4 }),
+    getBerita({ utama: false, limit: 2 }),
     getPengumuman({ beranda: true }),
     getAgenda(),
   ]);
-  const tanpaBackend = !backendAktif();
-
-  const berita = beritaRes.data ?? (tanpaBackend ? beritaContoh() : []);
-  const pengumuman = pengumumanRes.data ?? (tanpaBackend ? pengumumanContoh() : []);
-  const agenda = agendaRes.data ?? (tanpaBackend ? agendaContoh() : []);
+  const berita = beritaRes.data ?? [];
+  const pengumuman = pengumumanRes.data ?? [];
+  const agenda = agendaRes.data ?? [];
 
   return (
     <>

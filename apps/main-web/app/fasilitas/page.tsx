@@ -1,12 +1,10 @@
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
 import { Reveal } from '@/components/ui/Reveal';
-import { backendAktif, getFasilitas } from '@/lib/api';
-import { fasilitasContoh } from '@/lib/fallback';
+import { getFasilitas } from '@/lib/api';
 
 export default async function FasilitasPage() {
   const fasilitasRes = await getFasilitas();
-  const tanpaBackend = !backendAktif();
-  const fasilitas = fasilitasRes.data ?? (tanpaBackend ? fasilitasContoh() : []);
+  const fasilitas = fasilitasRes.data ?? [];
 
   return (
     <>
