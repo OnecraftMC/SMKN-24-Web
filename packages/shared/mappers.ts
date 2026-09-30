@@ -144,15 +144,18 @@ export function slugify(title: string): string {
     .replace(/^-|-$/g, "");
 }
 
-export function beritaHref(news: Pick<BeritaDTO, "id" | "judul">): string {
-  return `/berita/${slugify(news.judul)}-${news.id}`;
+// Slug URL segment (tanpa prefix /berita/) — dipakai halaman detail
+// (app/berita/[slug]/page.tsx) untuk mencocokkan params dan oleh komponen
+// untuk membangun tautan `/berita/${slug}`.
+export function slugBerita(item: Pick<BeritaDTO, "id" | "judul">): string {
+  return `${slugify(item.judul)}-${item.id}`;
 }
 
 export function mapBerita(item: BeritaDTO, backendUrl: string): BeritaView {
   return {
     ...item,
     gambar: assetUrl(item.gambar, backendUrl),
-    slug: beritaHref(item),
+    slug: slugBerita(item),
     tanggalTampil: formatDateId(item.tanggalIso),
   };
 }
