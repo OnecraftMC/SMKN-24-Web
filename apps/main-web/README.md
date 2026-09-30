@@ -26,6 +26,16 @@ Jangan commit `.env.local` atau nilai rahasia. Konten publik diambil dari backen
 
 Backend lokal dapat dijalankan dari root repository dengan `php -S localhost:8000 -t backend`; pastikan database PHP dikonfigurasi dan berjalan.
 
+### Set env di Vercel (wajib sebelum deploy)
+
+`next.config.ts` membaca `BACKEND_URL` saat **build**, jadi env harus diset sebelum deploy:
+
+1. Buka Vercel → pilih project → **Settings → Environment Variables**.
+2. Tambah `BACKEND_URL` (origin backend PHP yang bisa dijangkau server Vercel, mis. `https://domain.sekolah.id/backend`) dan `NEXT_PUBLIC_ADMIN_URL` (origin dashboard admin).
+3. Redeploy agar nilai baru terbaca. Tanpa `BACKEND_URL`, situs tetap jalan tetapi semua konten menampilkan status "backend belum dikonfigurasi" — bukan data contoh.
+
+`BACKEND_URL` dengan port database (3306/5432) ditolak oleh `lib/api.ts` dengan pesan error yang jelas.
+
 ## Instalasi shadcn/ui
 
 Setelah masuk ke folder `apps/main-web` dan menjalankan `npm install`, jalankan inisialisasi satu kali:
