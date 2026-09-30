@@ -17,13 +17,19 @@ Seluruh tujuan utama halaman `/jurusan` mati. Ini juga membuat fetcher (`Foto ke
 
 ## Acceptance criteria
 
-- [ ] `apps/main-web/app/jurusan/[key]/page.tsx` ada; `key` divalidasi terhadap `JurusanKey`
-- [ ] `generateStaticParams()` mengulang 5 `JurusanKey` supaya halaman ter-prerender
-- [ ] Halaman memuat profil jurusan: deskripsi, mata pelajaran praktik (`JADWAL_DATA[key]`), dan slot galeri kegiatan
-- [ ] Slot foto mengikuti `Jurusan.gambar` (lihat `lib/types.ts:240`) — `public/images/jurusan/<key>.jpg`
-- [ ] Jurusan tanpa foto menampilkan fallback yang sama dengan `DaftarJurusan` (bukan kotak rusak)
-- [ ] `notFound()` untuk `key` yang tidak dikenal
-- [ ] `npm run build` exit 0 dan tabel route memuat `/jurusan/[key]`
+- [x] `apps/main-web/app/jurusan/[key]/page.tsx` ada; `key` divalidasi terhadap `JurusanKey`
+- [x] `generateStaticParams()` mengulang 5 `JurusanKey` supaya halaman ter-prerender
+- [x] Halaman memuat profil jurusan: deskripsi, mata pelajaran praktik (`JADWAL_DATA[key]`), dan slot galeri kegiatan
+- [x] Slot foto mengikuti `Jurusan.gambar` (lihat `lib/types.ts:240`) — `public/images/jurusan/<key>.jpg`
+- [x] Jurusan tanpa foto menampilkan fallback yang sama dengan `DaftarJurusan` (bukan kotak rusak)
+- [x] `notFound()` untuk `key` yang tidak dikenal
+- [x] `npm run build` exit 0 dan tabel route memuat `/jurusan/[key]`
+
+> Status 29 Sep 2026: seluruh AC terpenuhi. Fallback memakai ulang `LatarKartu`
+> (di-export dari `DaftarJurusan`) sehingga identik dengan kartu daftar; halaman juga
+> punya `generateMetadata`. Terverifikasi: build exit 0 dengan 5 path SSG
+> (`/jurusan/{perhotelan,boga,busana,pplg,pariwisata}`), smoke test prod server —
+> `/jurusan/pplg` 200 dengan `<h1>`, `/jurusan/tidak-ada` 404.
 
 ## Referensi
 

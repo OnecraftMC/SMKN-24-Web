@@ -18,13 +18,17 @@
 
 ## Acceptance criteria
 
-- [ ] `apps/main-web/app/berita/[slug]/page.tsx` ada, menerima `params.slug`
-- [ ] Halaman memanggil `getBeritaById(id)` dengan `id` hasil parse dari slug
-- [ ] `generateMetadata()` mengembalikan judul berita
-- [ ] State loading / error / tidak-ditemukan ditangani jujur (bukan `alert`, bukan 404 kosong)
-- [ ] `notFound()` dipakai untuk slug yang tidak ada
-- [ ] Gambar dari backend dilayani `next/image` (butuh `BACKEND_URL` terisi — lihat issue dokumentasi env)
-- [ ] `npm run build` di `apps/main-web` tetap exit 0
+- [x] `apps/main-web/app/berita/[slug]/page.tsx` ada, menerima `params.slug`
+- [x] Halaman memanggil `getBeritaById(id)` dengan `id` hasil parse dari slug
+- [x] `generateMetadata()` mengembalikan judul berita
+- [x] State loading / error / tidak-ditemukan ditangani jujur (bukan `alert`, bukan 404 kosong)
+- [x] `notFound()` dipakai untuk slug yang tidak ada
+- [x] Gambar dari backend dilayani `next/image` (butuh `BACKEND_URL` terisi — lihat issue dokumentasi env)
+- [x] `npm run build` di `apps/main-web` tetap exit 0
+
+> Status 29 Sep 2026: seluruh AC terpenuhi. Parse slug + `generateMetadata` kini berbagi
+> satu helper `ambilBerita()` sehingga aturan 404 tidak diduplikasi. Terverifikasi:
+> `tsc --noEmit` exit 0, `eslint` exit 0, `next build` exit 0.
 
 ## Catatan
 
