@@ -31,6 +31,13 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        // Foto gedung sekolah pada Hero (components/beranda/Hero.tsx).
+        protocol: 'https',
+        hostname: 'ak-d.tripcdn.com',
+        port: '',
+        pathname: '/**',
+      },
       ...backendImagePattern,
     ],
   },

@@ -10,10 +10,13 @@ export default function SambutanKepsek() {
               <div className="absolute -top-4 -left-4 w-28 h-28 bg-secondary-container/20 rounded-3xl -z-10"></div>
               <div className="absolute -bottom-4 -right-4 w-36 h-36 bg-surface-container-highest rounded-3xl -z-10"></div>
               <div className="rounded-2xl overflow-hidden shadow-xl bg-surface-container-lowest p-2">
-                <img
+                <Image
                   alt="Dra. Isfariani Marlena, M.Pd. - Kepala Sekolah"
                   className="w-full aspect-square object-cover rounded-xl shadow-inner"
-                  src="/images/kepsek.jpg"                />
+                  src="/images/kepsek.jpg"
+                  width={600}
+                  height={600}
+                />
               </div>
               <div className="absolute bottom-6 -right-4 bg-primary text-surface px-space-md py-space-sm rounded-xl shadow-lg flex items-center gap-3">
                 <span className="material-symbols-outlined text-secondary-container text-[28px]">
