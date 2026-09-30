@@ -26,7 +26,9 @@ const JUMLAH_CHIPE = 3;
 // Latar kartu: foto kegiatan resmi bila tersedia (slot
 // public/images/jurusan/<key>.jpg — lihat komentar `gambar` di lib/types.ts),
 // jika belum: fallback token berupa gradien surface + ikon watermark besar.
-function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
+// Diekspor dan dipakai ulang oleh app/jurusan/[key]/page.tsx supaya fallback
+// halaman detail identik dengan kartu di halaman daftar.
+export function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
   if (item.gambar) {
     return (
       <Image
