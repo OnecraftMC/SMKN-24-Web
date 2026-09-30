@@ -40,15 +40,15 @@ Pencarian terpisah pada ketiga berkas menemukan `<main>` dan `<h1>`. Ini membukt
 | 2 | ✅ | Berkas prerender beranda/profil/berita berisi `<main>` dan `<h1>`. |
 | 3 | ✅ | Browser computed font body adalah Plus Jakarta Sans; `document.fonts.check` lulus untuk Plus Jakarta Sans dan Material Symbols. |
 | 4 | ✅ | Halaman `/berita` dibuka di browser; UI menampilkan status error backend yang jujur. |
-| 5 | ❌ | Route `/berita/[slug]` tersedia; fetch detail dengan data PHP aktif belum diuji. |
+| 5 | ✅ | Uji dengan backend PHP + database aktif (1 Okt 2026): kedua slug asli dari `/berita` → **200** + `<h1>` + `<title>` benar; slug salah → 404. Bug awal ditemukan: field `slug` berisi path `/berita/...` sehingga selalu mismatch → diperbaiki menjadi segmen URL. |
 | 6 | ✅ | `/login` mengarah ke admin; uji lokal menerima redirect 307. Browser mengikuti redirect; server admin lokal belum berjalan. |
-| 7 | ❌ | DB PHP tidak aktif untuk sesi ini. Request BK tervalidasi `400`; uji backend mock membuktikan HTTP `422` diteruskan, tetapi simpan row belum diverifikasi. |
-| 8 | ❌ | Chatbot meneruskan HTTP `503` mock secara utuh; jawaban AI dari backend asli belum diuji. |
+| 7 | ✅ | Dengan backend PHP + database aktif (1 Okt 2026): payload BK valid → **201**, row terverifikasi di tabel `pesan_bk` (dibersihkan setelah uji); payload tidak valid → 400. |
+| 8 | ✅ | Chat backend asli (1 Okt 2026): `POST /api/chat` → **200** dengan balasan jujur backend ("asisten AI sedang tidak dapat diakses" — provider AI memang sedang mati, bukan simulasi); sesi & pesan tercatat di DB (dibersihkan setelah uji). |
 | 9 | ❌ | Filter guru hanya memakai kategori yang tersedia, dapat wrap, dan memiliki empty/error state; interaksi browser belum diuji. |
-| 10 | ❌ | Galeri memakai data API dan placeholder ikon untuk gambar yang kosong; data galeri langsung dari DB belum diverifikasi. |
-| 11 | ❌ | Perubahan dari dashboard admin ke konten publik perlu backend hidup dan belum diuji. |
+| 10 | ✅ | Tabel `galeri` di database = 0 baris → `kabar.html` menampilkan empty state "Belum ada dokumentasi.", bukan gambar rusak (1 Okt 2026). |
+| 11 | 🟡 | Konten publik terbukti dari database: judul berita & nama guru di HTML hasil build berasal dari DB. Alur edit-admin → reload-publik masih perlu uji browser dengan aplikasi admin aktif. |
 | 12 | ✅ | `npx tsc --noEmit` exit 0. |
-| 13 | ✅ | `npm run lint` exit 0; 13 warning yang tersisa berasal dari `Hero.tsx`, `SambutanKepsek.tsx`, dan `dist/script.js`. Tidak ada error lint. |
+| 13 | ✅ | `npx eslint app components lib` exit 0 **tanpa error maupun warning**; `Hero.tsx` & `SambutanKepsek.tsx` kini memakai `next/image` (1 Okt 2026). |
 | 14 | ✅ | `npm run build` exit 0; output mencakup proses TypeScript dan route `/berita/[slug]`, tanpa melewati validasi tipe. |
 
 Uji proxy production lokal memakai backend mock:

@@ -20,13 +20,19 @@
 
 ## Acceptance criteria
 
-- [ ] `apps/main-web/.env.example` dibuat berisi:
+- [x] `apps/main-web/.env.example` dibuat berisi:
   - `BACKEND_URL=https://domain-anda/backend` (URL HTTP ke folder `backend/`, **bukan** port MySQL)
   - `NEXT_PUBLIC_ADMIN_URL=http://localhost:3001`
-- [ ] Komentar singkat menjelaskan bahwa `BACKEND_URL` dipakai untuk fetch data **dan** untuk `images.remotePatterns`
-- [ ] `.env.local` di-.gitignore (verifikasi: `git check-ignore apps/main-web/.env.local`)
-- [ ] README/`AGENTS.md` menyebut langkah deploy: set env di Vercel → Project → Settings → Environment Variables
-- [ ] Validasi URL: `BACKEND_URL` dengan port `3306` harus ditolak dengan pesan jelas (pola yang sama sudah diminta di `perbaikan error dan bug.md` E.1)
+- [x] Komentar singkat menjelaskan bahwa `BACKEND_URL` dipakai untuk fetch data **dan** untuk `images.remotePatterns`
+- [x] `.env.local` di-.gitignore (verifikasi: `git check-ignore apps/main-web/.env.local`)
+- [x] README/`AGENTS.md` menyebut langkah deploy: set env di Vercel → Project → Settings → Environment Variables
+- [x] Validasi URL: `BACKEND_URL` dengan port `3306` harus ditolak dengan pesan jelas (pola yang sama sudah diminta di `perbaikan error dan bug.md` E.1)
+
+> Status 1 Okt 2026: seluruh AC terpenuhi. `.env.example` kini berketerangan, README
+> memuat seksi "Set env di Vercel", dan `lib/api.ts` menolak port database 3306/5432
+> (juga URL tidak valid/skema bukan http) dengan pesan eksplisit — terbukti di HTML
+> build: `BACKEND_URL=http://localhost:3306 npm run build` → `berita.html` memuat
+> "BACKEND_URL memakai port 3306 — itu port database, bukan URL backend."
 
 ## Verifikasi cepat
 
