@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "../../../packages/shared/tokens.css";
+
+/* -----------------------------------------------------------------------------
+ * Basis visual dashboard admin.
+ * Token (warna, radius, spacing, tipografi) berasal dari packages/shared/tokens.css
+ * sehingga branding identik dengan website publik. Dashboard boleh lebih padat
+ * dan berorientasi data, tetapi tidak boleh menyimpang dari token tersebut.
+ * -------------------------------------------------------------------------- */
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ring fokus konsisten dan selalu terlihat (aksesibilitas keyboard). */
+:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Angka statistik dashboard lebih mudah dibaca dengan tabular figures. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
