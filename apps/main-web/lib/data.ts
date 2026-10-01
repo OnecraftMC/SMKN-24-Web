@@ -172,15 +172,6 @@ export const beritaUtama = {
   ringkasan: "Tim riset fisika dan komputasi kami mencatatkan sejarah baru dengan memenangkan medali emas dalam kompetisi bergengsi tingkat nasional di Balikpapan.",
 };
 
-export const galeriData = [
-  {
-    id: 1,
-    judul: "Upacara Hari Kebangkitan Nasional",
-    kategori: "Kegiatan",
-    gambar: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAKaA+gDASIAAhEBAxEB/8QAHQAAAQUBAQEBAAAAAAAAAAAABQIDBAYHAQAICf/EAEwQAAIBAwMCBAQCBwYFAwICCwECAwAEEQUSIQYxEyJBUQcUYXEygRUjQlKRobEIJDNicsEWJTQ10UPh8ReT/8QAIBAAAgMBAQEBAQEAAAAAAAAAAAECAxEEBQYHEAAICAwEAAgMBAAM=",
-  },
-];
-
 export const jurusanData: Jurusan[] = [
   {
     key: "perhotelan",

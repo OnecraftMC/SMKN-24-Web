@@ -159,8 +159,9 @@ export interface JadwalAdminRow {
 // ---------------------------------------------------------------------------
 // Galeri (Gallery)
 // ---------------------------------------------------------------------------
-// Dipakai di: apps/main-web/lib/data.ts (galeriData),
-//   apps/main-web/components/kabar/GaleriVisual.tsx
+// Dipakai di: apps/main-web/components/kabar/GaleriVisual.tsx
+// (array `galeriData` di lib/data.ts dihapus — asetnya base64 terpotong dan
+// tidak pernah dipakai; lihat issue 08.)
 
 export interface Galeri {
   id: number;
