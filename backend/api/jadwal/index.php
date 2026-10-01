@@ -13,6 +13,11 @@ require_once __DIR__ . '/../../bootstrap.php';
 $db = getDB();
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Dideklarasikan SEBELUM switch: `const` top-level tidak di-hoist, jadi bila
+// diletakkan setelah switch, handleGet() memanggilnya sebelum dieksekusi
+// (bug: "Undefined constant JURUSAN_LIST" -> HTTP 500, ditemukan saat uji e2e).
+const JURUSAN_LIST = ['perhotelan', 'boga', 'busana', 'pplg', 'pariwisata'];
+
 switch ($method) {
     case 'GET':
         handleGet($db);
@@ -28,8 +33,6 @@ switch ($method) {
     default:
         jsonError('Method tidak diizinkan', 405);
 }
-
-const JURUSAN_LIST = ['perhotelan', 'boga', 'busana', 'pplg', 'pariwisata'];
 
 function handleGet(PDO $db): void
 {
