@@ -16,12 +16,19 @@ Dua sumber kebenaran untuk konten berita. Kontributor yang mengedit lewat dashbo
 
 ## Acceptance criteria
 
-- [ ] `app/berita/page.tsx` jadi async server component, memanggil `getBerita()`
-- [ ] Pakai pola yang sama seperti 5 halaman lain: `res.data ?? (tanpaBackend ? beritaContoh() : [])`
-- [ ] State loading / kosong / error ditangani (pola yang sama dengan komponen lain)
-- [ ] Komponen `DaftarBerita` tidak lagi meng-import `lib/data` secara langsung
-- [ ] Konsisten dengan `app/page.tsx` soal `limit` dan sumber data
-- [ ] `npm run build` exit 0
+- [x] `app/berita/page.tsx` jadi async server component, memanggil `getBerita()`
+- [x] Pakai pola yang sama seperti 5 halaman lain: `res.data ?? (tanpaBackend ? beritaContoh() : [])`
+- [x] State loading / kosong / error ditangani (pola yang sama dengan komponen lain)
+- [x] Komponen `DaftarBerita` tidak lagi meng-import `lib/data` secara langsung
+- [x] Konsisten dengan `app/page.tsx` soal `limit` dan sumber data
+- [x] `npm run build` exit 0
+
+> Status 1 Okt 2026: seluruh AC terpenuhi, dengan **satu revisi keputusan**:
+> `lib/fallback.ts` + `beritaContoh()` sudah dihapus pada ronde Jalur B karena
+> menampilkan data contoh sebagai seolah data sekolah. Pola yang berlaku sekarang
+> adalah `res.data ?? []` + status error/kosong jujur — bukan fallback arsip.
+> Terverifikasi dengan backend produksi hidup: `/berita` memuat judul berita dari
+> DB (2 berita), kartu detail `/berita/<slug>` 200 dan memuat `<h1>`.
 
 ## Referensi
 

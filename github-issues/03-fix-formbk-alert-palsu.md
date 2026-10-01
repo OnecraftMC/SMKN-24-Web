@@ -20,13 +20,18 @@
 
 ## Acceptance criteria
 
-- [ ] `alert(...)` dihapus sepenuhnya
-- [ ] Submit memanggil `POST /api/bk` (proxy route) → `proxyPublicPost("bk", payload)`
-- [ ] Status inline `aria-live="polite"`: loading / berhasil / gagal
-- [ ] Tombol dinonaktifkan saat mengirim (cegah submit ganda)
-- [ ] Error backend ditampilkan apa adanya, tidak ditelan
-- [ ] `app/api/bk/route.ts` memakai `proxyPublicPost` (hapus stub 501)
-- [ ] Verifikasi manual: submit → cek tabel `pesan_bk` bertambah 1 row
+- [x] `alert(...)` dihapus sepenuhnya
+- [x] Submit memanggil `POST /api/bk` (proxy route) → `proxyPublicPost("bk", payload)`
+- [x] Status inline `aria-live="polite"`: loading / berhasil / gagal
+- [x] Tombol dinonaktifkan saat mengirim (cegah submit ganda)
+- [x] Error backend ditampilkan apa adanya, tidak ditelan
+- [x] `app/api/bk/route.ts` memakai `proxyPublicPost` (hapus stub 501)
+- [x] Verifikasi manual: submit → cek tabel `pesan_bk` bertambah 1 row
+
+> Status 1 Okt 2026: terverifikasi end-to-end dengan PHP + MySQL produksi.
+> `POST /api/bk` lewat prod server main-web → **201** + row masuk `pesan_bk`
+> (dicek via PDO, lalu row uji dihapus kembali agar tidak mengotori inbox BK).
+> `OPTIONS /api/bk` → 204 dengan header CORS (issue 06).
 
 ## Referensi
 

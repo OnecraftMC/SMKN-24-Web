@@ -24,11 +24,18 @@ Catatan positif: F01 **sudah diperbaiki** — hasil prerender `index.html` sudah
 
 ## Acceptance criteria
 
-- [ ] Solusi yang dipilih **tidak** murderingkan anti-flash
-- [ ] `setState` sinkron di dalam effect hilang
-- [ ] Perilaku `prefers-reduced-motion` tetap dihormati
-- [ ] `sessionStorage` tetap mencegah splash berulang
-- [ ] Verifikasi: `npx eslint app components lib` → 0 error
+- [x] Solusi yang dipilih **tidak** murderingkan anti-flash
+- [x] `setState` sinkron di dalam effect hilang
+- [x] Perilaku `prefers-reduced-motion` tetap dihormati
+- [x] `sessionStorage` tetap mencegah splash berulang
+- [x] Verifikasi: `npx eslint app components lib` → 0 error
+
+> Status 1 Okt 2026: selesai. Pendekatan ketiga dipakai (bukan dua opsi di bawah):
+> `setIsLoading(true)` dipindah ke dalam `requestAnimationFrame` di effect, jadi
+> tidak ada `setState` sinkron saat effect berjalan dan splash tetap tampil sebelum
+> paint pertama. `prefers-reduced-motion` dan kunci `sessionStorage`
+> `smkn24-splash-shown` tidak berubah. `npx eslint app components lib` → **0 error,
+> 0 warning**; `tsc --noEmit` → exit 0.
 
 ## Opsi pendekatan (pilih satu)
 

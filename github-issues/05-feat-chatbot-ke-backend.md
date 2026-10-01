@@ -18,13 +18,21 @@ Widget chatbot menampilkan Iterator yang tidak benar — jawaban apa pun yang di
 
 ## Acceptance criteria
 
-- [ ] `setTimeout` simulasi dihapus
-- [ ] Pesan dikirim `POST /api/chat` dengan `{ sessionId, message }`
-- [ ] `sessionId` disimpan di `localStorage` (kunci `smkn24-chat-session`)
-- [ ] `app/api/chat/route.ts` memakai `proxyPublicPost("chat", ...)`, bukan stub 501
-- [ ] Indikator "mengetik" mencerminkan request nyata, bukan timer
-- [ ] Error backend ditampilkan di UI, bukan disembunyikan
-- [ ] Tombol kirim nonaktif saat request berjalan
+- [x] `setTimeout` simulasi dihapus
+- [x] Pesan dikirim `POST /api/chat` dengan `{ sessionId, message }`
+- [x] `sessionId` disimpan di `localStorage` (kunci `smkn24-chat-session`)
+- [x] `app/api/chat/route.ts` memakai `proxyPublicPost("chat", ...)`, bukan stub 501
+- [x] Indikator "mengetik" mencerminkan request nyata, bukan timer
+- [x] Error backend ditampilkan di UI, bukan disembunyikan
+- [x] Tombol kirim nonaktif saat request berjalan
+
+> Status 1 Okt 2026: terverifikasi. `POST /api/chat` lewat prod server main-web →
+> **200** dengan `{ sessionId, reply }`; sesi + 2 pesan tersimpan di
+> `chat_sessions`/`chat_messages` (dibersihkan setelah uji).
+> **Catatan risiko tetap terbuka:** balasan yang diterima saat uji adalah
+> *fallback* backend ("asisten AI sedang tidak dapat diakses") karena provider AI
+> tidak merespons, jadi HTTP 200 tidak menjamin jawaban AI asli — kontrak backend
+> belum memisahkan kedua kondisi ini. Rate limit `/api/chat` **belum ada**.
 
 ## Catatan keamanan
 

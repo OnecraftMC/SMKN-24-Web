@@ -4,9 +4,17 @@
 - [x] Sambungkan halaman publik ke API PHP dan tampilkan state error/kosong tanpa data contoh.
 - [x] Sambungkan FormBK dan chatbot melalui proxy Next.js; pertahankan status HTTP backend.
 - [x] Jalankan type-check, lint, production build, dan verifikasi proxy dengan backend mock.
-- [ ] Verifikasi alur simpan FormBK/chatbot, data publik, serta DB dengan PHP/MySQL aktif.
+- [x] Verifikasi alur simpan FormBK/chatbot, data publik, serta DB dengan PHP/MySQL aktif.
+  (Terbukti: POST `/api/bk` 201 + row `pesan_bk` dibuat lalu dibersihkan; POST `/api/chat` 200 +
+  sesi tersimpan; seluruh GET publik memuat data DB nyata. Backend PHP dijalankan lokal,
+  DB = MySQL hosting dari `backend/.env`.)
 - [ ] Jalankan uji browser JavaScript mati, navigasi, font, dan responsif.
+  (Sebagian: HTML prerender `/` & `/jurusan/pplg` memuat `<main>`/`<h1>` dan teks DB;
+  redirect `/login` 307 ke origin admin; uji browser sungguhan dengan JS dimatikan
+  serta uji keyboard/responsif **belum** dilakukan.)
 - [ ] Tambahkan proteksi rate limit di backend sebelum rilis publik.
+  (Catatan tambahan: `/api/chat` mengembalikan HTTP 200 berisi teks *fallback* saat
+  provider AI gagal — frontend tidak bisa membedakannya, perlu keputusan kontrak backend.)
 
 ## Lanjutan 29 Sep 2026 (issue 01/02 + lint)
 

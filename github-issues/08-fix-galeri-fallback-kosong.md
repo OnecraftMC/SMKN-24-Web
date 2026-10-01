@@ -17,10 +17,16 @@ Bagian "Dokumentasi Momen Emas Siswa" kosong di fallback. Selain itu satu-satuny
 
 ## Acceptance criteria
 
-- [ ] either: aset galeri asli diunggah ke `backend/uploads/` atau `public/images/galeri/`, **atau** `galeriData` base64 dihapus dari `lib/data.ts` supaya tidak menyesatkan
-- [ ] `galeriContoh()` mengembalikan entri dengan `image` berupa path/URL yang bisa dilayani `next/image`
-- [ ] Kalau galeri sengaja kosong, pertahankan pesan status yang jujur (sudah ada) — jangan menambahkan foto placeholder palsu
-- [ ] `next.config.ts` `images.remotePatterns` mengizinkan hostname backend (sudah otomatis bila `BACKEND_URL` terisi)
+- [x] either: aset galeri asli diunggah ke `backend/uploads/` atau `public/images/galeri/`, **atau** `galeriData` base64 dihapus dari `lib/data.ts` supaya tidak menyesatkan
+- [x] `galeriContoh()` mengembalikan entri dengan `image` berupa path/URL yang bisa dilayani `next/image`
+- [x] Kalau galeri sengaja kosong, pertahankan pesan status yang jujur (sudah ada) — jangan menambahkan foto placeholder palsu
+- [x] `next.config.ts` `images.remotePatterns` mengizinkan hostname backend (sudah otomatis bila `BACKEND_URL` terisi)
+
+> Status 1 Okt 2026: opsi pertama dipakai — blok `galeriData` (base64 terpotong,
+> 0 pemakai) **dihapus** dari `lib/data.ts`; komentar di `lib/types.ts` disesuaikan.
+> `galeriContoh()`/`lib/fallback.ts` sudah tidak ada sejak Jalur B, jadi AC kedua
+> tidak berlaku lagi. Terverifikasi: dengan `galeri` kosong di DB, `/kabar`
+> menampilkan "Belum ada dokumentasi." (bukan kartu rusak).
 
 ## Catatan
 

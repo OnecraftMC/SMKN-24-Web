@@ -97,3 +97,56 @@ Smoke test browser memakai production build setelah konfigurasi font diperbaiki:
 3. Tambahkan rate-limit backend dan tetapkan batas operasional chatbot.
 4. Verifikasi dokumen unduhan akademik, metadata berita, serta tampilan mobile/keyboard dan reduced motion di browser.
 5. Tambahkan CI lint/typecheck/build untuk PR; pertimbangkan E2E setelah environment backend test tersedia.
+
+---
+
+## 9. Addendum Fase 1 — verifikasi e2e dengan backend & DB nyata (1 Okt 2026)
+
+Verifikasi lanjutan setelah #4 di atas tertutup. Backend PHP 8.5 dijalankan lokal
+(`php -S 127.0.0.1:8000`), database = **MySQL hosting produksi** dari `backend/.env`
+(`berita` 2, `pengumuman` 2, `agenda` 2, `guru` 3, `fasilitas` 1; `galeri`, `jadwal`,
+`pesan_bk`, `aspirasi`, `chat_*` kosong).
+
+### 9.1 Hasil
+
+| Uji | Hasil |
+|---|---|
+| `GET /` (main-web, `BACKEND_URL` terisi) | 200; HTML memuat `<main>`, `<h1>`, judul berita dari DB |
+| `GET /berita` + `/berita/<slug>` | 200; daftar & detail memuat judul/isi berita DB |
+| `GET /profil` | 200; direktori guru (3) & fasilitas (1) dari DB |
+| `GET /kabar` (galeri DB kosong) | 200; empty state jujur "Belum ada dokumentasi." |
+| `GET /akademik` (jadwal DB kosong) | 200; "Belum ada jadwal pembelajaran." |
+| `GET /login` | **307 → `http://localhost:3001`** (`NEXT_PUBLIC_ADMIN_URL`) |
+| `POST /api/bk` (proxy) | **201** "Pesan Anda berhasil dikirim…"; row `pesan_bk` bertambah 1 → diverifikasi PDO → **dihapus kembali** |
+| `POST /api/chat` (proxy) | **200** `{ sessionId, reply }`; sesi + 2 pesan tersimpan → dibersihkan |
+| `OPTIONS /api/bk` & `/api/chat` | 204 + `Access-Control-Allow-Origin`/`-Methods` (setelah perbaikan issue 06) |
+| Toggle admin → publik | `pengumuman.tampil_beranda` 0→1 → `/` menampilkan "Gelombang 2 Dibuka" pada request kedua (ISR `revalidate = 60`) → flag dikembalikan 0 |
+
+Bukti filter beranda: backend `GET /api/pengumuman/index.php?beranda=1` mengembalikan
+`[]` saat semua flag 0 dan 1 item setelah flag dinaikkan — jadi ketiadaan pengumuman
+di beranda sebelumnya adalah perilaku benar, bukan bug.
+
+### 9.2 Bug backend yang ditemukan & diperbaiki
+
+**`backend/api/jadwal/index.php` → HTTP 500 setiap dipanggil.**
+`const JURUSAN_LIST = [...]` dideklarasikan **setelah** `switch` yang sudah memanggil
+`handleGet()`. `const` top-level PHP tidak di-hoist (dibuktikan dengan `php -r`), jadi
+handler membaca konstanta yang belum dieksekusi → `Undefined constant "JURUSAN_LIST"`.
+Perbaikan: deklarasi dipindah ke sebelum `switch`. `php -l` lolos, endpoint kini 200
+(matriks 5 jurusan, array kosong karena tabel `jadwal` memang kosong).
+
+### 9.3 Perubahan kode lain (issue 06 & 08)
+
+- `app/api/_lib/cors.ts`: helper `withCors()` baru.
+- `app/api/bk|chat/route.ts`: `OPTIONS` eksplisit + header CORS pada respons proxy & error.
+- `app/api/guru|galeri/route.ts`: `200 []` → `501` + pesan yang menjelaskan jalur data.
+- `app/api/aspirasi/route.ts`: **dihapus** (keputusan B10 belum diambil; tidak ada pemanggil).
+- `lib/data.ts`: `galeriData` (base64 terpotong, 0 pemakai) dihapus; komentar `lib/types.ts` disesuaikan.
+
+### 9.4 Yang masih terbuka
+
+1. **Balasan chatbot saat provider AI gagal** tetap HTTP 200 berisi teks fallback — kontrak backend perlu flag pembeda.
+2. **Rate limit** `/api/bk` dan `/api/chat` belum ada (wajib sebelum rilis publik).
+3. **Route GET statis** (`api/berita`, `api/agenda`, `api/pengumuman`, `api/jadwal`) masih ada tanpa konsumen (urusan struktur data/F21).
+4. **Issue 09, 10, 11, 13** belum dikerjakan (Fase 2).
+5. Uji browser sesungguhnya (JS mati, keyboard, responsif lintas perangkat) belum dijalankan.

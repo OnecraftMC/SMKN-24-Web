@@ -23,11 +23,27 @@ Helper di `apps/main-web/lib/api.ts:167-197` — `proxyPublicPost()` sudah memva
 
 ## Acceptance criteria
 
-- [ ] `app/api/bk/route.ts` dan `app/api/chat/route.ts` memakai `proxyPublicPost`, stub `501` dihapus
-- [ ] `app/api/aspirasi/route.ts` entah di-proxy atau dihapus — **jangan** tinggalkan 501 yang menyesatkan
-- [ ] Tidak ada route yang mengembalikan `200 []` sebagai placeholder; kalau belum diimplementasikan, kembalikan `501` + `{"error": …}` yang jujur
-- [ ] Status upstream diteruskan apa adanya (jangan mark 200 saat backend 5xx)
-- [ ] `OPTIONS` preflight tetap dikembalikan agar CORS tidak rusak
+- [x] `app/api/bk/route.ts` dan `app/api/chat/route.ts` memakai `proxyPublicPost`, stub `501` dihapus
+- [x] `app/api/aspirasi/route.ts` entah di-proxy atau dihapus — **jangan** tinggalkan 501 yang menyesatkan
+- [x] Tidak ada route yang mengembalikan `200 []` sebagai placeholder; kalau belum diimplementasikan, kembalikan `501` + `{"error": …}` yang jujur
+- [x] Status upstream diteruskan apa adanya (jangan mark 200 saat backend 5xx)
+- [x] `OPTIONS` preflight tetap dikembalikan agar CORS tidak rusak
+
+> Status 1 Okt 2026:
+> - `app/api/aspirasi/route.ts` **dihapus** (opsi kedua). Alasan: `FormAspirasi`
+>   masih CTA `mailto:` dan keputusan B10 (aspirasi vs pengajuan prestasi) belum
+>   diambil, jadi proxy tanpa pemanggil hanya menambah kode spekulatif. Saat B10
+>   diputuskan, route bisa ditambahkan lagi dengan `proxyPublicPost`.
+> - `api/guru` dan `api/galeri` tidak lagi menjawab `200 []`; keduanya kini `501`
+>   + `{"error": …}` yang menjelaskan jalur data sebenarnya (`lib/api` server-side).
+> - `bk`/`chat`: `OPTIONS` eksplisit + helper baru `withCors()` di `_api/_lib/cors.ts`
+>   memasang header CORS pada respons proxy dan error route. Terverifikasi di prod
+>   server: `OPTIONS /api/bk` → 204 + `Access-Control-Allow-Origin: *`,
+>   `OPTIONS /api/chat` → 204, `POST /api/bk` → 201 + header CORS.
+> - **Belum disentuh:** route GET statis (`api/berita`, `api/agenda`,
+>   `api/pengumuman`, `api/jadwal`) masih menyajikan salinan `lib/data.ts`.
+>   Tidak ada konsumen; mengganti seluruhnya adalah pekerjaan struktur data (F21),
+>   di luar cakupan issue ini.
 
 ## Referensi
 
