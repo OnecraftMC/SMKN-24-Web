@@ -1,4 +1,5 @@
 berikut adalah dokumentasi penuh untuk project saya (progress saya saat ini) yang tedapat di root folder
+jangan melakukan commit tanpa persetujuan user
 
 file "pemindahan memori.md" atau "otak utama" adalah dokumentasi utama (otak dari semua dokumentasi)
 file tersebut awalnya ditujukan untuk melakukan pemindahan memori ai-agent saya ke ai agent saya yang lain sehingga mereka bisa berbagi memori dan konteks secara bersamaan. file tersebut sebenarnya sudah memuat sebagian besar deskripsi dari project saya. namun perlu diingat, terdapat informasi yang masih kurang tepat dan kurang jelas, maka dari itu saya membuat file dokumentasi selanjutnya untuk memperjelas konteks dari "otak utama" tersebut
