@@ -37,13 +37,21 @@ pnpm-debug.log*
 .eslintcache
 /apps/main-web/template and promt
 template login admin.txt
-template and promt
+komponen navbar.md
+template dashboard admin.txt
+/template-and-promt
+pemindahan konteks main-web.md
+perbaikan error dan bug.md
 php.ini
-/github-issues/
-PLAN.md
 /laporan/
-
-
+PLAN.md
+PROMPT_PENGGABUNGAN_MONOREPO.md
+/github-issues/
+report.md
+rpl computer service.cs
+implementasi.md
+pemindahan memori.md
+laporan inspeksi.md
 # Local certificates and private keys
 *.pem
 *.key
