@@ -1,0 +1,67 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+interface NavLink {
+  href: string;
+  label: string;
+  icon: string;
+}
+
+interface MobileMenuProps {
+  isOpen: boolean;
+  onClose: () => void;
+  navLinks: NavLink[];
+}
+
+export default function MobileMenu({ isOpen, onClose, navLinks }: MobileMenuProps) {
+  const pathname = usePathname();
+  // Login menuju `/login` same-origin pada aplikasi gabungan.
+  const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="lg:hidden border-t border-surface-container bg-surface-container-lowest px-margin-mobile py-space-sm shadow-xl space-y-1">
+      {navLinks.map((link) => {
+        const isActive = link.href === "/" ? pathname === "/" : pathname.startsWith(link.href);
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={onClose}
+            className={`w-full text-left px-space-md py-2.5 rounded-lg font-label-md hover:bg-surface-container-low flex items-center justify-between ${
+              isActive ? "font-bold text-primary" : "text-on-surface-variant"
+            }`}
+          >
+            <span>{link.label}</span>
+            <span className="material-symbols-outlined text-[18px]">{link.icon}</span>
+          </Link>
+        );
+      })}
+      <a
+        className="block w-full text-center mt-2 py-2.5 rounded-lg bg-primary text-surface font-label-md font-bold"
+        href="https://spmb.jakarta.go.id"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        SPMB Online
+      </a>
+      <a
+        href={adminUrl}
+        onClick={onClose}
+        className="block w-full text-center mt-2 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md font-bold"
+      >
+        Login Admin
+      </a>
+      <Link
+        href="/#lokasi-sekolah"
+        onClick={onClose}
+        className="block w-full text-center mt-2 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md font-bold"
+      >
+        Lihat Lokasi Sekolah
+      </Link>
+    </div>
+  );
+}

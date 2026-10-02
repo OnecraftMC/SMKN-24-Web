@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+
+# Test and coverage output
+coverage/
+
+# Environment files dan rahasia — JANGAN PERNAH COMMIT
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript and tooling cache
+*.tsbuildinfo
+.eslintcache
+
+# File rahasia lainnya
+*.pem
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Data upload runtime (jangan ikut ke repo; aset tersedia di server)
+/backend/uploads/*
+!/backend/uploads/.gitkeep
+!/backend/uploads/.htaccess
