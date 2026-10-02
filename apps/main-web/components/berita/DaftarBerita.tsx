@@ -24,7 +24,7 @@ export default function DaftarBerita({
               {berita.map((item) => (
                 <li key={item.id}>
                   <article className="group h-full overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-shadow hover:shadow-md">
-                    <Link href={item.slug} className="block h-full">
+                    <Link href={`/berita/${item.slug}`} className="block h-full">
                       <div className="relative h-56 overflow-hidden">
                         {item.gambar ? (
                           <Image

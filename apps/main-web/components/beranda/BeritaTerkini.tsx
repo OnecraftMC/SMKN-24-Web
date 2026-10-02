@@ -72,7 +72,7 @@ export default function BeritaTerkini({
                   {item.ringkasan}
                 </p>
               </div>
-              <Link href={item.slug} className="pt-space-xs flex items-center gap-1 text-primary font-semibold font-label-sm text-label-sm hover:text-secondary">
+              <Link href={`/berita/${item.slug}`} className="pt-space-xs flex items-center gap-1 text-primary font-semibold font-label-sm text-label-sm hover:text-secondary">
                 <span>Baca Selengkapnya</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </Link>

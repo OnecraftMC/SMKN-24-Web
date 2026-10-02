@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+/* =============================================================================
+ * app/globals.css — aplikasi gabungan (website publik + dashboard admin).
+ *
+ * Token visual (warna, radius, spacing, tipografi) hanya didefinisikan SEKALI di
+ * `styles/tokens.css` (sebelumnya `packages/shared/tokens.css`). Jangan menyalin
+ * isi file tersebut ke sini — ubah di sumbernya agar publik dan admin tetap
+ * identik.
+ *
+ * Blok di bawah adalah gabungan `:root`/keyframes website publik dan basis
+ * dashboard admin. Nilai efektifnya sama dengan kedua aplikasi sumber:
+ * body memakai `--color-surface` (sama dengan `bg-surface` yang dipakai layout
+ * publik), dan font memakai variabel `next/font` (Plus Jakarta Sans self-hosted).
+ * ========================================================================== */
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--color-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-plus-jakarta), "Plus Jakarta Sans", ui-sans-serif, system-ui,
+    -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Tipografi: seluruh skala token mengarah ke font brand yang di-self-host
+   lewat next/font (variabel --font-plus-jakarta). */
+@theme inline {
+  --font-headline-md: var(--font-plus-jakarta);
+  --font-title-md: var(--font-plus-jakarta);
+  --font-body-sm: var(--font-plus-jakarta);
+  --font-label-md: var(--font-plus-jakarta);
+  --font-headline-lg: var(--font-plus-jakarta);
+  --font-headline-sm: var(--font-plus-jakarta);
+  --font-label-sm: var(--font-plus-jakarta);
+  --font-headline-lg-mobile: var(--font-plus-jakarta);
+  --font-display-hero: var(--font-plus-jakarta);
+  --font-body-md: var(--font-plus-jakarta);
+  --font-display-hero-mobile: var(--font-plus-jakarta);
+  --font-body-lg: var(--font-plus-jakarta);
+}
+
+/* Ring fokus konsisten dan selalu terlihat (aksesibilitas keyboard). */
+:focus-visible {
+  outline: 2px solid var(--color-secondary);
+  outline-offset: 2px;
+}
+
+/* Angka statistik dashboard lebih mudah dibaca dengan tabular figures. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ========== Loading Animation Keyframes (splash website publik) ========== */
+@keyframes shieldIntro {
+  0% { opacity: 0; transform: scale(0.82); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ovalIntro {
+  0% { opacity: 0; transform: scale(0.65); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes waveSlide {
+  0% { opacity: 0; transform: translateY(24px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes waveIdle {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  50% { transform: translateY(-3.5px) scaleY(1.06); }
+}
+@keyframes emblemIntro {
+  0% { opacity: 0; transform: scale(0.5) translateY(20px); }
+  60% { opacity: 1; transform: scale(1.08) translateY(-3px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes wheatLeftIntro {
+  0% { opacity: 0; transform: translateX(-35px) rotate(-14deg); }
+  100% { opacity: 1; transform: translateX(0) rotate(0); }
+}
+@keyframes wheatRightIntro {
+  0% { opacity: 0; transform: translateX(35px) rotate(14deg); }
+  100% { opacity: 1; transform: translateX(0) rotate(0); }
+}
+@keyframes num24Pop {
+  0% { opacity: 0; transform: scale(0.2); }
+  65% { opacity: 1; transform: scale(1.22); }
+  85% { transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes smknFade {
+  0% { opacity: 0; transform: translateY(-8px) scale(0.9); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes dropletIntro {
+  0% { opacity: 0; transform: scale(0) translateY(12px); }
+  70% { opacity: 1; transform: scale(1.3) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes flameGlow {
+  0%, 100% { filter: drop-shadow(0 0 2px #ffbb00) drop-shadow(0 0 6px #ff7700); }
+  50% { filter: drop-shadow(0 0 5px #ffe600) drop-shadow(0 0 12px #ff5500); }
+}
+@keyframes curvedTextIntro {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ribbonIntro {
+  0% { opacity: 0; transform: scaleX(0.2) scaleY(0.5) translateY(10px); }
+  70% { opacity: 1; transform: scaleX(1.08) scaleY(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes jakartaIntro {
+  0% { opacity: 0; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}

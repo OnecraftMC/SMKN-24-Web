@@ -31,19 +31,40 @@ export interface ApiResult<T> {
 
 const TIMEOUT_MS = 5000;
 
-function backendBaseUrl(): string | null {
+// Port yang menandakan BACKEND_URL diisi dengan host database, bukan URL HTTP
+// backend — kesalahan konfigurasi nyata yang pernah terjadi (lihat
+// `perbaikan error dan bug.md` E.1: NEXT_PUBLIC_API_URL = host:3306).
+const PORT_DATABASE = new Set([3306, 5432]);
+
+function backendBaseUrl(): { url: string | null; error: string | null } {
   const value = process.env.BACKEND_URL?.trim();
-  if (!value) return null;
+  if (!value) return { url: null, error: null };
+  let url: URL;
   try {
-    const url = new URL(value);
-    return ["http:", "https:"].includes(url.protocol) ? value.replace(/\/+$/, "") : null;
+    url = new URL(value);
   } catch {
-    return null;
+    return {
+      url: null,
+      error: "BACKEND_URL bukan URL yang valid. Contoh nilai: http://localhost:8000",
+    };
   }
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    return { url: null, error: "BACKEND_URL harus diawali http:// atau https://." };
+  }
+  if (url.port && PORT_DATABASE.has(Number(url.port))) {
+    return {
+      url: null,
+      error: `BACKEND_URL memakai port ${url.port} — itu port database, bukan URL backend. Isi origin HTTP backend (mis. http://localhost/backend).`,
+    };
+  }
+  return { url: value.replace(/\/+$/, ""), error: null };
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T>> {
-  const baseUrl = backendBaseUrl();
+  const { url: baseUrl, error: configError } = backendBaseUrl();
+  if (configError) {
+    return { data: null, error: configError, status: null };
+  }
   if (!baseUrl) {
     return { data: null, error: "Backend belum dikonfigurasi. Atur BACKEND_URL.", status: null };
   }
@@ -84,9 +105,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
 }
 
 function backendUrl(): string {
-  const value = backendBaseUrl();
-  if (!value) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
-  return value;
+  const { url, error } = backendBaseUrl();
+  if (error) throw new Error(error);
+  if (!url) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
+  return url;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -229,7 +251,10 @@ export async function proxyPublicPost(
     };
   }
 
-  const baseUrl = backendBaseUrl();
+  const { url: baseUrl, error: configError } = backendBaseUrl();
+  if (configError) {
+    return Response.json({ error: configError }, { status: 503 });
+  }
   if (!baseUrl) {
     return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
   }

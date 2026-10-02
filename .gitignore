@@ -39,7 +39,7 @@ pnpm-debug.log*
 template login admin.txt
 komponen navbar.md
 template dashboard admin.txt
-/template-and-promt
+template and promt
 pemindahan konteks main-web.md
 perbaikan error dan bug.md
 php.ini
@@ -48,6 +48,13 @@ rpl computer service.cs
 implementasi.md
 pemindahan memori.md
 laporan inspeksi.md
+deployment-logs.txt
+/github-issues/
+PLAN.md
+laporan jalur-a-b.md
+/laporan/
+
+
 # Local certificates and private keys
 *.pem
 *.key

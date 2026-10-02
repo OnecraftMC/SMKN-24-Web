@@ -56,7 +56,7 @@ export default function FeaturedNews({
               <span className="text-xs font-bold text-primary flex items-center gap-1">
                 <span className="material-symbols-outlined text-[16px]">campaign</span> Berita Pilihan
               </span>
-              <Link href={berita.slug} className="px-4 py-2 rounded-xl bg-primary text-surface font-label-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-1">
+              <Link href={`/berita/${berita.slug}`} className="px-4 py-2 rounded-xl bg-primary text-surface font-label-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-1">
                 <span>Baca Lengkap</span>
                 <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
               </Link>
