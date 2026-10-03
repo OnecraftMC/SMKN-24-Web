@@ -52,6 +52,9 @@ rpl computer service.cs
 implementasi.md
 pemindahan memori.md
 laporan inspeksi.md
+PROMPT_PENGGABUNGAN_MONOREPO.md
+/penggabungan-monorepo/penggabungan-monorepo.zip
+/backend/backend.zip
 # Local certificates and private keys
 *.pem
 *.key
