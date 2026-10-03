@@ -138,6 +138,7 @@ export interface FasilitasDTO {
   judul: string;
   deskripsi: string | null;
   gambar: string | null;
+  unggulan: boolean;
 }
 
 // -----------------------------------------------------------------------------

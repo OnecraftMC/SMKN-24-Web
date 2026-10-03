@@ -21,10 +21,10 @@ export default async function FasilitasPage() {
               <span>Fasilitas &amp; Sarana Kampus</span>
             </div>
             <h1 className="font-headline-lg text-headline-lg lg:text-[2.75rem] font-bold text-surface tracking-tight">
-              Fasilitas Unggulan SMKN 24 Jakarta
+              Seluruh Fasilitas SMKN 24 Jakarta
             </h1>
             <p className="font-body-lg text-primary-fixed max-w-3xl">
-              Berbagai fasilitas modern dan lengkap untuk mendukung proses belajar mengajar serta pengembangan bakat siswa.
+              Jelajahi seluruh sarana untuk mendukung proses belajar mengajar dan pengembangan bakat siswa.
             </p>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default async function FasilitasPage() {
         />
       </Reveal>
       <Reveal>
-        <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} />
+        <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} variant="all" />
       </Reveal>
     </>
   );

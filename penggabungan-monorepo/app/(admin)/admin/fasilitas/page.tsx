@@ -179,7 +179,14 @@ export default function FasilitasPage() {
                   )}
                 </div>
                 <div className="space-y-space-sm p-space-md">
-                  <h2 className="font-title-md font-bold text-primary">{row.judul}</h2>
+                  <div className="flex flex-wrap items-center gap-space-xs">
+                    <h2 className="font-title-md font-bold text-primary">{row.judul}</h2>
+                    {row.unggulan && (
+                      <span className="rounded-full bg-secondary-container px-2 py-0.5 font-label-sm text-[11px] font-bold text-on-secondary-container">
+                        Unggulan profil
+                      </span>
+                    )}
+                  </div>
                   <p className="text-body-sm text-on-surface-variant">{row.deskripsi}</p>
                   <div className="flex justify-end gap-space-xs pt-1">
                     <button

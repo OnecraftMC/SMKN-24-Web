@@ -31,6 +31,19 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
      (`CREATE DATABASE ...` dan `USE ...`) — shared hosting menolak perintah
      pembuatan database dari user biasa. Pastikan collation database
      `utf8mb4_unicode_ci`.
+   Schema baru sudah membuat kolom `fasilitas.unggulan` dengan nilai default `0`.
+   Untuk database yang sudah ada, **backup dahulu**, periksa `SHOW COLUMNS FROM
+   fasilitas LIKE 'unggulan';`, lalu jika belum ada jalankan sekali:
+
+   ```sql
+   ALTER TABLE fasilitas
+     ADD COLUMN unggulan TINYINT(1) NOT NULL DEFAULT 0 AFTER gambar;
+   ```
+
+   SQL upgrade yang sama tersedia di `backend/migrations/20261004_add_fasilitas_unggulan.sql`.
+   Jalankan upgrade schema sebelum deploy versi aplikasi yang membaca kolom ini.
+   Baris lama otomatis bernilai `0` (bukan fasilitas unggulan). Jangan jalankan
+   migration ini pada database baru yang sudah dibuat dari `database.sql`.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
