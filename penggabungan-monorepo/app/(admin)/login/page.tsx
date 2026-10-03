@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Loader2, LogIn, TriangleAlert } from "lucide-react";
+import { useReducedMotion } from "motion/react";
+import { ArrowLeft, Eye, EyeOff, Loader2, LogIn, TriangleAlert } from "lucide-react";
+import LogoLoadingAnimation from "@/components/ui/LogoLoadingAnimation";
 import { useAuth } from "@/lib/admin/auth";
 
 const MAIN_WEB_URL = process.env.NEXT_PUBLIC_MAIN_WEB_URL ?? "/";
@@ -19,10 +21,22 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Hanya true SETELAH login sukses: memicu splash logo sebelum masuk dasbor.
+  const [loginSucceeded, setLoginSucceeded] = useState(false);
+  // Penjaga race: `login()` menandai status auth sebagai `authenticated` SEBELUM
+  // promise-nya selesai, jadi flag ref dipasang lebih dulu agar effect redirect di
+  // bawah tidak mendahului splash logo.
+  const loginSucceededRef = useRef(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  // Sudah login? Langsung ke dasbor.
+  const goToDashboard = useCallback(() => {
+    router.replace("/admin");
+  }, [router]);
+
+  // Sesi yang sudah valid (mis. membuka `/login` saat masih login) langsung ke
+  // dasbor tanpa splash — splash hanya untuk transisi login berhasil → dasbor.
   useEffect(() => {
-    if (status === "authenticated") {
+    if (status === "authenticated" && !loginSucceededRef.current) {
       router.replace("/admin");
     }
   }, [status, router]);
@@ -37,10 +51,20 @@ export default function LoginPage() {
     }
 
     setSubmitting(true);
+    loginSucceededRef.current = true;
     try {
       await login(username.trim(), password);
-      // Status jadi authenticated -> effect di atas mengarahkan ke dasbor.
+      if (shouldReduceMotion) {
+        // Paritas LoadingScreenProvider: pengguna reduced-motion tidak digerbang
+        // animasi 3.2 detik, jadi langsung masuk dasbor tanpa splash.
+        goToDashboard();
+      } else {
+        // Sukses: tampilkan splash logo, `goToDashboard` dipanggil saat animasi selesai.
+        setLoginSucceeded(true);
+      }
     } catch (err) {
+      // Gagal: batalkan penjaga race supaya redirect normal tetap berlaku nanti.
+      loginSucceededRef.current = false;
       setError(
         err instanceof Error
           ? err.message
@@ -63,12 +87,36 @@ export default function LoginPage() {
     );
   }
 
+  // Transisi login berhasil → dasbor: splash logo identik dengan website utama
+  // (LogoLoadingAnimation yang sama) + teks "Administrator" di bawah logo.
+  if (loginSucceeded) {
+    return (
+      <main
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-white"
+        role="status"
+        aria-live="polite"
+      >
+        <LogoLoadingAnimation caption="Administrator" onFinished={goToDashboard} />
+        <span className="sr-only">Login berhasil. Membuka dashboard admin…</span>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen bg-surface">
       <BrandPanel />
 
       <section className="flex w-full items-center justify-center px-margin-mobile py-space-2xl md:px-margin-tablet lg:w-1/2">
         <div className="w-full max-w-sm">
+          {/* Tombol kembali eksplisit ke website utama (tanpa history.back()). */}
+          <a
+            href={MAIN_WEB_URL}
+            className="mb-space-lg inline-flex items-center gap-space-xs rounded-lg border border-outline-variant bg-surface-container-lowest px-space-sm py-2 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container"
+          >
+            <ArrowLeft aria-hidden className="h-4 w-4" />
+            <span>Kembali ke beranda</span>
+          </a>
+
           <div className="mb-space-2xl flex items-center gap-space-sm lg:hidden">
             <Image
               src="/logo-smkn24.png"

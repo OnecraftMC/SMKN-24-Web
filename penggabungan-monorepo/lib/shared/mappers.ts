@@ -42,6 +42,13 @@ export interface AgendaDTO {
   deskripsi: string | null;
   gambar: string | null;
   tampilBeranda: boolean;
+  /**
+   * Dikirim backend (diturunkan dari `tgl_mulai`) tetapi TIDAK dipakai untuk
+   * tampilan publik — `mapAgenda` menghitung ulang dalam format id-ID.
+   * Dinyatakan agar kontrak backend tidak terlihat tidak sengaja.
+   */
+  day?: number;
+  month?: string;
 }
 
 export interface GuruDTO {

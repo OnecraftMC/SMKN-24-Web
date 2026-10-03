@@ -6,12 +6,15 @@ interface LogoLoadingAnimationProps {
   onFinished?: () => void;
   className?: string;
   showReplayButton?: boolean;
+  /** Teks tambahan di bawah logo (mis. `Administrator` saat login admin). */
+  caption?: string;
 }
 
 export default function LogoLoadingAnimation({
   onFinished,
   className = 'w-[340px] max-w-[85vw]',
   showReplayButton = false,
+  caption,
 }: LogoLoadingAnimationProps) {
   const [animKey, setAnimKey] = useState(0);
 
@@ -196,6 +199,11 @@ export default function LogoLoadingAnimation({
           </g>
         </svg>
       </div>
+      {caption && (
+        <p className="mt-4 text-center font-headline-sm text-headline-sm font-bold tracking-wide text-primary">
+          {caption}
+        </p>
+      )}
       {showReplayButton && (
         <button onClick={handleReplay} className="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Replay</button>
       )}

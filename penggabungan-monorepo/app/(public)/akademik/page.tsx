@@ -2,17 +2,29 @@ import AkademikBanner from '@/components/akademik/AkademikBanner';
 import JadwalMatriks from '@/components/akademik/JadwalMatriks';
 import KalenderUnduhan from '@/components/akademik/KalenderUnduhan';
 import FormBK from '@/components/akademik/FormBK';
+import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
-import { getJadwal } from '@/lib/api';
+import { getBerita, getJadwal } from '@/lib/api';
 
 export default async function AkademikPage() {
-  const jadwalRes = await getJadwal();
+  // Hotnews compact memakai sumber yang sama dengan `/kabar` (`utama: true`).
+  const [jadwalRes, utamaRes] = await Promise.all([
+    getJadwal(),
+    getBerita({ utama: true }),
+  ]);
   const jadwal = jadwalRes.data ?? {};
 
   return (
     <>
       <Reveal>
         <AkademikBanner />
+      </Reveal>
+      <Reveal>
+        <FeaturedNews
+          variant="compact"
+          berita={utamaRes.data?.[0] ?? null}
+          error={utamaRes.error}
+        />
       </Reveal>
       <Reveal>
         <JadwalMatriks jadwal={jadwal} error={jadwalRes.error} />

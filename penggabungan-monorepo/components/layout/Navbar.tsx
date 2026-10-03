@@ -6,6 +6,9 @@ import Image from "next/image";
 import MobileMenu from "./MobileMenu";
 import PillNavIndicator from "./PillNavIndicator";
 
+/** id dropdown mobile — dipakai tombol toggle untuk `aria-controls`. */
+const MOBILE_MENU_ID = "navbar-mobile-menu";
+
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
@@ -104,8 +107,9 @@ export default function Navbar() {
           </Link>
 
           <button
+            aria-controls={MOBILE_MENU_ID}
             aria-expanded={isMobileOpen}
-            aria-label="Toggle Menu"
+            aria-label={isMobileOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
             className="lg:hidden p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
             type="button"
@@ -118,7 +122,12 @@ export default function Navbar() {
       </div>
 
       {/* Mobile menu dropdown */}
-      <MobileMenu isOpen={isMobileOpen} onClose={() => setIsMobileOpen(false)} navLinks={navLinks} />
+      <MobileMenu
+        id={MOBILE_MENU_ID}
+        isOpen={isMobileOpen}
+        onClose={() => setIsMobileOpen(false)}
+        navLinks={navLinks}
+      />
     </header>
   );
 }

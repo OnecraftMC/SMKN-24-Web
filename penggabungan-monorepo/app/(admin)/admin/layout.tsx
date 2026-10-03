@@ -46,7 +46,11 @@ export default function DashboardLayout({
         mobileOpen={mobileOpen}
         onCloseMobile={() => setMobileOpen(false)}
       />
-      <div className={`flex min-h-screen flex-col ${collapsed ? "md:pl-[4.5rem]" : "md:pl-64"}`}>
+      <div
+        className={`flex min-h-screen flex-col transition-[padding] duration-300 ease-in-out motion-reduce:transition-none ${
+          collapsed ? "md:pl-[4.5rem]" : "md:pl-64"
+        }`}
+      >
         <Topbar onOpenMobile={() => setMobileOpen(true)} />
         <main className="flex-1 px-margin-mobile py-space-lg md:px-margin-tablet lg:px-margin-desktop">
           {children}
