@@ -167,37 +167,33 @@ export async function getGaleri(): Promise<ApiResult<GaleriView[]>> {
     : { data: null, error: result.error };
 }
 
+/**
+ * Matriks jadwal publik.
+ *
+ * Bentuk respons backend BERBEDA tergantung filter, jadi tipenya ikut berbeda:
+ *  - tanpa filter → `{ perhotelan: {pagi,siang}, boga: …, … }` (Record 5 jurusan)
+ *  - `?jurusan=X` → `{ pagi: string[]; siang: string[] }` (objek tunggal, bukan Record)
+ *
+ * Overload di bawah memberi tipe yang benar ke pemanggil tanpa cast manual.
+ */
+export async function getJadwal(): Promise<ApiResult<Record<JurusanKey, JadwalDTO>>>;
+export async function getJadwal(jurusan: JurusanKey): Promise<ApiResult<JadwalDTO>>;
 export async function getJadwal(
   jurusan?: JurusanKey,
-): Promise<ApiResult<Record<JurusanKey, JadwalDTO>>> {
+): Promise<ApiResult<Record<JurusanKey, JadwalDTO> | JadwalDTO>> {
   const query = jurusan ? `?jurusan=${encodeURIComponent(jurusan)}` : "";
   return request(`api/jadwal/index.php${query}`);
 }
 
-export async function postBK(payload: {
-  nama: string;
-  kelas: string;
-  noHp: string;
-  keperluan: string;
-  pesan: string;
-}): Promise<ApiResult<{ message: string }>> {
-  return request("api/bk/index.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
-
-export async function postChat(payload: {
-  sessionId: string;
-  message: string;
-}): Promise<ApiResult<{ sessionId: string; reply: string }>> {
-  return request("api/chat/index.php", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-}
+/**
+ * POST publik (BK & chatbot) TIDAK lewat helper di file ini.
+ *
+ * FormBK.tsx dan ChatbotWidget.tsx memanggil route Next.js (`/api/bk`,
+ * `/api/chat`) langsung dari browser; route tersebut memakai
+ * `proxyPublicPost()` di bawah untuk meneruskan ke PHP. Jadi tidak ada helper
+ * `postBK`/`postChat` yang mengarahkan browser langsung ke backend — jangan
+ * ditambahkannya kembali, karena itu melewati normalisasi & validasi proxy.
+ */
 
 export async function proxyPublicPost(
   endpoint: "bk" | "chat",

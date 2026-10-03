@@ -1,9 +1,14 @@
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
+import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
-import { getFasilitas } from '@/lib/api';
+import { getBerita, getFasilitas } from '@/lib/api';
 
 export default async function FasilitasPage() {
-  const fasilitasRes = await getFasilitas();
+  // Hotnews compact memakai sumber yang sama dengan `/kabar` (`utama: true`).
+  const [fasilitasRes, utamaRes] = await Promise.all([
+    getFasilitas(),
+    getBerita({ utama: true }),
+  ]);
   const fasilitas = fasilitasRes.data ?? [];
 
   return (
@@ -23,6 +28,13 @@ export default async function FasilitasPage() {
             </p>
           </div>
         </div>
+      </Reveal>
+      <Reveal>
+        <FeaturedNews
+          variant="compact"
+          berita={utamaRes.data?.[0] ?? null}
+          error={utamaRes.error}
+        />
       </Reveal>
       <Reveal>
         <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} />
