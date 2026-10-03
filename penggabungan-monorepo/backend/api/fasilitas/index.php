@@ -1,6 +1,7 @@
 <?php
 /**
  * GET    /api/fasilitas/index.php     -> semua fasilitas
+ * GET    /api/fasilitas/index.php?unggulan=1 -> fasilitas unggulan
  * GET    /api/fasilitas/index.php?id=1 -> detail
  * POST   /api/fasilitas/index.php     -> tambah (admin)
  * PUT    /api/fasilitas/index.php?id=1 -> update (admin)
@@ -43,7 +44,10 @@ function handleGet(PDO $db): void
         return;
     }
 
-    $stmt = $db->query('SELECT * FROM fasilitas ORDER BY id ASC');
+    $where = isset($_GET['unggulan']) && $_GET['unggulan'] === '1'
+        ? ' WHERE unggulan = 1'
+        : '';
+    $stmt = $db->query('SELECT * FROM fasilitas' . $where . ' ORDER BY id ASC');
     jsonResponse(array_map('formatRow', $stmt->fetchAll()));
 }
 
@@ -52,8 +56,13 @@ function handleCreate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
-    $stmt = $db->prepare('INSERT INTO fasilitas (judul, deskripsi, gambar) VALUES (?, ?, ?)');
-    $stmt->execute([$body['judul'], $body['deskripsi'] ?? '', $body['gambar'] ?? null]);
+    $stmt = $db->prepare('INSERT INTO fasilitas (judul, deskripsi, gambar, unggulan) VALUES (?, ?, ?, ?)');
+    $stmt->execute([
+        $body['judul'],
+        $body['deskripsi'] ?? '',
+        $body['gambar'] ?? null,
+        !empty($body['unggulan']) ? 1 : 0,
+    ]);
 
     jsonResponse(['id' => (int)$db->lastInsertId(), 'message' => 'Fasilitas berhasil ditambahkan'], 201);
 }
@@ -67,12 +76,22 @@ function handleUpdate(PDO $db): void
     validate($body);
 
     // Eksistensi dicek dulu; rowCount() 0 saat tidak ada perubahan bukan 404.
-    $exists = $db->prepare('SELECT id FROM fasilitas WHERE id = ?');
+    $exists = $db->prepare('SELECT id, unggulan FROM fasilitas WHERE id = ?');
     $exists->execute([$id]);
-    if (!$exists->fetch()) jsonError('Fasilitas tidak ditemukan', 404);
+    $existing = $exists->fetch();
+    if (!$existing) jsonError('Fasilitas tidak ditemukan', 404);
 
-    $stmt = $db->prepare('UPDATE fasilitas SET judul=?, deskripsi=?, gambar=? WHERE id=?');
-    $stmt->execute([$body['judul'], $body['deskripsi'] ?? '', $body['gambar'] ?? null, $id]);
+    $unggulan = array_key_exists('unggulan', $body)
+        ? (!empty($body['unggulan']) ? 1 : 0)
+        : (int)$existing['unggulan'];
+    $stmt = $db->prepare('UPDATE fasilitas SET judul=?, deskripsi=?, gambar=?, unggulan=? WHERE id=?');
+    $stmt->execute([
+        $body['judul'],
+        $body['deskripsi'] ?? '',
+        $body['gambar'] ?? null,
+        $unggulan,
+        $id,
+    ]);
 
     jsonResponse(['message' => 'Fasilitas berhasil diperbarui']);
 }
@@ -91,6 +110,13 @@ function handleDelete(PDO $db): void
 function validate(array $body): void
 {
     if (empty($body['judul'])) jsonError("Field 'judul' wajib diisi", 400);
+    if (
+        array_key_exists('unggulan', $body) &&
+        !is_bool($body['unggulan']) &&
+        !in_array($body['unggulan'], [0, 1, '0', '1'], true)
+    ) {
+        jsonError("Field 'unggulan' harus berupa boolean", 400);
+    }
 }
 
 function formatRow(array $row): array
@@ -100,5 +126,8 @@ function formatRow(array $row): array
         'judul' => $row['judul'],
         'deskripsi' => $row['deskripsi'],
         'gambar' => $row['gambar'],
+        // `?? 0` mengikuti pola berita.php: aman bila migrasi belum dijalankan
+        // (kunci tidak ada) sehingga response tetap JSON valid.
+        'unggulan' => (bool)($row['unggulan'] ?? 0),
     ];
 }

@@ -66,6 +66,7 @@ export interface FasilitasDTO {
   judul: string;
   deskripsi: string | null;
   gambar: string | null;
+  unggulan: boolean;
 }
 
 export interface GaleriDTO {
@@ -113,6 +114,7 @@ export interface FasilitasView {
   title: string;
   desc: string;
   image: string | null;
+  unggulan: boolean;
 }
 
 export interface GaleriView {
@@ -209,6 +211,7 @@ export function mapFasilitas(item: FasilitasDTO, backendUrl: string): FasilitasV
     title: item.judul,
     desc: item.deskripsi ?? "",
     image: assetUrl(item.gambar, backendUrl),
+    unggulan: item.unggulan,
   };
 }
 

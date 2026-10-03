@@ -17,14 +17,20 @@ export type FasilitasFormValues = {
   judul: string;
   deskripsi: string;
   gambar: string | null;
+  unggulan: boolean;
 };
 
 function emptyForm(): FasilitasFormValues {
-  return { judul: "", deskripsi: "", gambar: null };
+  return { judul: "", deskripsi: "", gambar: null, unggulan: false };
 }
 
 function formFromRow(row: FasilitasDTO): FasilitasFormValues {
-  return { judul: row.judul, deskripsi: row.deskripsi ?? "", gambar: row.gambar };
+  return {
+    judul: row.judul,
+    deskripsi: row.deskripsi ?? "",
+    gambar: row.gambar,
+    unggulan: row.unggulan,
+  };
 }
 
 export default function FasilitasDialog({
@@ -62,6 +68,7 @@ export default function FasilitasDialog({
         judul: form.judul.trim(),
         deskripsi: form.deskripsi.trim(),
         gambar: form.gambar,
+        unggulan: form.unggulan,
       };
 
       if (editing) {
@@ -140,6 +147,20 @@ export default function FasilitasDialog({
             onChange={(e) => update("deskripsi", e.target.value)}
           />
         </Field>
+
+        <label
+          htmlFor="fasilitas-unggulan"
+          className="flex min-h-11 items-center gap-space-sm rounded-lg border border-surface-container px-space-md font-body-sm text-body-sm text-on-surface"
+        >
+          <input
+            id="fasilitas-unggulan"
+            type="checkbox"
+            checked={form.unggulan}
+            onChange={(event) => update("unggulan", event.target.checked)}
+            className="h-4 w-4 accent-secondary"
+          />
+          <span>Tampilkan sebagai fasilitas unggulan di halaman profil</span>
+        </label>
 
         <ImageField
           label="Gambar fasilitas"

@@ -11,7 +11,7 @@ export default async function ProfilPage() {
   // Fetch paralel bersama data profil agar tidak menambah waterfall request.
   const [guruRes, fasilitasRes, utamaRes] = await Promise.all([
     getGuru(),
-    getFasilitas(),
+    getFasilitas({ unggulan: true }),
     getBerita({ utama: true }),
   ]);
   const guru = guruRes.data ?? [];
@@ -36,7 +36,7 @@ export default async function ProfilPage() {
         <DewanGuru guru={guru} error={guruRes.error} />
       </Reveal>
       <Reveal>
-        <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} />
+        <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} variant="featured" />
       </Reveal>
     </>
   );

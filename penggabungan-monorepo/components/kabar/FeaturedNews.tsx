@@ -29,8 +29,19 @@ export default function FeaturedNews({
 
   if (!berita) {
     if (compact) {
-      // Halaman yang hanya memuat hotnews tidak boleh menampilkan blok kosong
-      // besar; cukup diamkan agar konten utama halaman tetap dominan.
+      if (error) {
+        return (
+          <div className="w-full px-margin-mobile py-space-sm md:px-margin-tablet lg:px-margin-desktop">
+            <p
+              className="mx-auto max-w-container-max rounded-lg border border-surface-container bg-surface-container-lowest px-space-md py-space-sm font-body-sm text-body-sm text-on-surface-variant"
+              role="status"
+            >
+              Berita pilihan belum dapat dimuat: {error}
+            </p>
+          </div>
+        );
+      }
+      // Tidak ada berita utama yang dipilih admin: jangan tampilkan placeholder.
       return null;
     }
     return (

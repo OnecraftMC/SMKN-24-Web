@@ -153,8 +153,9 @@ export async function getGuru(): Promise<ApiResult<GuruView[]>> {
     : { data: null, error: result.error };
 }
 
-export async function getFasilitas(): Promise<ApiResult<FasilitasView[]>> {
-  const result = await request<FasilitasDTO[]>("api/fasilitas/index.php");
+export async function getFasilitas(options: { unggulan?: boolean } = {}): Promise<ApiResult<FasilitasView[]>> {
+  const query = options.unggulan ? "?unggulan=1" : "";
+  const result = await request<FasilitasDTO[]>(`api/fasilitas/index.php${query}`);
   return result.data
     ? { data: result.data.map((item) => mapFasilitas(item, backendUrl())), error: null }
     : { data: null, error: result.error };
