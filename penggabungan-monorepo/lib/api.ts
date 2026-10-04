@@ -31,6 +31,7 @@ export interface ApiResult<T> {
 }
 
 const TIMEOUT_MS = 5000;
+const PUBLIC_DATA_REVALIDATE_SECONDS = 10;
 
 // Port yang menandakan BACKEND_URL diisi dengan host database, bukan URL HTTP
 // backend — kesalahan konfigurasi nyata yang pernah terjadi (lihat
@@ -75,7 +76,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
       ...init,
       headers: { Accept: "application/json", ...init?.headers },
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      next: init?.method ? undefined : { revalidate: 60 },
+      next: init?.method ? undefined : { revalidate: PUBLIC_DATA_REVALIDATE_SECONDS },
     });
     let body: unknown = null;
     try {
@@ -401,7 +402,7 @@ export async function proxyPublicGet(
     response = await fetch(`${baseUrl}/api/${endpoint}/index.php${suffix}`, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      next: { revalidate: 60 },
+      next: { revalidate: PUBLIC_DATA_REVALIDATE_SECONDS },
     });
   } catch (error) {
     if (error instanceof Error && error.name === "TimeoutError") {
