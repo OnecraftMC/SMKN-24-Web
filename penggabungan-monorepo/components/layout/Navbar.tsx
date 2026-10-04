@@ -63,21 +63,21 @@ export default function Navbar() {
       </div>
 
       {/* Main nav */}
-      <div className="h-20 max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md">
+      <div className="h-16 md:h-20 max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md">
         {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-space-sm text-left group">
+        <Link href="/" className="flex items-center gap-2 md:gap-space-sm text-left group min-w-0 shrink">
           <Image
             src="/logo-smkn24.png"
             alt="Logo SMK Negeri 24 Jakarta"
             width={36}
             height={36}
-            className="h-9 w-auto object-contain rounded-md shadow-sm"
+            className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
           />
-          <span className="flex flex-col">
-            <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors">
+          <span className="flex flex-col min-w-0">
+            <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
               SMKN 24 Jakarta
             </span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant font-normal leading-none hidden sm:inline">
+            <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-normal leading-tight truncate whitespace-nowrap hidden md:inline">
               Sekolah • Unggul &amp; Berkarakter
             </span>
           </span>
