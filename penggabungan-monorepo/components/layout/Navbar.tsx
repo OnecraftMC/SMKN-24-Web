@@ -77,7 +77,7 @@ export default function Navbar() {
             <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
               SMKN 24 Jakarta
             </span>
-            <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-normal leading-tight truncate whitespace-nowrap hidden md:inline">
+            <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-normal leading-tight truncate whitespace-nowrap">
               Sekolah • Unggul &amp; Berkarakter
             </span>
           </span>

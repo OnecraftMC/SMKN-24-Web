@@ -2,12 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
-import BKChatModal from "@/components/bk/BKChatModal";
 
 export default function Hero() {
-  const [isBKOpen, setIsBKOpen] = useState(false);
-
   return (
     <>
       <div className="relative w-full overflow-hidden bg-primary text-on-primary">
@@ -49,16 +45,16 @@ export default function Hero() {
             </p>
 
             <div className="flex flex-wrap items-center gap-space-md pt-space-sm">
-              <button
-                type="button"
-                onClick={() => setIsBKOpen(true)}
+              <Link
+                href="/#lokasi-sekolah"
                 className="inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
               >
-                <span>Bimbingan Konseling</span>
+                <span className="material-symbols-outlined text-[20px]">location_on</span>
+                <span>Lihat Lokasi Sekolah</span>
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">
                   arrow_forward
                 </span>
-              </button>
+              </Link>
 
               <Link
                 href="/profil"
@@ -124,9 +120,6 @@ export default function Hero() {
         </div>
       </div>
       </div>
-
-      {/* Layanan Bimbingan Konseling (counsellor AI) */}
-      <BKChatModal open={isBKOpen} onClose={() => setIsBKOpen(false)} />
     </>
   );
 }
