@@ -101,7 +101,7 @@ export default function BKHistoryPanel({
           type="button"
           onClick={() => void load()}
           aria-label="Muat ulang riwayat"
-          className="rounded-lg p-1.5 text-on-surface-variant hover:bg-surface-container"
+          className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container"
         >
           <RefreshCw aria-hidden className="h-4 w-4" />
         </button>
@@ -116,7 +116,7 @@ export default function BKHistoryPanel({
         )}
 
         {!loading && error && (
-          <p className="rounded-xl bg-error-container px-3 py-2 text-sm text-on-error-container">
+          <p className="rounded-2xl bg-error-container px-4 py-2.5 text-sm text-on-error-container">
             {error}
           </p>
         )}
@@ -130,7 +130,7 @@ export default function BKHistoryPanel({
               <button
                 type="button"
                 onClick={onMulaiBaru}
-                className="mt-3 rounded-lg bg-primary px-5 py-2.5 text-surface font-label-md font-bold"
+                className="mt-3 rounded-full bg-primary px-5 py-2.5 shadow-sm text-surface font-label-md font-bold"
               >
                 Mulai bercerita
               </button>
@@ -144,7 +144,7 @@ export default function BKHistoryPanel({
             return (
               <article
                 key={item.id}
-                className={`rounded-xl border p-3 ${
+                className={`rounded-3xl border p-4 shadow-sm ${
                   item.butuhPerhatian
                     ? "border-error bg-error-container/20"
                     : "border-surface-container bg-surface-container-lowest"
@@ -190,7 +190,7 @@ export default function BKHistoryPanel({
                 </div>
 
                 {isOpen && item.messages && (
-                  <div className="mt-2 space-y-2 rounded-lg bg-surface-container p-3">
+                  <div className="mt-2 space-y-2 rounded-2xl bg-surface-container/70 p-3">
                     {item.messages.map((m, i) => {
                       const isUser = (m.sender ?? m.role) === "user";
                       const text = m.text ?? "";

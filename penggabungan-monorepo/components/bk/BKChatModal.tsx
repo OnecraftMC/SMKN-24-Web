@@ -178,60 +178,70 @@ export default function BKChatModal({
         }
       >
         {/* Kepala */}
-        <div className="flex items-start justify-between gap-3 px-5 py-4 bg-secondary-container text-on-secondary-container">
-          <div className="min-w-0">
-            <h2 className="font-headline-sm text-headline-sm font-bold leading-tight">
-              Bimbingan Konseling
-            </h2>
-            <p className="font-label-sm text-label-sm opacity-90">
-              Ceritakan apa yang kamu rasakan. Tim kami akan membalas.
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-1">
-            <button
-              type="button"
-              onClick={() => setIsFullscreen((v) => !v)}
-              aria-label={isFullscreen ? "Keluar dari layar penuh" : "Layar penuh"}
-              aria-pressed={isFullscreen}
-              className="rounded-full p-1.5 hover:bg-black/10"
-            >
-              <span className="material-symbols-outlined text-[20px]">
-                {isFullscreen ? "close_fullscreen" : "fullscreen"}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              aria-label="Tutup"
-              className="rounded-full p-1.5 hover:bg-black/10"
-            >
-              <span className="material-symbols-outlined text-[20px]">close</span>
-            </button>
-          </div>
-        </div>
+        <div className="relative shrink-0 overflow-hidden rounded-t-[28px] bg-gradient-to-br from-secondary-container via-secondary-container to-tertiary-container px-5 pb-6 pt-5 text-on-secondary-container">
+          <div className="pointer-events-none absolute -right-10 -top-14 h-40 w-40 rounded-full bg-white/10" />
+          <div className="pointer-events-none absolute -bottom-16 -left-8 h-36 w-36 rounded-full bg-white/10" />
 
-        {/* Tab: Ceritakan / Riwayat */}
-        <div className="flex gap-1 px-4 pt-3 bg-surface-container-lowest">
-          {(
-            [
-              { key: "chat", label: "Ceritakan" },
-              { key: "riwayat", label: "Riwayat" },
-            ] as const
-          ).map((t) => (
-            <button
-              key={t.key}
-              type="button"
-              onClick={() => setTab(t.key)}
-              aria-pressed={tab === t.key}
-              className={`rounded-t-lg px-4 py-2 font-label-sm text-label-sm font-bold ${
-                tab === t.key
-                  ? "bg-secondary-container text-on-secondary-container"
-                  : "text-on-surface-variant hover:bg-surface-container"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
+          <div className="relative flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white/25 backdrop-blur">
+                <span className="material-symbols-outlined text-[22px]">forum</span>
+              </span>
+              <div className="min-w-0">
+                <h2 className="font-headline-sm text-headline-sm font-bold leading-tight">
+                  Bimbingan Konseling
+                </h2>
+                <p className="font-label-sm text-label-sm opacity-90">
+                  Ceritakan apa yang kamu rasakan.
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setIsFullscreen((v) => !v)}
+                aria-label={isFullscreen ? "Keluar dari layar penuh" : "Layar penuh"}
+                aria-pressed={isFullscreen}
+                className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-black/10"
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  {isFullscreen ? "close_fullscreen" : "fullscreen"}
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Tutup"
+                className="grid h-9 w-9 place-items-center rounded-full transition-colors hover:bg-black/10"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Tab pill */}
+          <div className="relative mt-4 inline-flex rounded-full bg-white/20 p-1">
+            {(
+              [
+                { key: "chat", label: "Ceritakan" },
+                { key: "riwayat", label: "Riwayat" },
+              ] as const
+            ).map((t) => (
+              <button
+                key={t.key}
+                type="button"
+                onClick={() => setTab(t.key)}
+                aria-pressed={tab === t.key}
+                className={`rounded-full px-4 py-1.5 font-label-sm text-label-sm font-bold transition-all ${
+                  tab === t.key
+                    ? "bg-white text-secondary shadow-sm"
+                    : "text-on-secondary-container/80"
+                }`}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {tab === "riwayat" ? (
@@ -241,20 +251,27 @@ export default function BKChatModal({
         {/* Percakapan */}
         <div
           ref={listRef}
-          className="flex-1 overflow-y-auto px-5 py-4 bg-surface-container-low"
+          className="flex-1 overflow-y-auto bg-surface-container-low px-4 py-5"
         >
           {/* Batasi lebar di layar penuh agar pesan tidak melebar dan sulit dibaca. */}
           <div className="mx-auto w-full max-w-2xl space-y-3">
           {messages.map((m) => (
             <div
               key={m.id}
-              className={m.sender === "user" ? "flex justify-end" : "flex justify-start"}
+              className={`flex ${m.sender === "user" ? "justify-end" : "justify-start"}`}
             >
+              {m.sender === "bot" && (
+                <span className="mr-2 mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-container">
+                  <span className="material-symbols-outlined text-[15px] text-on-secondary-container">
+                    psychology
+                  </span>
+                </span>
+              )}
               <div
                 className={
                   m.sender === "user"
-                    ? "max-w-[85%] rounded-2xl rounded-br-sm bg-primary text-surface px-4 py-2.5 text-sm leading-relaxed"
-                    : "max-w-[85%] rounded-2xl rounded-bl-sm bg-surface-container-highest px-4 py-2.5 text-sm leading-relaxed text-on-surface"
+                    ? "max-w-[80%] rounded-[22px] rounded-br-md bg-gradient-to-br from-primary to-primary/90 px-4 py-2.5 text-sm leading-relaxed text-surface shadow-sm"
+                    : "max-w-[80%] rounded-[22px] rounded-bl-md bg-surface-container-lowest px-4 py-2.5 text-sm leading-relaxed text-on-surface shadow-sm ring-1 ring-surface-container"
                 }
               >
                 {m.text}
@@ -264,8 +281,16 @@ export default function BKChatModal({
 
           {isSending && (
             <div className="flex justify-start">
-              <div className="rounded-2xl rounded-bl-sm bg-surface-container-highest px-4 py-2.5 text-sm text-on-surface-variant">
-                Counsellor AI sedang membaca ceritamu…
+              <span className="mr-2 mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-container">
+                <span className="material-symbols-outlined text-[15px] text-on-secondary-container">
+                  psychology
+                </span>
+              </span>
+              <div className="flex items-center gap-1.5 rounded-[22px] rounded-bl-md bg-surface-container-lowest px-4 py-3 shadow-sm ring-1 ring-surface-container">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-on-surface-variant" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-on-surface-variant [animation-delay:150ms]" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-on-surface-variant [animation-delay:300ms]" />
+                <span className="sr-only">Counsellor AI sedang membaca ceritamu</span>
               </div>
             </div>
           )}
@@ -296,11 +321,11 @@ export default function BKChatModal({
             </div>
           ) : (
             <>
-              <div className="flex items-end gap-2">
+              <div className="flex items-end gap-2 rounded-[26px] bg-surface-container-lowest p-2 shadow-sm ring-1 ring-surface-container transition-shadow focus-within:ring-2 focus-within:ring-primary/60">
                 <textarea
                   ref={inputRef}
                   value={draft}
-                  rows={2}
+                  rows={1}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
@@ -309,16 +334,16 @@ export default function BKChatModal({
                     }
                   }}
                   placeholder="Tulis apa yang sedang kamu rasakan…"
-                  className="flex-1 resize-none rounded-xl border border-outline bg-surface-container-lowest px-4 py-3 text-sm focus:outline-none focus:border-primary"
+                  className="max-h-32 min-h-[2.75rem] flex-1 resize-none bg-transparent px-3 py-2.5 text-sm leading-relaxed outline-none focus:outline-none focus-visible:outline-none"
                 />
                 <button
                   type="button"
                   onClick={sendDraft}
                   disabled={!draft.trim()}
                   aria-label="Kirim pesan"
-                  className="rounded-xl bg-secondary-container px-4 py-3 text-on-secondary-container disabled:opacity-40"
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-container text-on-secondary-container transition-transform active:scale-95 disabled:opacity-30"
                 >
-                  <span className="material-symbols-outlined text-[20px]">send</span>
+                  <span className="material-symbols-outlined text-[20px]">arrow_upward</span>
                 </button>
               </div>
 
@@ -326,11 +351,11 @@ export default function BKChatModal({
                 type="button"
                 onClick={submitCerita}
                 disabled={isSending || !messages.some((m) => m.sender === "user")}
-                className="w-full rounded-lg bg-primary px-5 py-3 text-surface font-label-md font-bold disabled:opacity-40"
+                className="w-full rounded-full bg-primary px-5 py-3 text-surface font-label-md font-bold shadow-sm transition-transform active:scale-[0.99] disabled:opacity-40"
               >
                 {isSending ? "Mengirim…" : "Selesai ceritakan, kirim ke Guru BK"}
               </button>
-              <p className="text-xs text-on-surface-variant px-1">
+              <p className="text-center text-xs text-on-surface-variant">
                 Nama dan kelas boleh dikosongkan bila ingin tetap anonim.
               </p>
             </>

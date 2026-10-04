@@ -145,16 +145,16 @@ export default function ChatbotWidget() {
           className={
             isFullscreen
               ? "fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-surface focus:outline-none"
-              : "mb-4 flex max-h-[min(620px,calc(100dvh-6rem))] min-h-[min(460px,calc(100dvh-6rem))] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-outline-variant/70 bg-surface shadow-[0_24px_70px_-24px_rgba(0,20,47,0.55)] focus:outline-none sm:w-96"
+              : "mb-4 flex max-h-[min(620px,calc(100dvh-6rem))] min-h-[min(460px,calc(100dvh-6rem))] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-[28px] border border-outline-variant/60 bg-surface shadow-[0_28px_80px_-28px_rgba(0,20,47,0.6)] focus:outline-none sm:w-96"
           }
         >
-          <div className="relative flex shrink-0 items-center justify-between gap-3 overflow-hidden bg-primary px-4 py-4 text-on-primary">
+          <div className="relative flex shrink-0 items-center justify-between gap-3 overflow-hidden bg-gradient-to-br from-primary via-primary to-primary-container px-4 py-4 text-on-primary">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full border-[24px] border-secondary-container/10"
+              className="pointer-events-none absolute -right-10 -top-16 h-44 w-44 rounded-full bg-white/[0.06]"
             />
             <div className="relative flex min-w-0 items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary-container shadow-sm">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-container text-on-secondary-container shadow-sm">
                 <Sparkles aria-hidden className="h-5 w-5" />
               </div>
               <div className="min-w-0">
@@ -172,7 +172,7 @@ export default function ChatbotWidget() {
                 aria-label={isFullscreen ? "Kembali ke ukuran biasa" : "Mode layar penuh"}
                 aria-pressed={isFullscreen}
                 aria-controls="smkn24-chat-panel"
-                className="rounded-xl p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
+                className="rounded-full p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
               >
                 {isFullscreen ? <Minimize2 aria-hidden className="h-4 w-4" /> : <Maximize2 aria-hidden className="h-4 w-4" />}
               </button>
@@ -180,7 +180,7 @@ export default function ChatbotWidget() {
                 type="button"
                 onClick={toggleChat}
                 aria-label="Tutup chatbot"
-                className="rounded-xl p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
+                className="rounded-full p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
               >
                 <X aria-hidden className="h-4 w-4" />
               </button>
@@ -212,7 +212,7 @@ export default function ChatbotWidget() {
         aria-label={isOpen ? "Tutup chatbot" : "Buka chatbot"}
         aria-expanded={isOpen}
         aria-controls="smkn24-chat-panel"
-        className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-[0_12px_30px_-8px_rgba(0,20,47,0.55)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary-container focus-visible:outline-offset-4 ${isFullscreen ? "hidden" : ""}`}
+        className={`flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-[0_14px_34px_-10px_rgba(0,20,47,0.6)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary-container focus-visible:outline-offset-4 ${isFullscreen ? "hidden" : ""}`}
       >
         {isOpen ? <X aria-hidden className="h-6 w-6" /> : <MessageCircle aria-hidden className="h-6 w-6" />}
       </button>

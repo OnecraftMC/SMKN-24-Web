@@ -34,7 +34,7 @@ export default function ChatMessages({ messages, isTyping = false }: ChatMessage
           className={`flex w-full items-end gap-2.5 ${msg.sender === "user" ? "justify-end" : "justify-start"}`}
         >
           {msg.sender === "bot" && (
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary shadow-sm">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary shadow-sm">
               <Bot aria-hidden className="h-4 w-4" />
             </div>
           )}
@@ -47,7 +47,7 @@ export default function ChatMessages({ messages, isTyping = false }: ChatMessage
             {msg.text}
           </p>
           {msg.sender === "user" && (
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container shadow-sm">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container shadow-sm">
               <UserRound aria-hidden className="h-4 w-4" />
             </div>
           )}
@@ -59,10 +59,10 @@ export default function ChatMessages({ messages, isTyping = false }: ChatMessage
           role="status"
           aria-label="Asisten sedang menyiapkan jawaban"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary shadow-sm">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary shadow-sm">
             <Bot aria-hidden className="h-4 w-4" />
           </div>
-          <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-outline-variant/40 bg-surface-container-lowest px-4 py-3 shadow-sm">
+          <div className="flex items-center gap-1 rounded-[22px] rounded-bl-md bg-surface-container-lowest ring-1 ring-surface-container px-4 py-3 shadow-sm">
             {[0, 1, 2].map((dot) => (
               <motion.span
                 key={dot}
