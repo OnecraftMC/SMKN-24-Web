@@ -14,6 +14,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type AgendaDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type AgendaFormValues = {
   judul: string;
@@ -169,6 +170,25 @@ export default function AgendaDialog({
             <span>{error}</span>
           </p>
         )}
+
+        <AiWriterPanel<AgendaDraft>
+          module="agenda"
+          label="agenda"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            // Tanggal, waktu, kategori, dan gambar sengaja tidak ikut diisi AI.
+            // Field tanggal/waktu paling rawan dikarang model, jadi tetap
+            // dikendalikan admin.
+            setForm((prev) => ({
+              ...prev,
+              judul: draf.judul || prev.judul,
+              badge: draf.badge || prev.badge,
+              lokasi: draf.lokasi || prev.lokasi,
+              deskripsi: draf.deskripsi || prev.deskripsi,
+            }));
+          }}
+        />
 
         <Field htmlFor="agenda-judul" label="Judul kegiatan">
           <input

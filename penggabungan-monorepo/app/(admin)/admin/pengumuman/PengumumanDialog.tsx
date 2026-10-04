@@ -14,6 +14,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type PengumumanDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type PengumumanFormValues = {
   judul: string;
@@ -193,6 +194,24 @@ export default function PengumumanDialog({
             <span>{error}</span>
           </p>
         )}
+
+        <AiWriterPanel<PengumumanDraft>
+          module="pengumuman"
+          label="pengumuman"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            // Tanggal, tautan (linkLabel/linkHref), ikon, dan checkbox TIDAK
+            // diisi AI: semuanya keputusan faktual admin.
+            setForm((prev) => ({
+              ...prev,
+              judul: draf.judul || prev.judul,
+              isi: draf.isi || prev.isi,
+              badge: draf.badge || prev.badge,
+              status: draf.status || prev.status,
+            }));
+          }}
+        />
 
         <Field htmlFor="peng-judul" label="Judul">
           <input

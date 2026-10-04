@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type GuruDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type GuruFormValues = {
   nama: string;
@@ -157,6 +158,22 @@ export default function GuruDialog({
             maxLength={150}
           />
         </Field>
+
+        <AiWriterPanel<GuruDraft>
+          module="guru"
+          label="profil guru"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            // Nama, urutan, gambar, dan kategori TIDAK diisi AI. Nama adalah
+            // identitas orang nyata dan tidak boleh dikarang oleh model.
+            setForm((prev) => ({
+              ...prev,
+              jabatan: draf.jabatan || prev.jabatan,
+              deskripsi: draf.deskripsi || prev.deskripsi,
+            }));
+          }}
+        />
 
         <Field htmlFor="guru-jabatan" label="Jabatan">
           <input

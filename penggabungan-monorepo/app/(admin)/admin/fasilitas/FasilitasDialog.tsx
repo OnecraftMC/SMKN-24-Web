@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type FasilitasDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type FasilitasFormValues = {
   judul: string;
@@ -131,6 +132,20 @@ export default function FasilitasDialog({
             <span>{error}</span>
           </p>
         )}
+
+        <AiWriterPanel<FasilitasDraft>
+          module="fasilitas"
+          label="fasilitas"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            setForm((prev) => ({
+              ...prev,
+              judul: draf.judul || prev.judul,
+              deskripsi: draf.deskripsi || prev.deskripsi,
+            }));
+          }}
+        />
 
         <Field htmlFor="fasilitas-judul" label="Judul">
           <input

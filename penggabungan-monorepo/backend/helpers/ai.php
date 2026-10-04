@@ -19,20 +19,23 @@
  * Panggil provider AI sesuai AI_PROVIDER dan kembalikan teks balasannya.
  *
  * @param array $messages Daftar pesan [{role, content}, ...] sudah termasuk system.
+ * @param array $options Tuning opsional: `max_tokens`, `temperature`.
+ *                        Default-nya sama dengan sebelumnya (400 / 0.6) sehingga
+ *                        pemanggil lama (chat & BK) tidak ikut berubah.
  * @return string Teks balasan mentah dari provider.
  */
-function callAiProvider(array $messages): string
+function callAiProvider(array $messages, array $options = []): string
 {
     switch (AI_PROVIDER) {
         case 'gemini':
-            $reply = callAiGemini($messages);
+            $reply = callAiGemini($messages, $options);
             break;
         case 'anthropic':
-            $reply = callAiAnthropic($messages);
+            $reply = callAiAnthropic($messages, $options);
             break;
         case 'openai':
         default:
-            $reply = callAiOpenai($messages);
+            $reply = callAiOpenai($messages, $options);
             break;
     }
 
@@ -42,7 +45,7 @@ function callAiProvider(array $messages): string
 /**
  * OpenAI (juga untuk provider OpenAI-compatible lewat OPENAI_BASE_URL).
  */
-function callAiOpenai(array $messages): string
+function callAiOpenai(array $messages, array $options = []): string
 {
     if (empty(OPENAI_API_KEY)) {
         throw new RuntimeException('OPENAI_API_KEY belum diisi di file .env');
@@ -51,8 +54,8 @@ function callAiOpenai(array $messages): string
     $payload = [
         'model' => OPENAI_MODEL,
         'messages' => $messages,
-        'temperature' => 0.6,
-        'max_tokens' => 400,
+        'temperature' => $options['temperature'] ?? 0.6,
+        'max_tokens' => $options['max_tokens'] ?? 400,
     ];
 
     $response = httpPostJson(OPENAI_BASE_URL, $payload, [
@@ -65,7 +68,7 @@ function callAiOpenai(array $messages): string
 /**
  * Anthropic Claude â€” `system` dikirim terpisah, messages hanya user/assistant.
  */
-function callAiAnthropic(array $messages): string
+function callAiAnthropic(array $messages, array $options = []): string
 {
     if (empty(ANTHROPIC_API_KEY)) {
         throw new RuntimeException('ANTHROPIC_API_KEY belum diisi di file .env');
@@ -85,7 +88,7 @@ function callAiAnthropic(array $messages): string
         'model' => ANTHROPIC_MODEL,
         'system' => $system,
         'messages' => $chatMessages,
-        'max_tokens' => 400,
+        'max_tokens' => $options['max_tokens'] ?? 400,
     ];
 
     $response = httpPostJson('https://api.anthropic.com/v1/messages', $payload, [
@@ -99,7 +102,7 @@ function callAiAnthropic(array $messages): string
 /**
  * Google Gemini â€” `systemInstruction` terpisah dari `contents`.
  */
-function callAiGemini(array $messages): string
+function callAiGemini(array $messages, array $options = []): string
 {
     if (empty(GEMINI_API_KEY)) {
         throw new RuntimeException('GEMINI_API_KEY belum diisi di file .env');
@@ -121,6 +124,10 @@ function callAiGemini(array $messages): string
     $payload = [
         'contents' => $contents,
         'systemInstruction' => ['parts' => [['text' => $system]]],
+        'generationConfig' => [
+            'temperature' => $options['temperature'] ?? 0.6,
+            'maxOutputTokens' => $options['max_tokens'] ?? 400,
+        ],
     ];
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
