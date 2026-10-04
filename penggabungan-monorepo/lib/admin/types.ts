@@ -185,6 +185,16 @@ export interface PesanBKDTO {
   status: StatusPesanBK;
   kategori: string | null;
   tanggal: string;
+
+  // ---- Hasil triase Counsellor AI (Bimbingan Konseling) ----
+  /** Ringkasan netral masalah, ditulis AI dari cerita siswa. */
+  ringkasan: string | null;
+  /** 'Ringan' | 'Sedang' | 'Berat' — guru BK mengurutkan dari sini. */
+  tingkatKesulitan: TingkatKesulitanBK | null;
+  /** true bila ada indikasi risiko keselamatan - selalu didahulukan. */
+  butuhPerhatian: boolean;
+  /** Transkrip percakapan siswa dengan counseller AI (JSON string). */
+  transkrip: string | null;
 }
 
 export interface ArsipDTO {
@@ -227,6 +237,20 @@ export interface PrestasiDTO {
  * dipertahankan agar data lama di backend tetap terbaca bila diperlukan;
  * jangan dipakai untuk fitur baru.
  */
+
+/** Tingkat kesulitan hasil triase AI. */
+export type TingkatKesulitanBK = "Ringan" | "Sedang" | "Berat";
+
+/**
+ * Bobot urgensi untuk mengurutkan daftar di panel admin.
+ * Makin besar makin diprioritaskan.
+ */
+export const BOBOT_KESULITAN: Record<TingkatKesulitanBK, number> = {
+  Ringan: 1,
+  Sedang: 2,
+  Berat: 3,
+};
+
 export type StatusAspirasi = "Baru" | "Ditinjau" | "Selesai";
 
 export interface AspirasiDTO {

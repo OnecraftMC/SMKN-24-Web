@@ -28,7 +28,7 @@ const quickLinks = [
   { title: 'Profil', href: '/profil' },
   { title: 'Akademik', href: '/akademik' },
   { title: 'Kabar', href: '/kabar' },
-  { title: 'Lokasi Sekolah', href: '/#lokasi-sekolah' },
+  { title: 'Bimbingan Konseling', href: '/#bimbingan-konseling' },
   { title: 'Fasilitas', href: '/profil#fasilitas' },
   { title: 'Berita', href: '/berita' },
   { title: 'Jurusan', href: '/jurusan' },

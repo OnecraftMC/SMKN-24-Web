@@ -154,8 +154,27 @@ CREATE TABLE IF NOT EXISTS pesan_bk (
   pesan TEXT NOT NULL,
   status ENUM('Baru','Diproses','Selesai') NOT NULL DEFAULT 'Baru',
   kategori VARCHAR(100) DEFAULT NULL,
-  tanggal TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  tanggal TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+  -- Hasil triase AI Bimbingan Konseling (lihat AI_BK_SYSTEM_PROMPT).
+  -- Ringkasan netral masalah yang dilaporkan Counsellor AI.
+  ringkasan TEXT DEFAULT NULL,
+  -- 'Ringan' | 'Sedang' | 'Berat' - dipakai guru BK untuk mengurutkan prioritas.
+  tingkat_kesulitan ENUM('Ringan','Sedang','Berat') DEFAULT NULL,
+  -- true bila ada indikasi risiko keselamatan (menyakiti diri, kekerasan, ancaman).
+  butuh_perhatian TINYINT(1) NOT NULL DEFAULT 0,
+  -- Transkrip percakapan siswa dengan counseller AI (JSON).
+  transkrip MEDIUMTEXT DEFAULT NULL,
+
+  -- ID perangkat siswa (HP) yang dibuat di browser dan disimpan di localStorage.
+  -- Dipakai sebagai kunci membaca history milik siswa SENDIRI.
+  -- Sengaja TIDAK memakai IP: IP handphone sering berubah (pindah WiFi ke
+  -- seluler atau ganti lokasi) sehingga history bisa hilang sendiri, dan IP
+  -- sekolah dipakai bersama banyak siswa sehingga rawan tercampur.
+  device_id VARCHAR(64) DEFAULT NULL
 ) ENGINE=InnoDB;
+
+CREATE INDEX idx_pesan_bk_device ON pesan_bk (device_id, tanggal);
 
 -- ---------------------------------------------------------------------------
 -- Arsip dokumen publik (file privat di luar web root, diunduh melalui API)

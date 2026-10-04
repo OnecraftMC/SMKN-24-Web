@@ -17,9 +17,17 @@ interface MobileMenuProps {
   navLinks: NavLink[];
   /** id pembungkus menu — dipakai tombol toggle di Navbar untuk `aria-controls`. */
   id?: string;
+  /** Membuka layanan Bimbingan Konseling (counsellor AI). */
+  onOpenBK: () => void;
 }
 
-export default function MobileMenu({ isOpen, onClose, navLinks, id }: MobileMenuProps) {
+export default function MobileMenu({
+  isOpen,
+  onClose,
+  navLinks,
+  id,
+  onOpenBK,
+}: MobileMenuProps) {
   const pathname = usePathname();
   const shouldReduceMotion = useReducedMotion();
   // Login menuju `/login` same-origin pada aplikasi gabungan.
@@ -89,6 +97,16 @@ export default function MobileMenu({ isOpen, onClose, navLinks, id }: MobileMenu
               >
                 Lihat Lokasi Sekolah
               </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  onOpenBK();
+                }}
+                className="block w-full text-center mt-2 py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md font-bold"
+              >
+                Bimbingan Konseling
+              </button>
             </div>
           </motion.div>
         )}

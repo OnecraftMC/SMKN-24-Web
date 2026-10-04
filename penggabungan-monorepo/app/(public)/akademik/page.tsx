@@ -6,6 +6,13 @@ import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
 import { getArsip, getBerita, getJadwal } from '@/lib/api';
 
+/**
+ * Halaman akademik.
+ *
+ * Layanan Bimbingan Konseling TIDAK lagi ada di sini — siswa mengaksesnya lewat
+ * tombol "Bimbingan Konseling" (navbar dan beranda) yang membuka chat
+ * counseller AI. Formulir BK lama (FormBK) sudah dihapus.
+ */
 export default async function AkademikPage() {
   // Hotnews compact memakai sumber yang sama dengan `/kabar` (`utama: true`).
   const [jadwalRes, utamaRes, arsipRes] = await Promise.all([

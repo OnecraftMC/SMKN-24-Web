@@ -123,7 +123,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
 | `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
 | `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
-| `/api/bk`, `/api/chat` | Proxy publik ke backend (status dipertahankan) |
+| `/api/bk`, `/api/bk/chat`, `/api/bk/history`, `/api/chat` | Proxy publik ke backend (status dipertahankan) |
 | `/api/prestasi` | Proxy multipart pengajuan publik ke backend |
 | `/api/berita`, `pengumuman`, `agenda`, `jadwal` | Proxy baca ke backend PHP |
 | `backend/api/*.php` | REST API PHP (kontrak sumber, Bearer JWT untuk tulis) |
@@ -200,3 +200,56 @@ Lalu buka `https://domain-anda.id/login`, masuk dengan akun admin, pastikan
 mengarah ke `/admin`, dan coba CRUD satu modul.
 
 Hasil validasi lokal dan gap yang masih terbuka: `MIGRATION_MATRIX.md` §8.
+
+## Bimbingan Konseling (counsellor AI)
+
+Siswa membuka layanan BK lewat tombol **"Bimbingan Konseling"** di navbar,
+menu seluler, dan beranda. Tombol itu membuka chat modal: AI menyapa, siswa
+bercerita, lalu AI merangkum dan menyimpan laporan untuk guru BK. Modal ini
+berdampingan dengan formulir BK lama di `/akademik` dan tombol "Lihat Lokasi
+Sekolah" — ketiganya tetap dipertahankan.
+
+Backend punya **dua AI dengan tujuan terpisah**, keduanya memakai pemanggil
+provider yang sama (`backend/helpers/ai.php`):
+
+| AI | Prompt | Tujuan |
+|---|---|---|
+| Asisten sekolah | `AI_SYSTEM_PROMPT` | Jawab pertanyaan umum (PPDB, jurusan, jadwal) |
+| Counsellor AI | `AI_BK_SYSTEM_PROMPT` | Triase BK: ringkas masalah + nilai tingkat kesulitan |
+
+Counsellor AI mengembalikan JSON berisi `ringkasan`, `kategori`,
+`tingkat_kesulitan` (`Ringan`/`Sedang`/`Berat`), `butuh_perhatian`, dan
+`balasan_siswa`. Di panel `/admin/bk`, daftar diurutkan berdasarkan
+`butuh_perhatian` lalu tingkat kesulitan, sehingga guru BK dapat menangani yang
+paling mendesak lebih dahulu.
+
+### Riwayat percakapan siswa
+
+Modal BK punya tab **Riwayat** yang menampilkan 20 cerita terakhir. Kunci
+riwayat adalah **ID perangkat** yang dibuat browser dan disimpan di
+localStorage (`smkn24-bk-device`), bukan alamat IP:
+
+- IP handphone sering berubah (pindah WiFi ke seluler atau ganti lokasi)
+  sehingga history bisa hilang sendiri;
+- IP sekolah dipakai bersama banyak siswa sehingga history bisa tercampur.
+
+Konsekuensinya, history terikat per perangkat: mengganti perangkat atau
+menekan "Clear data browser" berarti history lama tidak terlihat di sana.
+
+Endpoint `/api/bk/history` hanya mengembalikan baris milik `deviceId` tersebut
+dan tidak menerima parameter lain. `deviceId` divalidasi sebagai UUID v4 di
+frontend, proxy, dan backend. Nomor HP siswa tidak pernah dikembalikan ke
+siswa.
+
+**Migrasi database wajib** sebelum memakai fitur ini:
+
+```bash
+mysql -u <user> -p <nama_database> < backend/tools/migrate-bk-ai.sql
+```
+
+File tersebut aman dijalankan berulang kali (semua blok di-check lewat
+`information_schema`).
+
+> Catatan: bila AI gagal atau tidak mengembalikan JSON, cerita siswa **tetap
+> tersimpan** dengan ringkasan cadangan — data tidak hilang, hanya triase
+> otomatisnya yang kosong.

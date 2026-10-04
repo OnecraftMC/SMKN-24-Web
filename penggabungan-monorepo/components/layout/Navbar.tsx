@@ -5,12 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
 import PillNavIndicator from "./PillNavIndicator";
+import BKChatModal from "@/components/bk/BKChatModal";
 
 /** id dropdown mobile — dipakai tombol toggle untuk `aria-controls`. */
 const MOBILE_MENU_ID = "navbar-mobile-menu";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isBKOpen, setIsBKOpen] = useState(false);
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
@@ -98,13 +100,14 @@ export default function Navbar() {
             <span className="material-symbols-outlined text-[18px]">open_in_new</span>
           </a>
 
-          <Link
-            href="/#lokasi-sekolah"
+          <button
+            type="button"
+            onClick={() => setIsBKOpen(true)}
             className="hidden sm:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-md hover:bg-secondary-fixed-dim transition-all"
           >
-            <span>Lokasi Sekolah</span>
-            <span className="material-symbols-outlined text-[18px]">location_on</span>
-          </Link>
+            <span>Bimbingan Konseling</span>
+            <span className="material-symbols-outlined text-[18px]">forum</span>
+          </button>
 
           <button
             aria-controls={MOBILE_MENU_ID}
@@ -127,7 +130,14 @@ export default function Navbar() {
         isOpen={isMobileOpen}
         onClose={() => setIsMobileOpen(false)}
         navLinks={navLinks}
+        onOpenBK={() => {
+          setIsMobileOpen(false);
+          setIsBKOpen(true);
+        }}
       />
+
+      {/* Layanan Bimbingan Konseling (counsellor AI) */}
+      <BKChatModal open={isBKOpen} onClose={() => setIsBKOpen(false)} />
     </header>
   );
 }

@@ -134,6 +134,12 @@ function buildSchoolContext(PDO $db): string
 
 /**
  * Meneruskan percakapan ke AI provider yang dipilih di config (AI_PROVIDER).
+ *
+ * Pemanggilan provider sendiri TIDAK diulang di sini â€” semuanya memakai
+ * `callAiProvider()` dari `helpers/ai.php`, yang juga dipakai Counsellor AI
+ * Bimbingan Konseling. Yang membedakan hanya system prompt: file ini memakai
+ * AI_SYSTEM_PROMPT (info sekolah), sedangkan endpoint BK memakai
+ * AI_BK_SYSTEM_PROMPT (triase).
  */
 function generateAiReply(string $message, array $history, string $context): string
 {
@@ -148,133 +154,5 @@ function generateAiReply(string $message, array $history, string $context): stri
         ];
     }
 
-    switch (AI_PROVIDER) {
-        case 'gemini':
-            return callGemini($messages);
-        case 'anthropic':
-            return callAnthropic($messages);
-        case 'openai':
-        default:
-            return callOpenAi($messages);
-    }
-}
-
-function callOpenAi(array $messages): string
-{
-    if (empty(OPENAI_API_KEY)) {
-        throw new RuntimeException('OPENAI_API_KEY belum diisi di file .env');
-    }
-
-    $payload = [
-        'model' => OPENAI_MODEL,
-        'messages' => $messages,
-        'temperature' => 0.6,
-        'max_tokens' => 400,
-    ];
-
-    $response = httpPostJson(OPENAI_BASE_URL, $payload, [
-        'Authorization: Bearer ' . OPENAI_API_KEY,
-    ]);
-
-    return $response['choices'][0]['message']['content'] ?? 'Maaf, tidak ada jawaban dari AI.';
-}
-
-function callAnthropic(array $messages): string
-{
-    if (empty(ANTHROPIC_API_KEY)) {
-        throw new RuntimeException('ANTHROPIC_API_KEY belum diisi di file .env');
-    }
-
-    // Format Anthropic: system terpisah, messages hanya user/assistant
-    $system = '';
-    $chatMessages = [];
-    foreach ($messages as $m) {
-        if ($m['role'] === 'system') {
-            $system = $m['content'];
-        } else {
-            $chatMessages[] = $m;
-        }
-    }
-
-    $payload = [
-        'model' => ANTHROPIC_MODEL,
-        'system' => $system,
-        'messages' => $chatMessages,
-        'max_tokens' => 400,
-    ];
-
-    $response = httpPostJson('https://api.anthropic.com/v1/messages', $payload, [
-        'x-api-key: ' . ANTHROPIC_API_KEY,
-        'anthropic-version: 2023-06-01',
-    ]);
-
-    return $response['content'][0]['text'] ?? 'Maaf, tidak ada jawaban dari AI.';
-}
-
-function callGemini(array $messages): string
-{
-    if (empty(GEMINI_API_KEY)) {
-        throw new RuntimeException('GEMINI_API_KEY belum diisi di file .env');
-    }
-
-    $system = '';
-    $contents = [];
-    foreach ($messages as $m) {
-        if ($m['role'] === 'system') {
-            $system = $m['content'];
-            continue;
-        }
-        $contents[] = [
-            'role' => $m['role'] === 'assistant' ? 'model' : 'user',
-            'parts' => [['text' => $m['content']]],
-        ];
-    }
-
-    $payload = [
-        'contents' => $contents,
-        'systemInstruction' => ['parts' => [['text' => $system]]],
-    ];
-
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-        . GEMINI_MODEL . ':generateContent?key=' . GEMINI_API_KEY;
-
-    $response = httpPostJson($url, $payload, []);
-
-    return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, tidak ada jawaban dari AI.';
-}
-
-/**
- * Helper cURL generik untuk POST JSON ke API eksternal.
- */
-function httpPostJson(string $url, array $payload, array $extraHeaders = []): array
-{
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json'], $extraHeaders),
-        // Harus lebih kecil dari timeout proxy `POST /api/chat` di frontend
-        // (CHAT_TIMEOUT_MS = 25 detik) supaya provider yang lambat atau error
-        // tetap sempat dibalas dari sini, bukan dipotong proxy menjadi 504.
-        CURLOPT_TIMEOUT => 20,
-    ]);
-
-    $responseBody = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
-
-    if ($responseBody === false) {
-        throw new RuntimeException('Gagal menghubungi layanan AI: ' . $curlError);
-    }
-
-    $decoded = json_decode($responseBody, true);
-
-    if ($httpCode >= 400) {
-        $errMsg = $decoded['error']['message'] ?? $responseBody;
-        throw new RuntimeException("Layanan AI mengembalikan error ($httpCode): $errMsg");
-    }
-
-    return $decoded ?? [];
+    return callAiProvider($messages);
 }

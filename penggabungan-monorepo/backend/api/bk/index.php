@@ -51,7 +51,18 @@ function handleCreate(PDO $db): void
 
 function handleGet(PDO $db): void
 {
-    $stmt = $db->query('SELECT * FROM pesan_bk ORDER BY tanggal DESC');
+    // Prioritas guru BK: kasus butuh perhatian didahulukan, lalu tingkat
+    // kesulitan (Berat > Sedang > Ringan), lalu yang terbaru.
+    // Catatan: pesan lama (sebelum fitur ini) punya tingkat_kesulitan NULL.
+    // FIELD() mengembalikan 0 untuk NULL sehingga akan menduduki posisi
+    // teratas; itu tidak diinginkan, jadi NULL dipaksa ke nilai paling akhir
+    // ('zzz') agar urutannya tidak menutupi kasus yang benar-benar triase.
+    $sql = "SELECT * FROM pesan_bk
+            ORDER BY
+                butuh_perhatian DESC,
+                FIELD(IFNULL(tingkat_kesulitan, 'zzz'), 'Berat', 'Sedang', 'Ringan', 'zzz'),
+                tanggal DESC";
+    $stmt = $db->query($sql);
     $rows = array_map(function ($r) {
         return [
             'id' => (int)$r['id'],
@@ -63,6 +74,12 @@ function handleGet(PDO $db): void
             'status' => $r['status'],
             'kategori' => $r['kategori'] ?? null,
             'tanggal' => $r['tanggal'],
+            // Hasil triase AI Bimbingan Konseling.
+            'ringkasan' => $r['ringkasan'] ?? null,
+            'tingkatKesulitan' => $r['tingkat_kesulitan'] ?? null,
+            'kategori' => $r['kategori'] ?? null,
+            'butuhPerhatian' => (bool)($r['butuh_perhatian'] ?? 0),
+            'transkrip' => $r['transkrip'] ?? null,
         ];
     }, $stmt->fetchAll());
 
