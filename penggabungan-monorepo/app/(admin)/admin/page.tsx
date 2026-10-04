@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   AlertTriangle,
   Building2,
   CalendarDays,
   GraduationCap,
   Images,
-  Lightbulb,
   Loader2,
   Megaphone,
   MessageSquareHeart,
@@ -19,7 +19,6 @@ import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type {
   AgendaDTO,
-  AspirasiDTO,
   BeritaDTO,
   FasilitasDTO,
   GaleriDTO,
@@ -43,18 +42,16 @@ const INITIAL_CARDS: Cards = {
   fasilitas: { kind: "loading" },
   galeri: { kind: "loading" },
   bk: { kind: "loading" },
-  aspirasi: { kind: "loading" },
 };
 
-const CARD_META: { id: string; label: string; icon: LucideIcon }[] = [
-  { id: "berita", label: "Berita", icon: Newspaper },
-  { id: "pengumuman", label: "Pengumuman", icon: Megaphone },
-  { id: "agenda", label: "Agenda", icon: CalendarDays },
-  { id: "guru", label: "Direktori Guru", icon: GraduationCap },
-  { id: "fasilitas", label: "Fasilitas", icon: Building2 },
-  { id: "galeri", label: "Galeri", icon: Images },
-  { id: "bk", label: "Pesan BK Baru", icon: MessageSquareHeart },
-  { id: "aspirasi", label: "Aspirasi Baru", icon: Lightbulb },
+const CARD_META: { id: string; label: string; icon: LucideIcon; href: string }[] = [
+  { id: "berita", label: "Berita", icon: Newspaper, href: "/admin/berita" },
+  { id: "pengumuman", label: "Pengumuman", icon: Megaphone, href: "/admin/pengumuman" },
+  { id: "agenda", label: "Agenda", icon: CalendarDays, href: "/admin/agenda" },
+  { id: "guru", label: "Direktori Guru", icon: GraduationCap, href: "/admin/guru" },
+  { id: "fasilitas", label: "Fasilitas", icon: Building2, href: "/admin/fasilitas" },
+  { id: "galeri", label: "Galeri", icon: Images, href: "/admin/galeri" },
+  { id: "bk", label: "Pesan BK Baru", icon: MessageSquareHeart, href: "/admin/bk" },
 ];
 
 function formatNumber(value: number): string {
@@ -88,7 +85,6 @@ export default function OverviewPage() {
       apiRequest<FasilitasDTO[]>("/api/fasilitas/index.php"),
       apiRequest<GaleriDTO[]>("/api/galeri/index.php"),
       apiRequest<PesanBKDTO[]>("/api/bk/index.php"),
-      apiRequest<AspirasiDTO[]>("/api/aspirasi/index.php"),
     ]).then((results) => {
       if (cancelled) return;
 
@@ -101,7 +97,7 @@ export default function OverviewPage() {
         return;
       }
 
-      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk, aspirasi] =
+      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk] =
         results;
 
       const errMessage = (r: PromiseSettledResult<unknown>): string =>
@@ -166,7 +162,6 @@ export default function OverviewPage() {
       };
 
       next.bk = inboxCard(bk);
-      next.aspirasi = inboxCard(aspirasi);
 
       setCards(next);
     });
@@ -201,19 +196,22 @@ export default function OverviewPage() {
         aria-label="Ringkasan konten dan inbox"
         className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-4"
       >
-        {CARD_META.map(({ id, label, icon: Icon }) => {
+        {CARD_META.map(({ id, label, icon: Icon, href }) => {
           const state = cards[id] ?? { kind: "loading" as const };
 
           return (
             <article
               key={id}
               aria-live="polite"
-              className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm"
+              className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm transition-colors hover:border-primary/40"
             >
               <div className="flex items-center justify-between gap-2">
-                <p className="font-label-md text-label-md font-bold text-on-surface-variant">
+                <Link
+                  href={href}
+                  className="rounded font-label-md text-label-md font-bold text-on-surface-variant underline-offset-4 hover:text-primary hover:underline"
+                >
                   {label}
-                </p>
+                </Link>
                 <Icon aria-hidden className="h-5 w-5 shrink-0 text-secondary" />
               </div>
 
@@ -255,9 +253,10 @@ export default function OverviewPage() {
 
       <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          Modul konten (Berita, Pengumuman, Agenda, Guru, Fasilitas, Galeri, Jadwal, Arsip,
-          Inbox, Chatbot) dibangun bertahap pada Slice 2–4 sesuai rencana. Item menu yang
-          nonaktif di sidebar menandai modul yang belum tersedia.
+          Modul konten (Berita, Pengumuman, Agenda, Guru, Fasilitas, Galeri, Jadwal, Pesan BK)
+          sudah aktif. Arsip, Pengajuan Prestasi, Riwayat Chatbot, dan Pengaturan dibangun
+          bertahap sesuai rencana. Item menu yang nonaktif di sidebar menandai modul yang
+          belum tersedia.
         </p>
       </section>
     </div>

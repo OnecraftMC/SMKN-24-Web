@@ -14,7 +14,6 @@ import {
   GraduationCap,
   Images,
   LayoutDashboard,
-  Lightbulb,
   Megaphone,
   MessageSquareHeart,
   Newspaper,
@@ -62,15 +61,14 @@ export const NAV_GROUPS: NavGroup[] = [
     heading: "Akademik",
     items: [
       { href: `${ADMIN_BASE}/jadwal`, label: "Jadwal Pembelajaran", icon: CalendarClock, ready: true },
-      { href: `${ADMIN_BASE}/arsip`, label: "Pusat Arsip", icon: FolderOpen, ready: false },
+      { href: `${ADMIN_BASE}/arsip`, label: "Pusat Arsip", icon: FolderOpen, ready: true },
     ],
   },
   {
     heading: "Inbox & Moderasi",
     items: [
-      { href: `${ADMIN_BASE}/bk`, label: "Pesan BK", icon: MessageSquareHeart, ready: false },
-      { href: `${ADMIN_BASE}/aspirasi`, label: "Aspirasi", icon: Lightbulb, ready: false },
-      { href: `${ADMIN_BASE}/prestasi`, label: "Pengajuan Prestasi", icon: Trophy, ready: false },
+      { href: `${ADMIN_BASE}/bk`, label: "Pesan BK", icon: MessageSquareHeart, ready: true },
+      { href: `${ADMIN_BASE}/prestasi`, label: "Pengajuan Prestasi", icon: Trophy, ready: true },
     ],
   },
   {
@@ -339,5 +337,4 @@ export default function Sidebar({
     </>
   );
 }
-
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getBeritaById } from "@/lib/api";
 
-export const revalidate = 60;
+export const revalidate = 10;
 
 type Berita = NonNullable<Awaited<ReturnType<typeof getBeritaById>>["data"]>;
 

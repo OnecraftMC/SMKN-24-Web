@@ -167,7 +167,7 @@ export interface JadwalMatriksDTO {
 }
 
 // -----------------------------------------------------------------------------
-// Inbox: Pesan BK & Aspirasi
+// Inbox: Pesan BK
 // -----------------------------------------------------------------------------
 
 export type StatusPesanBK = "Baru" | "Diproses" | "Selesai";
@@ -183,6 +183,45 @@ export interface PesanBKDTO {
   tanggal: string;
 }
 
+export interface ArsipDTO {
+  id: number;
+  judul: string;
+  deskripsi: string | null;
+  kategori: string;
+  namaFile: string;
+  ukuranFile: number;
+  aktif: boolean;
+  createdAt: string;
+  downloadUrl: string;
+}
+
+export type StatusPrestasi = "Baru" | "Ditinjau" | "Disetujui" | "Ditolak";
+
+export interface PrestasiDTO {
+  id: number;
+  nisn: string;
+  namaSiswa: string;
+  kelas: string;
+  jurusan: string;
+  perlombaan: string;
+  tingkat: string;
+  tanggalLomba: string;
+  penyelenggara: string;
+  prestasi: string;
+  deskripsi: string | null;
+  namaFile: string | null;
+  adaBukti: boolean;
+  status: StatusPrestasi;
+  createdAt: string;
+  reviewedAt: string | null;
+  downloadUrl: string | null;
+}
+
+/**
+ * @deprecated Aspirasi dihapus dari UI (P4.1/P4.6, 2026-10-04). Tipe ini hanya
+ * dipertahankan agar data lama di backend tetap terbaca bila diperlukan;
+ * jangan dipakai untuk fitur baru.
+ */
 export type StatusAspirasi = "Baru" | "Ditinjau" | "Selesai";
 
 export interface AspirasiDTO {
@@ -194,6 +233,8 @@ export interface AspirasiDTO {
   status: StatusAspirasi;
   created_at: string;
 }
+
+/** @deprecated Lihat catatan pada `StatusAspirasi`. */
 
 // -----------------------------------------------------------------------------
 // Riwayat chatbot (read-only)
@@ -211,4 +252,3 @@ export interface ChatMessageDTO {
   text: string;
   created_at: string;
 }
-

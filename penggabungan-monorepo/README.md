@@ -10,7 +10,7 @@ import berada di dalam folder ini.
 | `app/(public)/` | Website publik (beranda, profil, akademik, kabar, fasilitas, berita, jurusan) |
 | `app/(admin)/login/` | Halaman login admin — `/login` (satu origin, bukan redirect) |
 | `app/(admin)/admin/` | Dashboard admin — `/admin/...` |
-| `app/api/` | Route Next.js (BFF/proxy ke backend PHP untuk chat & BK, proxy baca) |
+| `app/api/` | Route Next.js (BFF/proxy ke backend PHP untuk publik dan upload pengajuan) |
 | `components/` | Komponen publik; `components/admin/` komponen shell/dialog admin |
 | `lib/` | Client publik (`lib/api.ts`), `lib/admin/`, `lib/shared/` (token data gabungan) |
 | `styles/tokens.css` | Design token visual — SATU sumber untuk publik & admin |
@@ -116,16 +116,36 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/profil` · `/akademik` · `/kabar` · `/fasilitas` | Halaman publik |
 | `/berita` · `/berita/[slug]` | Daftar & detail berita (404 untuk slug salah) |
 | `/jurusan` · `/jurusan/[key]` | 5 kompetensi keahlian |
+| `/akademik/pengajuan-prestasi` | Form pengajuan prestasi (tidak ditautkan di navbar) |
 | `/login` | Login admin (origin sama) |
 | `/admin` | Overview dashboard |
 | `/admin/berita` · `pengumuman` · `agenda` · `guru` · `fasilitas` · `galeri` · `jadwal` | Modul CRUD aktif |
+| `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
+| `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
+| `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
 | `/api/bk`, `/api/chat` | Proxy publik ke backend (status dipertahankan) |
+| `/api/prestasi` | Proxy multipart pengajuan publik ke backend |
 | `/api/berita`, `pengumuman`, `agenda`, `jadwal` | Proxy baca ke backend PHP |
 | `backend/api/*.php` | REST API PHP (kontrak sumber, Bearer JWT untuk tulis) |
 
-Modul sidebar yang masih `ready:false` (Pusat Arsip, Pesan BK, Aspirasi,
-Pengajuan Prestasi, Riwayat Chatbot, Profil & Sesi) **memang belum ada
-UI-nya** — jangan ditautkan seolah sudah jadi. Rincian di `MIGRATION_MATRIX.md` §3.
+| Fitur | Detail |
+|---|---|
+| `/profil` hanya menampilkan fasilitas berflag `unggulan`; `/fasilitas` menampilkan semua | Flag dikelola di `/admin/fasilitas` (kolom `fasilitas.unggulan`, default `0`) |
+| Hotnews ringkas muncul di 5 halaman publik | Berita highlight diambil dari backend (`berita.utama`); `/kabar` tetap memakai hero |
+| Widget chatbot punya tombol fullscreen | Tidak memakai Browser Fullscreen API agar tombol Escape tidak bentrok |
+
+Modul sidebar yang masih `ready:false` (Riwayat Chatbot, Profil & Sesi)
+memang belum diaktifkan. Pusat Arsip dan Pengajuan Prestasi sudah aktif.
+Item Aspirasi sudah dihapus dari sidebar
+(UI-nya dibuang; endpoint `backend/api/aspirasi` masih ada sebagai legacy dan
+tidak dihapus dari database). Rincian di `MIGRATION_MATRIX.md` §3.
+
+Arsip menerima PDF/DOCX/JPG/PNG (maks. 10 MB); bukti pengajuan prestasi
+menerima PDF/JPG/PNG (maks. 10 MB) dan hanya dapat diunduh admin. Jalankan
+`backend/migrations/20261004_add_arsip_prestasi.sql` setelah backup database
+dan sebelum deploy versi ini. Isi `PRIVATE_UPLOAD_DIR` hanya jika direktori
+default di luar document root tidak dapat ditulis; lokasi konfigurasi harus
+tetap di luar web root.
 
 ## 7. Perintah validasi
 
