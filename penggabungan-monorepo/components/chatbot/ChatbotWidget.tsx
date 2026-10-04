@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Maximize2, MessageCircle, Minimize2, Sparkles, X } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
@@ -100,6 +101,13 @@ export default function ChatbotWidget() {
         setError("Balasan chatbot tidak memiliki format yang valid.");
         return;
       }
+      // Backend menandai `aiAvailable: false` ketika provider AI belum
+      // dikonfigurasi atau gagal. `reply` pada kondisi itu hanya pesan bantuan,
+      // bukan jawaban model, jadi harus tampil sebagai kondisi "AI tidak
+      // tersedia" — bukan bubble percakapan biasa. Field yang tidak ada
+      // (backend versi lama) dianggap tersedia agar kontrak lama tetap jalan.
+      const aiAvailable = !("aiAvailable" in result) || result.aiAvailable !== false;
+
       const reply = result.reply;
       if (result.sessionId !== sessionId) {
         try {
@@ -107,6 +115,10 @@ export default function ChatbotWidget() {
         } catch {
           setError("Balasan diterima, tetapi sesi percakapan tidak dapat disimpan.");
         }
+      }
+      if (!aiAvailable) {
+        setError(reply);
+        return;
       }
       setMessages((prev) => [...prev, { id: crypto.randomUUID(), sender: "bot", text: reply }]);
     } catch (cause) {
@@ -132,58 +144,77 @@ export default function ChatbotWidget() {
           aria-modal={isFullscreen || undefined}
           className={
             isFullscreen
-              ? "fixed inset-0 z-50 flex flex-col overflow-hidden bg-surface-container-lowest focus:outline-none"
-              : "mb-4 w-80 sm:w-96 overflow-hidden flex flex-col max-h-[500px] bg-surface-container-lowest rounded-2xl shadow-2xl border border-surface-container"
+              ? "fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-surface focus:outline-none"
+              : "mb-4 flex max-h-[min(620px,calc(100dvh-6rem))] min-h-[min(460px,calc(100dvh-6rem))] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-3xl border border-outline-variant/70 bg-surface shadow-[0_24px_70px_-24px_rgba(0,20,47,0.55)] focus:outline-none sm:w-96"
           }
         >
-          <div className="bg-primary text-surface p-3 flex items-center justify-between gap-2">
-            <div className="flex min-w-0 items-center gap-2">
-              <span className="material-symbols-outlined text-[22px]">smart_toy</span>
-              <span className="truncate font-bold">Asisten AI SMKN 24</span>
+          <div className="relative flex shrink-0 items-center justify-between gap-3 overflow-hidden bg-primary px-4 py-4 text-on-primary">
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute -right-8 -top-12 h-36 w-36 rounded-full border-[24px] border-secondary-container/10"
+            />
+            <div className="relative flex min-w-0 items-center gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-secondary-container text-on-secondary-container shadow-sm">
+                <Sparkles aria-hidden className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <h2 className="truncate text-sm font-bold">Asisten AI SMKN 24</h2>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-on-primary/75">
+                  <span className="h-1.5 w-1.5 rounded-full bg-secondary-container" aria-hidden="true" />
+                  Siap membantu informasi sekolah
+                </p>
+              </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
+            <div className="relative flex shrink-0 items-center gap-1">
               <button
                 type="button"
                 onClick={toggleFullscreen}
                 aria-label={isFullscreen ? "Kembali ke ukuran biasa" : "Mode layar penuh"}
                 aria-pressed={isFullscreen}
                 aria-controls="smkn24-chat-panel"
-                className="rounded-md p-1.5 text-surface hover:text-secondary-container transition-colors"
+                className="rounded-xl p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  {isFullscreen ? "close_fullscreen" : "open_in_full"}
-                </span>
+                {isFullscreen ? <Minimize2 aria-hidden className="h-4 w-4" /> : <Maximize2 aria-hidden className="h-4 w-4" />}
               </button>
               <button
                 type="button"
                 onClick={toggleChat}
                 aria-label="Tutup chatbot"
-                className="rounded-md p-1.5 text-surface hover:text-secondary-container transition-colors"
+                className="rounded-xl p-2 text-on-primary/80 transition-colors hover:bg-on-primary/10 hover:text-on-primary focus-visible:outline-on-primary"
               >
-                <span className="material-symbols-outlined text-[20px]">close</span>
+                <X aria-hidden className="h-4 w-4" />
               </button>
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2">
-            <ChatMessages messages={messages} />
-            {isSending && <p className="text-sm text-on-surface-variant" role="status" aria-live="polite">Asisten sedang menyiapkan jawaban...</p>}
-            {error && <p className="text-sm text-red-700" role="status" aria-live="polite">{error}</p>}
+          <div className="min-h-0 flex-1 overflow-y-auto bg-surface-container-low px-4 py-5">
+            <ChatMessages messages={messages} isTyping={isSending} />
+            {error && (
+              <p
+                className="ml-10 mt-3 rounded-2xl border border-error/20 bg-error-container px-3 py-2 text-xs leading-relaxed text-on-error-container"
+                role="alert"
+              >
+                {error}
+              </p>
+            )}
           </div>
-          <div
-            className={`border-t border-surface-container p-2 ${isFullscreen ? "pb-[max(0.5rem,env(safe-area-inset-bottom))]" : ""}`}
-          >
+          <div className={`shrink-0 border-t border-outline-variant/50 bg-surface-container-lowest px-3 py-3 ${isFullscreen ? "pb-[max(0.75rem,env(safe-area-inset-bottom))]" : ""}`}>
             <ChatInput onSend={sendMessage} disabled={isSending} />
+            <p className="mt-2 text-center text-[10px] text-on-surface-variant/75">
+              Asisten AI informasi SMKN 24 Jakarta
+            </p>
           </div>
         </div>
       )}
       <button
         ref={fabRef}
+        type="button"
         onClick={toggleChat}
         aria-label={isOpen ? "Tutup chatbot" : "Buka chatbot"}
         aria-expanded={isOpen}
-        className={`w-14 h-14 rounded-full bg-primary text-surface shadow-lg items-center justify-center hover:bg-primary-container transition-colors ${isFullscreen ? "hidden" : "flex"}`}
+        aria-controls="smkn24-chat-panel"
+        className={`flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-on-primary shadow-[0_12px_30px_-8px_rgba(0,20,47,0.55)] transition duration-200 hover:-translate-y-0.5 hover:bg-primary-container focus-visible:outline-offset-4 ${isFullscreen ? "hidden" : ""}`}
       >
-        <span className="material-symbols-outlined text-[28px]">{isOpen ? "close" : "chat"}</span>
+        {isOpen ? <X aria-hidden className="h-6 w-6" /> : <MessageCircle aria-hidden className="h-6 w-6" />}
       </button>
     </div>
   );

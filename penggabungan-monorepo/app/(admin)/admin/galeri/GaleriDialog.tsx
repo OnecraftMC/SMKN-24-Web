@@ -12,14 +12,13 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type GaleriFormValues = {
   judul: string;
   kategori: string;
   gambar: string | null;
 };
-
-const KATEGORI_SARAN = ["Kegiatan", "Prestasi", "Fasilitas", "Lainnya"];
 
 function emptyForm(): GaleriFormValues {
   return { judul: "", kategori: "", gambar: null };
@@ -142,25 +141,13 @@ export default function GaleriDialog({
           />
         </Field>
 
-        <Field
-          htmlFor="galeri-kategori"
-          label="Kategori"
-          hint="Teks bebas; saran: Kegiatan, Prestasi, Fasilitas, Lainnya."
-        >
-          <input
-            id="galeri-kategori"
-            className={fieldClass}
-            value={form.kategori}
-            onChange={(e) => update("kategori", e.target.value)}
-            list="galeri-kategori-saran"
-            maxLength={100}
-          />
-          <datalist id="galeri-kategori-saran">
-            {KATEGORI_SARAN.map((value) => (
-              <option key={value} value={value} />
-            ))}
-          </datalist>
-        </Field>
+        <CategoryField
+          module="galeri"
+          value={form.kategori}
+          onChange={(kategori) => update("kategori", kategori ?? "")}
+          onUnauthorized={onUnauthorized}
+          required
+        />
 
         <ImageField
           label="Gambar galeri (wajib)"

@@ -13,6 +13,7 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type AgendaFormValues = {
   judul: string;
@@ -21,6 +22,7 @@ export type AgendaFormValues = {
   waktu: string;
   lokasi: string;
   badge: string;
+  kategori: string;
   deskripsi: string;
   gambar: string | null;
   tampilBeranda: boolean;
@@ -34,6 +36,7 @@ export function newAgendaForm(): AgendaFormValues {
     waktu: "",
     lokasi: "",
     badge: "",
+    kategori: "",
     deskripsi: "",
     gambar: null,
     tampilBeranda: true,
@@ -48,6 +51,7 @@ function formFromRow(row: AgendaDTO): AgendaFormValues {
     waktu: row.waktu ?? "",
     lokasi: row.lokasi ?? "",
     badge: row.badge ?? "",
+    kategori: row.kategori ?? "",
     deskripsi: row.deskripsi ?? "",
     gambar: row.gambar,
     tampilBeranda: row.tampilBeranda ?? false,
@@ -108,6 +112,7 @@ export default function AgendaDialog({
         waktu: form.waktu.trim() || null,
         lokasi: form.lokasi.trim() || null,
         badge: form.badge.trim() || null,
+        kategori: form.kategori || null,
         deskripsi: form.deskripsi,
         gambar: form.gambar,
         tampilBeranda: form.tampilBeranda,
@@ -227,6 +232,13 @@ export default function AgendaDialog({
             maxLength={100}
           />
         </Field>
+
+        <CategoryField
+          module="agenda"
+          value={form.kategori}
+          onChange={(kategori) => update("kategori", kategori ?? "")}
+          onUnauthorized={onUnauthorized}
+        />
 
         <Field htmlFor="agenda-deskripsi" label="Deskripsi">
           <textarea

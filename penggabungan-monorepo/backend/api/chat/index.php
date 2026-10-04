@@ -30,14 +30,28 @@ $history = getHistory($db, $sessionId);
 // Ambil juga beberapa data sekolah terbaru supaya AI bisa menjawab dengan konteks nyata
 $context = buildSchoolContext($db);
 
-try {
-    $reply = generateAiReply($message, $history, $context);
-} catch (Throwable $e) {
-    // Jika API key belum diisi / request ke provider gagal, tetap beri jawaban fallback
-    // Detail teknis cukup masuk log server — pengunjung publik hanya melihat pesan umum.
-    error_log('[SMKN24] Chat AI gagal: ' . $e->getMessage());
-    $reply = "Maaf, asisten AI sedang tidak dapat diakses saat ini. "
-        . "Silakan hubungi bagian Tata Usaha SMKN 24 Jakarta untuk informasi lebih lanjut.";
+// Dua kondisi harus bisa dibedakan oleh pemanggil: jawaban AI asli, atau
+// provider yang belum dikonfigurasi/gagal. Tanpa penanda ini, teks bantuan
+// dikirim dengan HTTP 200 dan frontend tidak bisa tahu itu bukan jawaban AI.
+$aiAvailable = true;
+$reason = null;
+
+if (!aiProviderConfigured()) {
+    error_log('[SMKN24] Chat AI dilewati: API key provider belum diisi di .env.');
+    $aiAvailable = false;
+    $reason = 'not_configured';
+    $reply = AI_UNAVAILABLE_MESSAGE;
+} else {
+    try {
+        $reply = generateAiReply($message, $history, $context);
+    } catch (Throwable $e) {
+        // Request ke provider gagal. Detail teknis cukup masuk log server —
+        // pengunjung publik hanya melihat pesan umum.
+        error_log('[SMKN24] Chat AI gagal: ' . $e->getMessage());
+        $aiAvailable = false;
+        $reason = 'provider_error';
+        $reply = AI_UNAVAILABLE_MESSAGE;
+    }
 }
 
 saveMessage($db, $sessionId, 'bot', $reply);
@@ -45,9 +59,34 @@ saveMessage($db, $sessionId, 'bot', $reply);
 jsonResponse([
     'sessionId' => $sessionId,
     'reply' => $reply,
+    // `aiAvailable` = false berarti `reply` hanya pesan bantuan, bukan jawaban
+    // model. Frontend wajib memperlakukannya sebagai kondisi tak tersedia,
+    // bukan menampilkan bubble percakapan biasa.
+    'aiAvailable' => $aiAvailable,
+    'reason' => $reason,
 ]);
 
 // -----------------------------------------------------------------------------
+
+/**
+ * True bila API key untuk AI_PROVIDER yang dipilih sudah terisi di .env.
+ *
+ * Dicek sebelum memanggil layanan AI supaya kondisi "belum dikonfigurasi"
+ * dapat dibedakan dari "provider gagal" pada respons publik. Kunci dibaca lewat
+ * `env()` di config/config.php, jadi nilainya tidak pernah keluar dari server.
+ */
+function aiProviderConfigured(): bool
+{
+    switch (AI_PROVIDER) {
+        case 'gemini':
+            return !empty(GEMINI_API_KEY);
+        case 'anthropic':
+            return !empty(ANTHROPIC_API_KEY);
+        case 'openai':
+        default:
+            return !empty(OPENAI_API_KEY);
+    }
+}
 
 function ensureSession(PDO $db, string $sessionId): void
 {
@@ -215,7 +254,10 @@ function httpPostJson(string $url, array $payload, array $extraHeaders = []): ar
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($payload),
         CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json'], $extraHeaders),
-        CURLOPT_TIMEOUT => 30,
+        // Harus lebih kecil dari timeout proxy `POST /api/chat` di frontend
+        // (CHAT_TIMEOUT_MS = 25 detik) supaya provider yang lambat atau error
+        // tetap sempat dibalas dari sini, bukan dipotong proxy menjadi 504.
+        CURLOPT_TIMEOUT => 20,
     ]);
 
     $responseBody = curl_exec($ch);

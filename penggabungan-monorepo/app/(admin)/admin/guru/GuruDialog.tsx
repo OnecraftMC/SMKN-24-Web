@@ -12,6 +12,7 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type GuruFormValues = {
   nama: string;
@@ -23,8 +24,6 @@ export type GuruFormValues = {
 };
 
 const URUTAN_RE = /^\d+$/;
-const KATEGORI_SARAN = ["Pimpinan", "Keahlian", "BK", "Pembimbing", "TU"];
-
 function emptyForm(): GuruFormValues {
   return { nama: "", jabatan: "", deskripsi: "", kategori: "", gambar: null, urutan: "0" };
 }
@@ -171,25 +170,13 @@ export default function GuruDialog({
         </Field>
 
         <div className="grid gap-space-md sm:grid-cols-2">
-          <Field
-            htmlFor="guru-kategori"
-            label="Kategori"
-            hint="Saran: Pimpinan, Keahlian, BK, Pembimbing, TU (teks bebas)."
-          >
-            <input
-              id="guru-kategori"
-              className={fieldClass}
-              value={form.kategori}
-              onChange={(e) => update("kategori", e.target.value)}
-              list="guru-kategori-saran"
-              maxLength={100}
-            />
-            <datalist id="guru-kategori-saran">
-              {KATEGORI_SARAN.map((value) => (
-                <option key={value} value={value} />
-              ))}
-            </datalist>
-          </Field>
+          <CategoryField
+            module="guru"
+            value={form.kategori}
+            onChange={(kategori) => update("kategori", kategori ?? "")}
+            onUnauthorized={onUnauthorized}
+            required
+          />
 
           <Field htmlFor="guru-urutan" label="Urutan tampil" hint="0 = paling depan.">
             <input

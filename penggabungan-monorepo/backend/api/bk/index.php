@@ -61,6 +61,7 @@ function handleGet(PDO $db): void
             'keperluan' => $r['keperluan'],
             'pesan' => $r['pesan'],
             'status' => $r['status'],
+            'kategori' => $r['kategori'] ?? null,
             'tanggal' => $r['tanggal'],
         ];
     }, $stmt->fetchAll());
@@ -74,15 +75,34 @@ function handleUpdate(PDO $db): void
     if (!$id) jsonError('Parameter id wajib diisi', 400);
 
     $body = getJsonBody();
-    if (empty($body['status']) || !in_array($body['status'], ['Baru', 'Diproses', 'Selesai'], true)) {
+    $hasStatus = array_key_exists('status', $body);
+    $hasCategory = array_key_exists('kategori', $body);
+    if (!$hasStatus && !$hasCategory) {
+        jsonError('Status atau kategori harus diubah.', 400);
+    }
+    if ($hasStatus && !in_array($body['status'], ['Baru', 'Diproses', 'Selesai'], true)) {
         jsonError('Status tidak valid', 400);
     }
 
-    $stmt = $db->prepare('UPDATE pesan_bk SET status = ? WHERE id = ?');
-    $stmt->execute([$body['status'], $id]);
+    $exists = $db->prepare('SELECT id FROM pesan_bk WHERE id = ?');
+    $exists->execute([$id]);
+    if (!$exists->fetch()) jsonError('Data tidak ditemukan.', 404);
 
-    if ($stmt->rowCount() === 0) jsonError('Data tidak ditemukan atau tidak ada perubahan', 404);
-    jsonResponse(['message' => 'Status berhasil diperbarui']);
+    $sets = [];
+    $values = [];
+    if ($hasStatus) {
+        $sets[] = 'status = ?';
+        $values[] = $body['status'];
+    }
+    if ($hasCategory) {
+        $sets[] = 'kategori = ?';
+        $values[] = validateCategorySelection($db, 'bk', $body['kategori']);
+    }
+    $values[] = $id;
+    $stmt = $db->prepare('UPDATE pesan_bk SET ' . implode(', ', $sets) . ' WHERE id = ?');
+    $stmt->execute($values);
+
+    jsonResponse(['message' => 'Pesan BK berhasil diperbarui.']);
 }
 
 function handleDelete(PDO $db): void

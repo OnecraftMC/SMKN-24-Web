@@ -59,7 +59,8 @@ function handleGet(PDO $db): void
 function handleCreate(PDO $db): void
 {
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'guru', $body['kategori']);
 
     $stmt = $db->prepare(
         'INSERT INTO guru (nama, jabatan, deskripsi, kategori, gambar, urutan) VALUES (?, ?, ?, ?, ?, ?)'
@@ -78,7 +79,8 @@ function handleUpdate(PDO $db): void
     if (!$id) jsonError('Parameter id wajib diisi', 400);
 
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'guru', $body['kategori']);
 
     // Eksistensi dicek dulu: rowCount() bisa 0 saat update tanpa perubahan,
     // yang sebelumnya salah dilaporkan sebagai 404 "tidak ditemukan".
@@ -109,11 +111,12 @@ function handleDelete(PDO $db): void
     jsonResponse(['message' => 'Data guru berhasil dihapus']);
 }
 
-function validate(array $body): void
+function validate(array $body, PDO $db): void
 {
     foreach (['nama', 'jabatan', 'kategori'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
     }
+    validateCategorySelection($db, 'guru', $body['kategori']);
 
     // urutan guru bebas >= 0, tetapi harus bilangan bulat valid.
     if (isset($body['urutan']) && $body['urutan'] !== '' && $body['urutan'] !== null) {

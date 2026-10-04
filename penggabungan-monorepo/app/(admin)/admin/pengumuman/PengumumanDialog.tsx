@@ -13,6 +13,7 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type PengumumanFormValues = {
   judul: string;
@@ -204,16 +205,13 @@ export default function PengumumanDialog({
         </Field>
 
         <div className="grid gap-space-md sm:grid-cols-2">
-          <Field htmlFor="peng-kategori" label="Kategori">
-            <input
-              id="peng-kategori"
-              className={fieldClass}
-              value={form.kategori}
-              onChange={(e) => update("kategori", e.target.value)}
-              placeholder="mis. Pendaftaran"
-              maxLength={100}
-            />
-          </Field>
+          <CategoryField
+            module="pengumuman"
+            value={form.kategori}
+            onChange={(kategori) => update("kategori", kategori ?? "")}
+            onUnauthorized={onUnauthorized}
+            required
+          />
           <Field htmlFor="peng-tanggal" label="Tanggal">
             <input
               id="peng-tanggal"

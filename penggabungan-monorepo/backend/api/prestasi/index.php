@@ -130,6 +130,9 @@ function handleGet(PDO $db): void
     if ($status !== '' && !in_array($status, $allowedStatuses, true)) {
         jsonError('Filter status tidak valid.', 400);
     }
+    $category = isset($_GET['kategori'])
+        ? validateCategorySelection($db, 'prestasi', $_GET['kategori'])
+        : null;
     $query = trim((string)($_GET['q'] ?? ''));
     if (strlen($query) > 100) jsonError('Kata pencarian maksimal 100 karakter.', 400);
 
@@ -138,6 +141,10 @@ function handleGet(PDO $db): void
     if ($status !== '') {
         $conditions[] = 'status = ?';
         $parameters[] = $status;
+    }
+    if ($category !== null) {
+        $conditions[] = 'kategori = ?';
+        $parameters[] = $category;
     }
     if ($query !== '') {
         $conditions[] = '(nama_siswa LIKE ? OR kelas LIKE ? OR jurusan LIKE ? OR perlombaan LIKE ? OR tingkat LIKE ? OR penyelenggara LIKE ? OR prestasi LIKE ?)';
@@ -176,19 +183,33 @@ function handleUpdateStatus(PDO $db): void
     $body = getJsonBody();
     $status = $body['status'] ?? null;
     $allowedStatuses = ['Baru', 'Ditinjau', 'Disetujui', 'Ditolak'];
-    if (!is_string($status) || !in_array($status, $allowedStatuses, true)) {
+    $hasStatus = array_key_exists('status', $body);
+    $hasCategory = array_key_exists('kategori', $body);
+    if (!$hasStatus && !$hasCategory) {
+        jsonError('Status atau kategori harus diubah.', 400);
+    }
+    if ($hasStatus && (!is_string($status) || !in_array($status, $allowedStatuses, true))) {
         jsonError('Status moderasi tidak valid.', 400);
     }
 
-    $stmt = $db->prepare(
-        "UPDATE prestasi SET status = ?, reviewed_at = IF(? = 'Baru', NULL, CURRENT_TIMESTAMP) WHERE id = ?"
-    );
-    $stmt->execute([$status, $status, $id]);
+    $sets = [];
+    $values = [];
+    if ($hasStatus) {
+        $sets[] = "status = ?, reviewed_at = IF(? = 'Baru', NULL, CURRENT_TIMESTAMP)";
+        array_push($values, $status, $status);
+    }
+    if ($hasCategory) {
+        $sets[] = 'kategori = ?';
+        $values[] = validateCategorySelection($db, 'prestasi', $body['kategori']);
+    }
+    $values[] = $id;
+    $stmt = $db->prepare('UPDATE prestasi SET ' . implode(', ', $sets) . ' WHERE id = ?');
+    $stmt->execute($values);
 
     $exists = $db->prepare('SELECT id FROM prestasi WHERE id = ?');
     $exists->execute([$id]);
     if (!$exists->fetch()) jsonError('Pengajuan tidak ditemukan.', 404);
-    jsonResponse(['message' => 'Status pengajuan berhasil diperbarui.']);
+    jsonResponse(['message' => 'Pengajuan berhasil diperbarui.']);
 }
 
 function achievementUploadTypes(): array
@@ -218,6 +239,7 @@ function formatAchievement(array $row): array
         'namaFile' => $row['nama_file'],
         'adaBukti' => $row['storage_key'] !== null,
         'status' => $row['status'],
+        'kategori' => $row['kategori'] ?? null,
         'createdAt' => $row['created_at'],
         'reviewedAt' => $row['reviewed_at'],
         'downloadUrl' => $row['storage_key'] === null

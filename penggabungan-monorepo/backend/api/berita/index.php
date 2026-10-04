@@ -78,7 +78,8 @@ function handleGet(PDO $db): void
 function handleCreate(PDO $db): void
 {
     $body = getJsonBody();
-    validateBerita($body);
+    validateBerita($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'berita', $body['kategori']);
 
     $gambar = $body['gambar'] ?? null;
 
@@ -125,7 +126,8 @@ function handleUpdate(PDO $db): void
     }
 
     $body = getJsonBody();
-    validateBerita($body);
+    validateBerita($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'berita', $body['kategori']);
 
     $db->beginTransaction();
     try {
@@ -185,7 +187,7 @@ function handleDelete(PDO $db): void
     jsonResponse(['message' => 'Berita berhasil dihapus']);
 }
 
-function validateBerita(array $body): void
+function validateBerita(array $body, PDO $db): void
 {
     $required = ['judul', 'kategori', 'tanggal'];
     foreach ($required as $field) {
@@ -193,6 +195,7 @@ function validateBerita(array $body): void
             jsonError("Field '$field' wajib diisi", 400);
         }
     }
+    validateCategorySelection($db, 'berita', $body['kategori']);
 
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$body['tanggal'])) {
         jsonError("Field 'tanggal' harus berformat YYYY-MM-DD", 400);

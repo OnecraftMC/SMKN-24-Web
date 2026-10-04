@@ -60,13 +60,14 @@ function handleCreate(PDO $db): void
     validate($body);
 
     $stmt = $db->prepare(
-        'INSERT INTO agenda (judul, tgl_mulai, tgl_selesai, waktu, lokasi, badge, deskripsi, gambar, tampil_beranda)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+        'INSERT INTO agenda (judul, tgl_mulai, tgl_selesai, waktu, lokasi, badge, kategori, deskripsi, gambar, tampil_beranda)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
     );
     $stmt->execute([
         $body['judul'], $body['tglMulai'], $body['tglSelesai'] ?? null,
         $body['waktu'] ?? null, $body['lokasi'] ?? null,
-        $body['badge'] ?? null, $body['deskripsi'] ?? null, $body['gambar'] ?? null,
+        $body['badge'] ?? null, validateCategorySelection($db, 'agenda', $body['kategori'] ?? null),
+        $body['deskripsi'] ?? null, $body['gambar'] ?? null,
         !empty($body['tampilBeranda']) ? 1 : 0,
     ]);
 
@@ -88,13 +89,14 @@ function handleUpdate(PDO $db): void
     if (!$exists->fetch()) jsonError('Agenda tidak ditemukan', 404);
 
     $stmt = $db->prepare(
-        'UPDATE agenda SET judul=?, tgl_mulai=?, tgl_selesai=?, waktu=?, lokasi=?, badge=?, deskripsi=?, gambar=?, tampil_beranda=?
+        'UPDATE agenda SET judul=?, tgl_mulai=?, tgl_selesai=?, waktu=?, lokasi=?, badge=?, kategori=?, deskripsi=?, gambar=?, tampil_beranda=?
          WHERE id=?'
     );
     $stmt->execute([
         $body['judul'], $body['tglMulai'], $body['tglSelesai'] ?? null,
         $body['waktu'] ?? null, $body['lokasi'] ?? null,
-        $body['badge'] ?? null, $body['deskripsi'] ?? null, $body['gambar'] ?? null,
+        $body['badge'] ?? null, validateCategorySelection($db, 'agenda', $body['kategori'] ?? null),
+        $body['deskripsi'] ?? null, $body['gambar'] ?? null,
         !empty($body['tampilBeranda']) ? 1 : 0,
         $id,
     ]);
@@ -152,6 +154,7 @@ function formatRow(array $row): array
         'waktu' => $row['waktu'],
         'lokasi' => $row['lokasi'],
         'badge' => $row['badge'],
+        'kategori' => $row['kategori'] ?? null,
         'deskripsi' => $row['deskripsi'],
         'gambar' => $row['gambar'],
         'day' => (int)date('d', strtotime($row['tgl_mulai'])),

@@ -31,6 +31,10 @@ export interface ApiResult<T> {
 }
 
 const TIMEOUT_MS = 5000;
+// Chatbot meneruskan pertanyaan ke provider AI, jadi latensinya jauh lebih tinggi
+// daripada pembacaan data statis. Nilai ini mencegah jawaban model dipotong proxy
+// menjadi 504; backend PHP sendiri membatasi 20 detik (lihat backend/api/chat/index.php).
+const CHAT_TIMEOUT_MS = 25000;
 const PUBLIC_DATA_REVALIDATE_SECONDS = 10;
 
 // Port yang menandakan BACKEND_URL diisi dengan host database, bukan URL HTTP
@@ -277,18 +281,25 @@ export async function proxyPublicPost(
     return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
   }
 
+  // Endpoint chat memanggil model AI sehingga butuh jendela waktu lebih besar
+  // daripada POST data biasa; sisanya tetap memakai TIMEOUT_MS.
+  const timeoutMs = endpoint === "chat" ? CHAT_TIMEOUT_MS : TIMEOUT_MS;
+
   let response: Response;
   try {
     response = await fetch(`${baseUrl}/api/${endpoint}/index.php`, {
       method: "POST",
       headers: { Accept: "application/json", "Content-Type": "application/json" },
       body: JSON.stringify(requestBody),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
       cache: "no-store",
     });
   } catch (error) {
     if (error instanceof Error && error.name === "TimeoutError") {
-      return Response.json({ error: "Backend tidak merespons dalam 5 detik." }, { status: 504 });
+      return Response.json(
+        { error: `Backend tidak merespons dalam ${Math.round(timeoutMs / 1000)} detik.` },
+        { status: 504 },
+      );
     }
     return Response.json(
       { error: "Tidak dapat menghubungi backend. Periksa koneksi dan konfigurasi." },

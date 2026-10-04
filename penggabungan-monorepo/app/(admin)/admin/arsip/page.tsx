@@ -15,6 +15,7 @@ import {
   buttonPrimaryClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 type ArchiveDraft = {
   judul: string;
@@ -266,16 +267,13 @@ export default function ArsipAdminPage() {
                 className={fieldClass}
               />
             </Field>
-            <Field htmlFor="archive-category" label="Kategori">
-              <input
-                id="archive-category"
-                value={draft.kategori}
-                maxLength={100}
-                required
-                onChange={(event) => setDraft((value) => ({ ...value, kategori: event.target.value }))}
-                className={fieldClass}
-              />
-            </Field>
+            <CategoryField
+              module="arsip"
+              value={draft.kategori}
+              onChange={(kategori) => setDraft((value) => ({ ...value, kategori: kategori ?? "" }))}
+              onUnauthorized={logout}
+              required
+            />
             <Field htmlFor="archive-description" label="Deskripsi" hint="Maksimal 5.000 karakter.">
               <textarea
                 id="archive-description"

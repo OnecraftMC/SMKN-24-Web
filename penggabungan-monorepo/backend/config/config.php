@@ -44,6 +44,12 @@ define('AI_SYSTEM_PROMPT', "Kamu adalah Asisten AI resmi SMKN 24 Jakarta. "
     . "dan informasi sekolah lain dengan ramah, singkat, dan jelas dalam Bahasa Indonesia. "
     . "Jika tidak tahu jawaban pastinya, arahkan pengguna untuk menghubungi pihak sekolah.");
 
+// Balasan jujur yang dipakai ketika provider AI belum dikonfigurasi atau gagal.
+// Teks ini BUKAN jawaban AI, jadi endpoint chat wajib menandainya secara
+// eksplisit di respons (lihat api/chat/index.php) supaya tidak disamar.
+define('AI_UNAVAILABLE_MESSAGE', "Maaf, asisten AI sedang tidak dapat diakses saat ini. "
+    . "Silakan hubungi bagian Tata Usaha SMKN 24 Jakarta untuk informasi lebih lanjut.");
+
 // -----------------------------------------------------------------------------
 // JWT / Session secret untuk auth admin
 // -----------------------------------------------------------------------------
