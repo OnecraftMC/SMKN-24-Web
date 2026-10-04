@@ -48,6 +48,13 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    `backend/migrations/20261004_add_arsip_prestasi.sql` satu kali sebelum deploy.
    Migration ini hanya menambah tabel `arsip` dan `prestasi`; data lama tidak
    diubah. Jangan jalankan migration production dari aplikasi atau dari test.
+   Untuk kategori reusable admin, backup dahulu lalu jalankan
+   `backend/migrations/20261004_add_admin_categories.sql` satu kali pada schema
+   existing sebelum deploy. Migration ini membuat tabel kategori, menyalin
+   kategori lama, dan menambah kolom pada modul yang sebelumnya belum memiliki
+   kategori. Statement `ALTER TABLE` tidak idempoten: jangan jalankan ulang,
+   dan jangan jalankan pada database fresh-install yang sudah dibuat dari
+   `database.sql` versi ini.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env

@@ -64,6 +64,7 @@ function handleCreate(PDO $db): void
     $kategori = trim((string)($_POST['kategori'] ?? 'Akademik'));
     $aktif = ($_POST['aktif'] ?? '0') === '1' ? 1 : 0;
     validateArchiveMetadata($judul, $deskripsi, $kategori);
+    $kategori = validateCategorySelection($db, 'arsip', $kategori);
 
     $upload = storePrivateUpload('file', archiveUploadTypes());
     if ($upload === null) jsonError('Pilih dokumen untuk diunggah.', 400);
@@ -106,6 +107,7 @@ function handleUpdate(PDO $db): void
         jsonError("Field 'aktif' harus berupa boolean.", 400);
     }
     validateArchiveMetadata($judul, $deskripsi, $kategori);
+    $kategori = validateCategorySelection($db, 'arsip', $kategori);
 
     $stmt = $db->prepare(
         'UPDATE arsip SET judul = ?, deskripsi = ?, kategori = ?, aktif = ? WHERE id = ?'

@@ -59,7 +59,8 @@ function handleGet(PDO $db): void
 function handleCreate(PDO $db): void
 {
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'galeri', $body['kategori']);
 
     $stmt = $db->prepare('INSERT INTO galeri (judul, kategori, gambar) VALUES (?, ?, ?)');
     $stmt->execute([$body['judul'], $body['kategori'], $body['gambar']]);
@@ -73,7 +74,8 @@ function handleUpdate(PDO $db): void
     if (!$id) jsonError('Parameter id wajib diisi', 400);
 
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'galeri', $body['kategori']);
 
     // Eksistensi dicek dulu; rowCount() 0 saat tidak ada perubahan bukan 404.
     $exists = $db->prepare('SELECT id FROM galeri WHERE id = ?');
@@ -97,11 +99,12 @@ function handleDelete(PDO $db): void
     jsonResponse(['message' => 'Galeri berhasil dihapus']);
 }
 
-function validate(array $body): void
+function validate(array $body, PDO $db): void
 {
     foreach (['judul', 'kategori', 'gambar'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
     }
+    validateCategorySelection($db, 'galeri', $body['kategori']);
 }
 
 function formatRow(array $row): array

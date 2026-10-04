@@ -58,7 +58,8 @@ function handleGet(PDO $db): void
 function handleCreate(PDO $db): void
 {
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'pengumuman', $body['kategori']);
 
     $stmt = $db->prepare(
         'INSERT INTO pengumuman (judul, isi, tanggal, kategori, penting, gambar, badge, status, link_label, link_href, icon, action_icon, variant, tampil_beranda)
@@ -82,7 +83,8 @@ function handleUpdate(PDO $db): void
     if (!$id) jsonError('Parameter id wajib diisi', 400);
 
     $body = getJsonBody();
-    validate($body);
+    validate($body, $db);
+    $body['kategori'] = validateCategorySelection($db, 'pengumuman', $body['kategori']);
 
     // Eksistensi dicek dulu; rowCount() 0 saat nilai tidak berubah (mis. toggle
     // tampilBeranda yang sudah sesuai) bukan 404 — sebelumnya bisa melempar error palsu.
@@ -118,11 +120,12 @@ function handleDelete(PDO $db): void
     jsonResponse(['message' => 'Pengumuman berhasil dihapus']);
 }
 
-function validate(array $body): void
+function validate(array $body, PDO $db): void
 {
     foreach (['judul', 'tanggal', 'kategori'] as $f) {
         if (empty($body[$f])) jsonError("Field '$f' wajib diisi", 400);
     }
+    validateCategorySelection($db, 'pengumuman', $body['kategori']);
 
     if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)$body['tanggal'])) {
         jsonError("Field 'tanggal' harus berformat YYYY-MM-DD", 400);

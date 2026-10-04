@@ -56,11 +56,12 @@ function handleCreate(PDO $db): void
     $body = getJsonBody();
     validate($body);
 
-    $stmt = $db->prepare('INSERT INTO fasilitas (judul, deskripsi, gambar, unggulan) VALUES (?, ?, ?, ?)');
+    $stmt = $db->prepare('INSERT INTO fasilitas (judul, deskripsi, gambar, kategori, unggulan) VALUES (?, ?, ?, ?, ?)');
     $stmt->execute([
         $body['judul'],
         $body['deskripsi'] ?? '',
         $body['gambar'] ?? null,
+        validateCategorySelection($db, 'fasilitas', $body['kategori'] ?? null),
         !empty($body['unggulan']) ? 1 : 0,
     ]);
 
@@ -84,11 +85,12 @@ function handleUpdate(PDO $db): void
     $unggulan = array_key_exists('unggulan', $body)
         ? (!empty($body['unggulan']) ? 1 : 0)
         : (int)$existing['unggulan'];
-    $stmt = $db->prepare('UPDATE fasilitas SET judul=?, deskripsi=?, gambar=?, unggulan=? WHERE id=?');
+    $stmt = $db->prepare('UPDATE fasilitas SET judul=?, deskripsi=?, gambar=?, kategori=?, unggulan=? WHERE id=?');
     $stmt->execute([
         $body['judul'],
         $body['deskripsi'] ?? '',
         $body['gambar'] ?? null,
+        validateCategorySelection($db, 'fasilitas', $body['kategori'] ?? null),
         $unggulan,
         $id,
     ]);
@@ -126,6 +128,7 @@ function formatRow(array $row): array
         'judul' => $row['judul'],
         'deskripsi' => $row['deskripsi'],
         'gambar' => $row['gambar'],
+        'kategori' => $row['kategori'] ?? null,
         // `?? 0` mengikuti pola berita.php: aman bila migrasi belum dijalankan
         // (kunci tidak ada) sehingga response tetap JSON valid.
         'unggulan' => (bool)($row['unggulan'] ?? 0),

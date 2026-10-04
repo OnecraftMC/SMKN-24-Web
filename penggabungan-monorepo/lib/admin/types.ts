@@ -96,6 +96,7 @@ export interface AgendaDTO {
   waktu: string | null;
   lokasi: string | null;
   badge: string | null;
+  kategori: string | null;
   deskripsi: string | null;
   gambar: string | null;
   /** Diturunkan backend dari tgl_mulai untuk kartu beranda. */
@@ -138,6 +139,7 @@ export interface FasilitasDTO {
   judul: string;
   deskripsi: string | null;
   gambar: string | null;
+  kategori: string | null;
   unggulan: boolean;
 }
 
@@ -158,6 +160,7 @@ export interface JadwalRowDTO {
   jam: string | null;
   waktu: string | null;
   guru: string | null;
+  kategori: string | null;
 }
 
 /** Bentuk matriks jadwal publik: hanya nama mapel per sesi. */
@@ -180,6 +183,7 @@ export interface PesanBKDTO {
   keperluan: string;
   pesan: string;
   status: StatusPesanBK;
+  kategori: string | null;
   tanggal: string;
 }
 
@@ -212,6 +216,7 @@ export interface PrestasiDTO {
   namaFile: string | null;
   adaBukti: boolean;
   status: StatusPrestasi;
+  kategori: string | null;
   createdAt: string;
   reviewedAt: string | null;
   downloadUrl: string | null;

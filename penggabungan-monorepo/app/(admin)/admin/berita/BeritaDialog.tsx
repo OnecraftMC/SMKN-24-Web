@@ -13,6 +13,7 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type BeritaFormValues = {
   judul: string;
@@ -171,16 +172,13 @@ export default function BeritaDialog({
         </Field>
 
         <div className="grid gap-space-md sm:grid-cols-2">
-          <Field htmlFor="berita-kategori" label="Kategori">
-            <input
-              id="berita-kategori"
-              className={fieldClass}
-              value={form.kategori}
-              onChange={(e) => update("kategori", e.target.value)}
-              placeholder="mis. Prestasi Siswa"
-              maxLength={100}
-            />
-          </Field>
+          <CategoryField
+            module="berita"
+            value={form.kategori}
+            onChange={(kategori) => update("kategori", kategori ?? "")}
+            onUnauthorized={onUnauthorized}
+            required
+          />
 
           <Field htmlFor="berita-tanggal" label="Tanggal">
             <input

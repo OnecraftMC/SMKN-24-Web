@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Send } from "lucide-react";
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -19,7 +20,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-2xl border border-outline-variant/60 bg-surface px-2 py-2 transition focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
       <input
         type="text"
         value={input}
@@ -28,10 +29,16 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
         maxLength={2000}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
         placeholder="Tanyakan sesuatu..."
-        className="flex-1 text-sm rounded-xl border border-surface-container bg-surface-container-low px-3 py-2 text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+        aria-label="Tulis pertanyaan untuk Asisten AI"
+        className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/70 disabled:cursor-not-allowed"
       />
-      <button type="submit" disabled={disabled} aria-label="Kirim pesan" className="p-2 rounded-full bg-primary text-surface hover:bg-primary-container transition-colors disabled:opacity-50">
-        <span className="material-symbols-outlined text-[20px]">send</span>
+      <button
+        type="submit"
+        disabled={disabled || !input.trim()}
+        aria-label="Kirim pesan"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary transition hover:bg-primary-container focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-45"
+      >
+        <Send aria-hidden className="h-4 w-4" />
       </button>
     </form>
   );

@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS agenda (
   waktu VARCHAR(100) DEFAULT NULL,       -- ex: "08.00 - 15.00 WIB"
   lokasi VARCHAR(255) DEFAULT NULL,
   badge VARCHAR(100) DEFAULT NULL,
+  kategori VARCHAR(100) DEFAULT NULL,
   deskripsi TEXT,
   gambar VARCHAR(500) DEFAULT NULL,
   tampil_beranda TINYINT(1) NOT NULL DEFAULT 0,
@@ -112,6 +113,7 @@ CREATE TABLE IF NOT EXISTS jadwal (
   jam VARCHAR(50) DEFAULT NULL,
   waktu VARCHAR(50) DEFAULT NULL,
   guru VARCHAR(150) DEFAULT NULL,
+  kategori VARCHAR(100) DEFAULT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY uniq_slot (jurusan, sesi, urutan)
 ) ENGINE=InnoDB;
@@ -135,6 +137,7 @@ CREATE TABLE IF NOT EXISTS fasilitas (
   judul VARCHAR(255) NOT NULL,
   deskripsi TEXT,
   gambar VARCHAR(500) DEFAULT NULL,
+  kategori VARCHAR(100) DEFAULT NULL,
   unggulan TINYINT(1) NOT NULL DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -150,6 +153,7 @@ CREATE TABLE IF NOT EXISTS pesan_bk (
   keperluan VARCHAR(255) NOT NULL,
   pesan TEXT NOT NULL,
   status ENUM('Baru','Diproses','Selesai') NOT NULL DEFAULT 'Baru',
+  kategori VARCHAR(100) DEFAULT NULL,
   tanggal TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -194,8 +198,18 @@ CREATE TABLE IF NOT EXISTS prestasi (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   reviewed_at TIMESTAMP NULL DEFAULT NULL,
+  kategori VARCHAR(100) DEFAULT NULL,
   INDEX idx_prestasi_status_created (status, created_at)
 ) ENGINE=InnoDB;
+
+-- Pilihan kategori disimpan permanen dan dipisahkan per modul admin.
+CREATE TABLE IF NOT EXISTS admin_categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  module_name VARCHAR(32) NOT NULL,
+  category_name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_admin_category (module_name, category_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- -----------------------------------------------------------------------------
 -- Aspirasi (form aspirasi siswa/masyarakat)
@@ -248,3 +262,16 @@ INSERT INTO guru (nama, jabatan, deskripsi, kategori, urutan) VALUES
 
 INSERT INTO fasilitas (judul, deskripsi) VALUES
 ('Hotel Training', 'Laboratorium perhotelan dan housekeeping dilengkapi kamar simulasi dan peralatan standar industri.');
+
+-- Kategori awal per modul; pilihan baru disimpan melalui API admin.
+INSERT IGNORE INTO admin_categories (module_name, category_name)
+SELECT 'berita', kategori FROM berita WHERE TRIM(kategori) <> '' GROUP BY kategori;
+INSERT IGNORE INTO admin_categories (module_name, category_name)
+SELECT 'pengumuman', kategori FROM pengumuman WHERE TRIM(kategori) <> '' GROUP BY kategori;
+INSERT IGNORE INTO admin_categories (module_name, category_name)
+SELECT 'guru', kategori FROM guru WHERE TRIM(kategori) <> '' GROUP BY kategori;
+INSERT IGNORE INTO admin_categories (module_name, category_name)
+SELECT 'galeri', kategori FROM galeri WHERE TRIM(kategori) <> '' GROUP BY kategori;
+INSERT IGNORE INTO admin_categories (module_name, category_name)
+SELECT 'arsip', kategori FROM arsip WHERE TRIM(kategori) <> '' GROUP BY kategori;
+INSERT IGNORE INTO admin_categories (module_name, category_name) VALUES ('arsip', 'Akademik');

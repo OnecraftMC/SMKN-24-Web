@@ -11,6 +11,7 @@ import {
   buttonPrimaryClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 const SLOT_URUTAN = [0, 1, 2, 3, 4] as const;
 
@@ -29,10 +30,11 @@ type SlotFormValues = {
   jam: string;
   waktu: string;
   guru: string;
-};
+  kategori: string;
+}
 
 function emptyForm(defaultUrutan: number): SlotFormValues {
-  return { urutan: String(defaultUrutan), mapel: "", jam: "", waktu: "", guru: "" };
+  return { urutan: String(defaultUrutan), mapel: "", jam: "", waktu: "", guru: "", kategori: "" };
 }
 
 function formFromRow(row: JadwalRowDTO): SlotFormValues {
@@ -42,6 +44,7 @@ function formFromRow(row: JadwalRowDTO): SlotFormValues {
     jam: row.jam ?? "",
     waktu: row.waktu ?? "",
     guru: row.guru ?? "",
+    kategori: row.kategori ?? "",
   };
 }
 
@@ -115,6 +118,7 @@ export default function JadwalSlotDialog({
           jam: form.jam.trim() || null,
           waktu: form.waktu.trim() || null,
           guru: form.guru.trim() || null,
+          kategori: form.kategori || null,
         },
       });
 
@@ -258,6 +262,12 @@ export default function JadwalSlotDialog({
             maxLength={150}
           />
         </Field>
+        <CategoryField
+          module="jadwal"
+          value={form.kategori}
+          onChange={(kategori) => update("kategori", kategori ?? "")}
+          onUnauthorized={onUnauthorized}
+        />
       </form>
     </Modal>
   );

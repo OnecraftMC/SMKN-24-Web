@@ -12,16 +12,18 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 export type FasilitasFormValues = {
   judul: string;
   deskripsi: string;
   gambar: string | null;
+  kategori: string;
   unggulan: boolean;
 };
 
 function emptyForm(): FasilitasFormValues {
-  return { judul: "", deskripsi: "", gambar: null, unggulan: false };
+  return { judul: "", deskripsi: "", gambar: null, kategori: "", unggulan: false };
 }
 
 function formFromRow(row: FasilitasDTO): FasilitasFormValues {
@@ -29,6 +31,7 @@ function formFromRow(row: FasilitasDTO): FasilitasFormValues {
     judul: row.judul,
     deskripsi: row.deskripsi ?? "",
     gambar: row.gambar,
+    kategori: row.kategori ?? "",
     unggulan: row.unggulan,
   };
 }
@@ -68,6 +71,7 @@ export default function FasilitasDialog({
         judul: form.judul.trim(),
         deskripsi: form.deskripsi.trim(),
         gambar: form.gambar,
+        kategori: form.kategori || null,
         unggulan: form.unggulan,
       };
 
@@ -137,6 +141,13 @@ export default function FasilitasDialog({
             maxLength={255}
           />
         </Field>
+
+        <CategoryField
+          module="fasilitas"
+          value={form.kategori}
+          onChange={(kategori) => update("kategori", kategori ?? "")}
+          onUnauthorized={onUnauthorized}
+        />
 
         <Field htmlFor="fasilitas-deskripsi" label="Deskripsi">
           <textarea

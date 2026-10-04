@@ -11,6 +11,7 @@ import {
   buttonGhostClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 const statuses: StatusPrestasi[] = ["Baru", "Ditinjau", "Disetujui", "Ditolak"];
 type StatusFilter = "semua" | StatusPrestasi;
@@ -94,6 +95,29 @@ export default function PrestasiAdminPage() {
         return;
       }
       setError(err instanceof Error ? err.message : "Gagal memperbarui status.");
+    } finally {
+      setStatusBusyId(null);
+    }
+  }
+
+  async function updateCategory(row: PrestasiDTO, kategori: string | null) {
+    if (row.kategori === kategori || statusBusyId !== null) return;
+    setStatusBusyId(row.id);
+    setError(null);
+    try {
+      await apiRequest(`/api/prestasi/index.php?id=${row.id}`, {
+        method: "PUT",
+        body: { kategori },
+      });
+      const updated = { ...row, kategori };
+      setRows((current) => current.map((item) => item.id === row.id ? updated : item));
+      setDetail((current) => current?.id === row.id ? updated : current);
+    } catch (err: unknown) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Gagal memperbarui kategori pengajuan.");
     } finally {
       setStatusBusyId(null);
     }
@@ -191,6 +215,7 @@ export default function PrestasiAdminPage() {
                 <th scope="col" className="px-space-md py-space-sm">NISN (disamarkan)</th>
                 <th scope="col" className="px-space-md py-space-sm">Lomba</th>
                 <th scope="col" className="px-space-md py-space-sm">Tanggal</th>
+                <th scope="col" className="px-space-md py-space-sm">Kategori internal</th>
                 <th scope="col" className="px-space-md py-space-sm">Status</th>
                 <th scope="col" className="px-space-md py-space-sm">Tindakan</th>
               </tr>
@@ -205,6 +230,7 @@ export default function PrestasiAdminPage() {
                   <td className="px-space-md py-space-md">{maskNisn(row.nisn)}</td>
                   <td className="px-space-md py-space-md">{row.perlombaan}</td>
                   <td className="px-space-md py-space-md">{formatDate(row.tanggalLomba)}</td>
+                  <td className="px-space-md py-space-md">{row.kategori ?? "—"}</td>
                   <td className="px-space-md py-space-md">
                     <label className="block">
                       <span className="sr-only">Status pengajuan {row.namaSiswa}</span>
@@ -279,6 +305,15 @@ export default function PrestasiAdminPage() {
             <Detail label="Penyelenggara">{detail.penyelenggara}</Detail>
             <Detail label="Prestasi / peringkat">{detail.prestasi}</Detail>
             <Detail label="Status">{detail.status}</Detail>
+            <div className="sm:col-span-2">
+              <CategoryField
+                module="prestasi"
+                value={detail.kategori}
+                onChange={(kategori) => void updateCategory(detail, kategori)}
+                onUnauthorized={logout}
+                label="Kategori internal"
+              />
+            </div>
             <div className="sm:col-span-2">
               <Detail label="Uraian">{detail.deskripsi || "Tidak ada uraian."}</Detail>
             </div>

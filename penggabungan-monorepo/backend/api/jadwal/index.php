@@ -86,13 +86,14 @@ function handleUpsert(PDO $db): void
     }
 
     $stmt = $db->prepare(
-        'INSERT INTO jadwal (jurusan, sesi, urutan, mapel, jam, waktu, guru)
-         VALUES (?, ?, ?, ?, ?, ?, ?)
-         ON DUPLICATE KEY UPDATE mapel=VALUES(mapel), jam=VALUES(jam), waktu=VALUES(waktu), guru=VALUES(guru)'
+        'INSERT INTO jadwal (jurusan, sesi, urutan, mapel, jam, waktu, guru, kategori)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+         ON DUPLICATE KEY UPDATE mapel=VALUES(mapel), jam=VALUES(jam), waktu=VALUES(waktu), guru=VALUES(guru), kategori=VALUES(kategori)'
     );
     $stmt->execute([
         $body['jurusan'], $body['sesi'], (int)$body['urutan'], $body['mapel'],
         $body['jam'] ?? null, $body['waktu'] ?? null, $body['guru'] ?? null,
+        validateCategorySelection($db, 'jadwal', $body['kategori'] ?? null),
     ]);
 
     jsonResponse(['message' => 'Jadwal berhasil disimpan']);
@@ -125,5 +126,6 @@ function formatAdminRow(array $row): array
         'jam' => $row['jam'],
         'waktu' => $row['waktu'],
         'guru' => $row['guru'],
+        'kategori' => $row['kategori'] ?? null,
     ];
 }

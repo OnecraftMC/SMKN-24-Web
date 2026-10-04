@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Eye, Loader2, Search, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
@@ -8,11 +8,11 @@ import { formatDateId } from "@/lib/admin/format";
 import type { PesanBKDTO, StatusPesanBK } from "@/lib/admin/types";
 import {
   ConfirmDialog,
-  ListState,
   Modal,
   buttonGhostClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import CategoryField from "@/components/admin/ui/CategoryField";
 
 type StatusFilter = "semua" | StatusPesanBK;
 
@@ -45,8 +45,6 @@ export default function PesanBKPage() {
   const [rows, setRows] = useState<PesanBKDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
-
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("semua");
 
@@ -56,12 +54,6 @@ export default function PesanBKPage() {
   const [deleting, setDeleting] = useState<PesanBKDTO | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  const reload = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    setReloadKey((value) => value + 1);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -87,10 +79,7 @@ export default function PesanBKPage() {
     return () => {
       cancelled = true;
     };
-    return () => {
-      cancelled = true;
-    };
-  }, [reloadKey, logout]);
+  }, [logout]);
 
   const visibleRows = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -129,6 +118,28 @@ export default function PesanBKPage() {
         return;
       }
       setError(err instanceof Error ? err.message : "Gagal memperbarui status.");
+    } finally {
+      setStatusBusyId(null);
+    }
+  }
+
+  async function updateCategory(row: PesanBKDTO, kategori: string | null) {
+    if (row.kategori === kategori || statusBusyId !== null) return;
+    setStatusBusyId(row.id);
+    setError(null);
+    try {
+      await apiRequest(`/api/bk/index.php?id=${row.id}`, {
+        method: "PUT",
+        body: { kategori },
+      });
+      setRows((prev) => prev.map((item) => (item.id === row.id ? { ...item, kategori } : item)));
+      setDetail((prev) => (prev?.id === row.id ? { ...prev, kategori } : prev));
+    } catch (err: unknown) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setError(err instanceof Error ? err.message : "Gagal memperbarui kategori pesan.");
     } finally {
       setStatusBusyId(null);
     }
@@ -198,12 +209,13 @@ export default function PesanBKPage() {
 
       {!loading && !error && visibleRows.length > 0 && (
         <div className="overflow-x-auto rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm">
-          <table className="w-full min-w-[760px] border-collapse font-body-sm text-body-sm">
+          <table className="w-full min-w-[900px] border-collapse font-body-sm text-body-sm">
             <thead>
               <tr className="border-b border-surface-container text-left">
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Nama</th>
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Kelas</th>
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Keperluan</th>
+                <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Kategori admin</th>
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">No. HP</th>
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Tanggal</th>
                 <th scope="col" className="px-space-md py-space-sm font-label-sm text-label-sm font-bold text-on-surface-variant">Status</th>
@@ -218,6 +230,7 @@ export default function PesanBKPage() {
                   <td className="max-w-56 px-space-md py-space-sm text-on-surface-variant">
                     <span className="line-clamp-2">{row.keperluan}</span>
                   </td>
+                  <td className="px-space-md py-space-sm text-on-surface-variant">{row.kategori ?? "—"}</td>
                   <td className="px-space-md py-space-sm text-on-surface-variant tabular-nums">
                     {maskPhone(row.noHp)}
                   </td>
@@ -286,6 +299,18 @@ export default function PesanBKPage() {
           onClose={() => setDetail(null)}
         >
           <dl className="space-y-space-sm font-body-sm text-body-sm">
+            <div>
+              <dt className="font-label-sm text-label-sm font-bold text-on-surface-variant">Kategori admin</dt>
+              <dd className="mt-2">
+                <CategoryField
+                  module="bk"
+                  value={detail.kategori}
+                  onChange={(kategori) => void updateCategory(detail, kategori)}
+                  onUnauthorized={logout}
+                  label="Klasifikasi internal"
+                />
+              </dd>
+            </div>
             <div>
               <dt className="font-label-sm text-label-sm font-bold text-on-surface-variant">Keperluan</dt>
               <dd className="text-on-surface">{detail.keperluan}</dd>
