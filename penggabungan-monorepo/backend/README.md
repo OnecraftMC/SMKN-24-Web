@@ -44,6 +44,10 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    Jalankan upgrade schema sebelum deploy versi aplikasi yang membaca kolom ini.
    Baris lama otomatis bernilai `0` (bukan fasilitas unggulan). Jangan jalankan
    migration ini pada database baru yang sudah dibuat dari `database.sql`.
+   Untuk pusat arsip dan pengajuan prestasi, backup dahulu lalu jalankan
+   `backend/migrations/20261004_add_arsip_prestasi.sql` satu kali sebelum deploy.
+   Migration ini hanya menambah tabel `arsip` dan `prestasi`; data lama tidak
+   diubah. Jangan jalankan migration production dari aplikasi atau dari test.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
@@ -74,6 +78,23 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    ```bash
    chmod -R 755 uploads
    ```
+   Arsip dan bukti prestasi tidak disimpan di folder publik tersebut. Backend
+   membuat `.smkn24-private-uploads` satu tingkat di atas document root. Jika
+   lokasi itu tidak dapat ditulis pada hosting, atur `PRIVATE_UPLOAD_DIR` di
+   `backend/.env` ke direktori writable yang benar-benar berada di luar document
+   root. Batas aplikasi adalah 10 MB per file; PHP `upload_max_filesize` dan
+   `post_max_size` harus disetel setidaknya 11 MB untuk menerima multipart form.
+   Arsip menerima PDF/DOCX/JPG/PNG; bukti prestasi menerima PDF/JPG/PNG. Bukti
+   prestasi hanya dapat diunduh oleh admin terautentikasi.
+   Metadata hapus dan file arsip dihapus bersama; bila pembersihan file gagal,
+   endpoint mengembalikan error dan mencatat kejadian generik di log. Kegagalan
+   proses antara penyimpanan file dan insert DB melakukan pembersihan best-effort.
+   Jangan menghapus file yatim secara otomatis: setelah backup, cocokkan storage
+   key file dengan kedua tabel sebelum pembersihan manual.
+   Rollback rilis dilakukan dengan mengembalikan kode aplikasi sebelumnya sambil
+   mempertahankan tabel dan file baru. Jangan DROP tabel atau menghapus folder
+   storage untuk rollback setelah ada pengajuan/dokumen; pulihkan hanya dari
+   backup yang telah diverifikasi dan dengan persetujuan pemilik data.
 6. Buka `config/config.php` bagian `ALLOWED_ORIGINS` dan tambahkan domain
    frontend Next.js Anda (misalnya `http://localhost:3000` untuk development,
    atau domain produksi).
@@ -127,7 +148,8 @@ backend/
 │   ├── response.php       <- helper JSON response
 │   ├── cors.php           <- middleware CORS
 │   ├── jwt.php            <- JWT auth admin
-│   └── upload.php         <- upload gambar
+│   ├── upload.php         <- upload gambar publik
+│   └── private_upload.php <- dokumen privat di luar web root
 ├── uploads/               <- file gambar ter-upload (publik, tanpa eksekusi PHP)
 ├── tools/                 <- skrip CLI (create-admin.php, hash-password.php)
 └── api/
@@ -141,6 +163,8 @@ backend/
     ├── jadwal/index.php    GET/POST/DELETE (matriks per jurusan & sesi)
     ├── galeri/index.php    GET/POST/PUT/DELETE
     ├── fasilitas/index.php GET/POST/PUT/DELETE
+    ├── arsip/index.php     CRUD metadata + unduhan arsip publik terkontrol
+    ├── prestasi/index.php  POST publik; GET/status + bukti admin-only
     ├── bk/index.php        POST (publik) / GET,PUT,DELETE (admin)
     ├── aspirasi/index.php  POST (publik) / GET,PUT,DELETE (admin)
     ├── chat/
@@ -152,7 +176,7 @@ backend/
 ## 5. Autentikasi Admin
 
 Semua endpoint tulis (POST/PUT/DELETE) untuk data konten, dan semua endpoint
-`GET` yang sensitif (daftar pesan BK, aspirasi, riwayat chat), membutuhkan
+`GET` yang sensitif (daftar pesan BK, prestasi, aspirasi, riwayat chat), membutuhkan
 header:
 
 ```

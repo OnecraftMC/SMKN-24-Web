@@ -1,7 +1,6 @@
 import KabarBanner from '@/components/kabar/KabarBanner';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import GaleriVisual from '@/components/kabar/GaleriVisual';
-import FormAspirasi from '@/components/kabar/FormAspirasi';
 import { Reveal } from '@/components/ui/Reveal';
 import { getBerita, getGaleri } from '@/lib/api';
 
@@ -25,9 +24,6 @@ export default async function KabarPage() {
       </Reveal>
       <Reveal>
         <GaleriVisual galeri={galeri} error={galeriError} />
-      </Reveal>
-      <Reveal>
-        <FormAspirasi />
       </Reveal>
     </>
   );

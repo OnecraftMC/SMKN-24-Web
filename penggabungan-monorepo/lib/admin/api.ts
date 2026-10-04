@@ -206,6 +206,40 @@ export async function apiUpload<T>(
   return parsed as T;
 }
 
+export async function apiDownload(path: string): Promise<Blob> {
+  const token = getStoredToken();
+  const headers: Record<string, string> = { Accept: "*/*" };
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      headers,
+      cache: "no-store",
+    });
+  } catch {
+    throw new ApiError(
+      `Tidak dapat menghubungi server di ${API_BASE_URL}. Periksa koneksi dan CORS.`,
+      0,
+    );
+  }
+
+  if (!response.ok) {
+    const rawBody = await response.text();
+    let parsed: unknown = null;
+    try {
+      parsed = JSON.parse(rawBody);
+    } catch {
+      parsed = null;
+    }
+    throw new ApiError(readErrorMessage(parsed, response.status), response.status);
+  }
+
+  return response.blob();
+}
+
 function readErrorMessage(parsed: unknown, status: number): string {
   if (
     typeof parsed === "object" &&

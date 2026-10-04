@@ -261,7 +261,7 @@ function BrandPanel() {
           Kelola konten sekolah dari satu tempat.
         </p>
         <p className="font-body-md text-body-md text-surface-container-high">
-          Berita, pengumuman, agenda, direktori guru, inbox BK, dan aspirasi —
+          Berita, pengumuman, agenda, direktori guru, dan inbox BK —
           semuanya terpusat di sini.
         </p>
       </div>

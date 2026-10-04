@@ -20,6 +20,7 @@ import {
   type PengumumanDTO,
   type PengumumanView,
 } from "@/lib/shared/mappers";
+import type { ArsipDTO } from "@/lib/admin/types";
 // JurusanKey tinggal di shared/types.ts (enum jadwal di backend), bukan di mappers.
 import type { JurusanKey } from "@/lib/shared/types";
 
@@ -168,6 +169,25 @@ export async function getGaleri(): Promise<ApiResult<GaleriView[]>> {
     : { data: null, error: result.error };
 }
 
+export interface ArsipPublicDTO extends Omit<ArsipDTO, "aktif"> {
+  downloadUrl: string;
+}
+
+export async function getArsip(): Promise<ApiResult<ArsipPublicDTO[]>> {
+  const result = await request<Omit<ArsipDTO, "aktif">[]>("api/arsip/index.php");
+  if (!result.data) return { data: null, error: result.error, status: result.status };
+
+  const baseUrl = backendUrl();
+  return {
+    data: result.data.map((row) => ({
+      ...row,
+      downloadUrl: `${baseUrl}${row.downloadUrl}`,
+    })),
+    error: null,
+    status: result.status,
+  };
+}
+
 /**
  * Matriks jadwal publik.
  *
@@ -282,6 +302,73 @@ export async function proxyPublicPost(
     },
   });
 }
+
+export async function proxyPublicMultipartPost(
+  endpoint: "prestasi",
+  formData: FormData,
+): Promise<Response> {
+  const requiredFields: Record<string, number> = {
+    nisn: 20,
+    namaSiswa: 150,
+    kelas: 80,
+    jurusan: 100,
+    perlombaan: 255,
+    tingkat: 100,
+    tanggalLomba: 10,
+    penyelenggara: 200,
+    prestasi: 150,
+  };
+
+  for (const [field, maxLength] of Object.entries(requiredFields)) {
+    const value = formData.get(field);
+    if (typeof value !== "string" || !value.trim() || value.length > maxLength) {
+      return Response.json({ error: `Field ${field} wajib diisi dan maksimal ${maxLength} karakter.` }, { status: 400 });
+    }
+    formData.set(field, value.trim());
+  }
+
+  const deskripsi = formData.get("deskripsi");
+  if (deskripsi !== null && (typeof deskripsi !== "string" || deskripsi.length > 3000)) {
+    return Response.json({ error: "Uraian maksimal 3.000 karakter." }, { status: 400 });
+  }
+
+  const bukti = formData.get("bukti");
+  if (bukti instanceof File && bukti.size > 10 * 1024 * 1024) {
+    return Response.json({ error: "Ukuran bukti maksimal 10 MB." }, { status: 413 });
+  }
+  if (bukti !== null && !(bukti instanceof File)) {
+    return Response.json({ error: "Format lampiran tidak valid." }, { status: 400 });
+  }
+
+  const { url: baseUrl, error: configError } = backendBaseUrl();
+  if (configError) return Response.json({ error: configError }, { status: 503 });
+  if (!baseUrl) {
+    return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
+  }
+
+  try {
+    const response = await fetch(`${baseUrl}/api/${endpoint}/index.php`, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: formData,
+      signal: AbortSignal.timeout(20_000),
+      cache: "no-store",
+    });
+    return new Response(response.body, {
+      status: response.status,
+      headers: { "Content-Type": response.headers.get("Content-Type") ?? "application/json" },
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      return Response.json({ error: "Backend tidak merespons dalam 20 detik." }, { status: 504 });
+    }
+    return Response.json(
+      { error: "Tidak dapat menghubungi backend. Periksa koneksi dan konfigurasi." },
+      { status: 502 },
+    );
+  }
+}
+
 /**
  * Proxy GET same-origin ke backend PHP untuk route baca publik
  * (`/api/berita`, `/api/pengumuman`, `/api/agenda`, `/api/jadwal`).

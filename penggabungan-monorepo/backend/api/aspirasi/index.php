@@ -1,6 +1,11 @@
 <?php
 /**
- * POST   /api/aspirasi/index.php        -> kirim aspirasi (publik, dari FormAspirasi.tsx)
+ * LEGACY/DEPRECATED (P4.1/P4.6, 2026-10-04): endpoint aspirasi tidak lagi
+ * dipanggil UI mana pun — CTA `/kabar` dan menu `/admin/aspirasi` sudah dihapus.
+ * File + tabel `aspirasi` dipertahankan agar data lama tidak hilang; jangan
+ * dipakai untuk fitur baru (pengajuan prestasi = resource `prestasi` terpisah).
+ *
+ * POST   /api/aspirasi/index.php        -> legacy, dipertahankan
  * GET    /api/aspirasi/index.php        -> daftar aspirasi (admin)
  * PUT    /api/aspirasi/index.php?id=1   -> update status (admin)
  * DELETE /api/aspirasi/index.php?id=1   -> hapus (admin)

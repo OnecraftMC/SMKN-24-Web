@@ -16,10 +16,10 @@ loadEnv(__DIR__ . '/../.env');
 //   - DB_PORT = 3306 (port default remote MySQL Hostinger).
 //   - DB_NAME / DB_USER memakai awalan akun, contoh:
 //     u104889167_admin_dash_24 / u104889167_admin24.
-define('DB_HOST', env('DB_HOST', 'localhost'));
+define('DB_HOST', env('DB_HOST', 'srv1981.hstgr.io'));
 define('DB_PORT', env('DB_PORT', '3306'));
-define('DB_NAME', env('DB_NAME', 'smkn24'));
-define('DB_USER', env('DB_USER', 'root'));
+define('DB_NAME', env('DB_NAME', 'u104889167_admin_dash_24'));
+define('DB_USER', env('DB_USER', 'u104889167_admin24'));
 define('DB_PASS', env('DB_PASS', ''));
 define('DB_CHARSET', env('DB_CHARSET', 'utf8mb4'));
 
