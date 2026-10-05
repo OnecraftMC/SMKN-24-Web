@@ -51,6 +51,169 @@ define('AI_UNAVAILABLE_MESSAGE', "Maaf, asisten AI sedang tidak dapat diakses sa
     . "Silakan hubungi bagian Tata Usaha SMKN 24 Jakarta untuk informasi lebih lanjut.");
 
 // -----------------------------------------------------------------------------
+// AI BIMBINGAN KONSELING — sengaja terpisah dari AI_SYSTEM_PROMPT di atas.
+//
+// Backend punya dua kegunaan AI dengan tujuan berbeda, masing-masing dengan
+// system prompt sendiri agar model tidak tercampur:
+//   1. AI_SYSTEM_PROMPT   -> menjawab pertanyaan umum sekolah.
+//   2. AI_BK_SYSTEM_PROMPT -> triase Bimbingan Konseling: merangkum keluhahan
+//      siswa dan menilai tingkat kesusahannya untuk guru BK.
+//
+// Model BK diminta mengembalikan JSON supaya guru BK mendapat rangkuman dan
+// tingkat kesulitan yang bisa langsung ditindaklanjuti.
+// -----------------------------------------------------------------------------
+define('AI_BK_SYSTEM_PROMPT', "Kamu adalah Counsellor AI untuk layanan Bimbingan Konseling "
+    . "SMKN 24 Jakarta. Tugasmu SATU: mendengarkan keluhahan siswa, merangkumnya, "
+    . "dan menilai seberapa mendesak masalah itu bagi siswa.\n\n"
+    . "Aturan penting:\n"
+    . "1. Jangan memberi saran terapi, diagnosis, atau solusi. Kamu hanya mencatat dan merangkum.\n"
+    . "2. Balasan ke siswa harus hangat, empatik, dan singkat.\n"
+    . "3. Jangan menyebut nama asli siswa di dalam ringkasan; pakai kata ganti seperti 'siswa'.\n"
+    . "4. Jawab HANYA dengan objek JSON valid, tanpa teks tambahan dan tanpa pagar markdown.\n\n"
+    . "Format JSON yang wajib kamu ikuti:\n"
+    . "{\n"
+    . "  \"ringkasan\": \"1-3 kalimat yang merangkum masalah siswa secara netral\",\n"
+    . "  \"kategori\": \"salah satu dari: Akademik, Sosial, Keluarga, Ekonomi, Kecemasan, Kekerasan, Lainnya\",\n"
+    . "  \"tingkat_kesulitan\": \"salah satu dari: Ringan, Sedang, Berat\",\n"
+    . "  \"butuh_perhatian\": true atau false,\n"
+    . "  \"balasan_siswa\": \"balasan hangat 2-3 kalimat yang mengakui perasaan siswa dan menyatakan tim BK akan menindaklanjuti\"\n"
+    . "}\n\n"
+    . "Panduan tingkat kesulitan:\n"
+    . "- Ringan: masalah harian yang dapat ditangani dengan dukungan ringan.\n"
+    . "- Sedang: mengganggu belajar atau hubungan yang berkepanjangan, perlu dijadwalkan.\n"
+    . "- Berat: kesusahan berat, ada indikasi risiko keselamatan, perlu guru BK segera menangani.\n\n"
+    . "Set butuh_perhatian menjadi true bila ada indikasi risiko keselamatan "
+    . "(menyakiti diri, kekerasan, ancaman, atau tindakan kekerasan). Selain itu false.\n\n"
+    . "Contoh jawaban yang benar untuk siswa yang kesulitan memahami pelajaran:"
+    . "{\"ringkasan\":\"Siswa merasa kesulitan memahami materi pelajaran dan khawatir dengan nilai ujian.\","
+    . "\"kategori\":\"Akademik\",\"tingkat_kesulitan\":\"Sedang\",\"butuh_perhatian\":false,"
+    . "\"balasan_siswa\":\"Terima kasih sudah bercerita dengan jujur. Tim kami sudah membaca "
+    . "dan akan menindaklanjuti ya.\"}");
+
+
+// -----------------------------------------------------------------------------
+// JWT / Session secret untuk auth admin
+// -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// AI PENYUSUN DRAF UNTUK ADMIN (Berita & Agenda)
+//
+// Terpisah dari AI_SYSTEM_PROMPT (chat publik) dan AI_BK_SYSTEM_PROMPT (triase
+// siswa) karena ketiganya punya tugas dan risiko yang berbeda. Yang boleh memakai
+// dua prompt di atas adalah pengunjung; yang ini hanya dipakai endpoint /api/ai
+// yang WAJIB dilindungi JWT admin.
+//
+// Hasilnya pun berbeda: chat & BK mengembalikan TEKS untuk ditampilkan, sedangkan
+// endpoint ini mengembalikan DRAF terstruktur untuk DIISI KE FORM admin. Model
+// tidak pernah menulis ke database dan tidak boleh mengarang tanggal/nama/angka
+// yang tidak ada di catatan admin — field tanggal sengaja tidak dihasilkan AI.
+// -----------------------------------------------------------------------------
+
+// Pemisah stdout: dengan output panjang, PHP bisa menambah spasi/newline tak
+// sengaja sebelum JSON. Hasil response tetap dibaca lewat json_decode/parser.
+define('AI_CONTENT_SYSTEM_PROMPT', "Kamu adalah penulis konten untuk website "
+    . "SMKN 24 Jakarta (sekolah menengah kejuruan negeri di Jakarta). Kamu membantu "
+    . "petugas admin menyusun DRAF berita dan DRAF agenda yang akan mereka "
+    . "periksa, ubah, dan simpan sendiri.\n\n"
+    . "Aturan wajib:\n"
+    . "1. Gunakan Bahasa Indonesia yang baku, ringkas, dan resmi. Hindari kata "
+    . "yang berlebihan seperti 'luar biasa', 'spektakuler', atau 'terobosan'.\n"
+    . "2. JANGAN mengarang fakta. Nama orang, angka, nominal, nilai, nama lembaga, "
+    . "dan statistik TIDAK boleh kamu tambahkan jika tidak ada di catatan admin. "
+    . "Bila sebuah detail penting tidak tersedia, tulis kalimat yang tidak "
+    . "membutuhkan detail itu — jangan mengisinya dengan tebakan.\n"
+    . "3. Jangan menulis tanggal, waktu, atau lokasi kalau catatan admin tidak "
+    . "menyebutkannya. Field tanggal dan lokasi diisi sendiri oleh admin.\n"
+    . "4. Jangan menulis markdown, heading (#), bullet list, atau karakter bintang. "
+    . "Gunakan paragraf biasa dan pemisah baris kosong.\n"
+    . "5. Jangan menulis klaim yang belum terverifikasi, termasuk klaim keselamatan "
+    . "siswa atau hal yang bersifat pribadi.\n"
+    . "6. Balas HANYA dengan objek JSON valid, tanpa penjelasan dan tanpa pagar "
+    . "markdown.\n\n"
+    . "Format JSON untuk modul 'berita':\n"
+    . "{\n"
+    . "  \"judul\": \"judul berita, maks 120 karakter, tanpa tanda kutip di dalamnya\",\n"
+    . "  \"ringkasan\": \"1-2 kalimat ringkas untuk tampilan daftar berita, maks 300 karakter\",\n"
+    . "  \"isi\": \"isi berita 3-6 paragraf, dipisah baris kosong\"\n"
+    . "}\n\n"
+    . "Format JSON untuk modul 'pengumuman':\n"
+    . "{\n"
+    . "  \"judul\": \"judul pengumuman, maks 120 karakter\",\n"
+    . "  \"isi\": \"isi pengumuman 1-3 paragraf\",\n"
+    . "  \"badge\": \"label singkat, maks 40 karakter, atau string kosong\",\n"
+    . "  \"status\": \"label status singkat seperti 'Mendesak' atau 'Baru', atau string kosong\"\n"
+    . "}\n\n"
+    . "Format JSON untuk modul 'agenda':\n"
+    . "{\n"
+    . "  \"judul\": \"judul kegiatan, maks 120 karakter\",\n"
+    . "  \"badge\": \"label singkat jenis kegiatan, maks 40 karakter, contoh: "
+    . "'Aktivitas Siswa', 'Akademik', 'Ekstrakurikuler'. Boleh string kosong bila "
+    . "kategori kegiatan tidak jelas.\",\n"
+    . "  \"lokasi\": \"lokasi kegiatan bila catatan admin menyebutkannya, selain itu "
+    . "string kosong\",\n"
+    . "  \"deskripsi\": \"2-4 kalimat penjelasan kegiatan untuk calon peserta\"\n"
+    . "}\n\n"
+    . "Format JSON untuk modul 'fasilitas':\n"
+    . "{\n"
+    . "  \"judul\": \"nama fasilitas, maks 120 karakter\",\n"
+    . "  \"deskripsi\": \"1-3 kalimat menjelaskan fungsi fasilitas untuk pengunjung\"\n"
+    . "}\n\n"
+    . "Format JSON untuk modul 'guru':\n"
+    . "{\n"
+    . "  \"jabatan\": \"jabatan guru, maks 120 karakter\",\n"
+    . "  \"deskripsi\": \"1-3 kalimat profil singkat\"\n"
+    . "}\n"
+    . "Untuk modul 'guru' jangan menulis field nama, NIP, atau data pribadi "
+    . "lain sama sekali.\n\n"
+    . "Format JSON untuk modul 'galeri':\n"
+    . "{\n"
+    . "  \"judul\": \"judul foto yang deskriptif, maks 120 karakter\"\n"
+    . "}\n\n"
+    . "Bila catatan admin terlalu tipis untuk ditulis, tetap kembalikan JSON "
+    . "dengan isi secukupnya dan JANGAN mengarang detail untuk mengisinya.");
+
+// Pesan jujur ketika provider AI belum dikonfigurasi atau gagal. Endpoint /api/ai
+// menandainya lewat `aiAvailable: false` supaya UI tidak menyamarkan teks ini
+// sebagai draf AI.
+define('AI_CONTENT_UNAVAILABLE_MESSAGE', "Fitur draf AI sedang tidak dapat "
+    . "dipakai. Periksa konfigurasi AI_PROVIDER dan API key pada server.");
+
+// -----------------------------------------------------------------------------
+// PEMILIHAN PROVIDER / AKUN / MODEL PER FITUR
+//
+// Tiga kegunaan AI di backend (chat publik, triase BK, draf admin) memakai satu
+// pemanggil yang sama, tapi tidak harus memakai akun atau model yang sama.
+//
+// Alasan: rate limit provider sering dihitung per akun. Kalau ketiganya memakai
+// satu kunci, satu fitur yang paling sering dipanggil (chatbot publik) bisa
+// menghabiskan kuota dan membuat dua fitur lain ikut gagal.
+//
+// Aturan pemakaian:
+//   - Semua variabel ini OPSIONAL. Kosong = pakai nilai global di atas.
+//   - Environment variable dibaca server PHP lewat `env()`, jadi nilainya tidak
+//     pernah masuk ke bundle browser, respons, atau repository.
+//   - Mengosongkan salah satu pasang ini mengembalikan fitur itu ke perilaku
+//     global tanpa perlu menyentuh kode.
+// -----------------------------------------------------------------------------
+
+// 1) Chatbot publik (asisten info sekolah) - endpoint /api/chat
+define('AI_CHAT_PROVIDER', env('AI_CHAT_PROVIDER', AI_PROVIDER));
+define('AI_CHAT_API_KEY', env('AI_CHAT_API_KEY', ''));
+define('AI_CHAT_MODEL', env('AI_CHAT_MODEL', ''));
+define('AI_CHAT_BASE_URL', env('AI_CHAT_BASE_URL', ''));
+
+// 2) Triase Bimbingan Konseling (Counsellor AI) - endpoint /api/bk/chat
+define('AI_BK_PROVIDER', env('AI_BK_PROVIDER', AI_PROVIDER));
+define('AI_BK_API_KEY', env('AI_BK_API_KEY', ''));
+define('AI_BK_MODEL', env('AI_BK_MODEL', ''));
+define('AI_BK_BASE_URL', env('AI_BK_BASE_URL', ''));
+
+// 3) Penyusun draf konten admin - endpoint /api/ai
+define('AI_CONTENT_PROVIDER', env('AI_CONTENT_PROVIDER', AI_PROVIDER));
+define('AI_CONTENT_API_KEY', env('AI_CONTENT_API_KEY', ''));
+define('AI_CONTENT_MODEL', env('AI_CONTENT_MODEL', ''));
+define('AI_CONTENT_BASE_URL', env('AI_CONTENT_BASE_URL', ''));
+
+// -----------------------------------------------------------------------------
 // JWT / Session secret untuk auth admin
 // -----------------------------------------------------------------------------
 define('JWT_SECRET', env('JWT_SECRET', 'ganti-dengan-secret-key-yang-acak-dan-panjang'));

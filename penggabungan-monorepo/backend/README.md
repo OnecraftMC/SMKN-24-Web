@@ -55,6 +55,9 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    kategori. Statement `ALTER TABLE` tidak idempoten: jangan jalankan ulang,
    dan jangan jalankan pada database fresh-install yang sudah dibuat dari
    `database.sql` versi ini.
+   Untuk pilihan berita `Prestasi & Akademik`, jalankan
+   `backend/migrations/20261005_add_prestasi_akademik_news_category.sql` satu
+   kali setelah migration kategori admin di atas.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
@@ -246,6 +249,67 @@ Response:
   "reply": "Untuk mendaftar SPMB SMKN 24 Jakarta, ..."
 }
 ```
+
+## 7b. Draf Berita & Agenda dengan AI (khusus admin)
+
+`POST /api/ai/index.php` dipakai dashboard admin untuk menyusun **draf** berita
+dan agenda. Endpoint ini memakai provider AI yang sama dengan chat, tapi memakai
+system prompt terpisah (`AI_CONTENT_SYSTEM_PROMPT`) dan WAJIB memakai token admin
+(`requireAuth()`). Tanpa token selalu dibalas 401.
+
+```bash
+curl -X POST https://domainanda.com/backend/api/ai/index.php \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN_ADMIN>" \
+  -d '{"modul":"berita","catatan":"Pameran karya siswa kelas XII TKU di aula sekolah."}'
+```
+
+Response sukses:
+
+```json
+{
+  "draf": {
+    "judul": "Pameran Karya Siswa Kelas XII TKU SMKN 24 Jakarta",
+    "ringkasan": "Siswa kelas XII TKU memamerkan karya mereka di aula sekolah.",
+    "isi": "Paragraf pertama...\n\nParagraf kedua..."
+  },
+  "aiAvailable": true,
+  "reason": null
+}
+```
+
+`modul` berisi salah satu dari `berita`, `pengumuman`, `agenda`, `fasilitas`,
+`guru`, atau `galeri`. Field draf per modul:
+
+| Modul         | Field hasil draf                          |
+| ------------- | ----------------------------------------- |
+| `berita`      | `judul`, `ringkasan`, `isi`               |
+| `pengumuman`  | `judul`, `isi`, `badge`, `status`         |
+| `agenda`      | `judul`, `badge`, `lokasi`, `deskripsi`   |
+| `fasilitas`   | `judul`, `deskripsi`                      |
+| `guru`        | `jabatan`, `deskripsi`                    |
+| `galeri`      | `judul`                                   |
+
+Hal yang perlu diketahui sebelum memakai fitur ini:
+
+- **Tidak ada yang disimpan otomatis.** Endpoint ini tidak pernah menulis ke
+  database. Hasil draf hanya mengisi field form admin; admin tetap menekan
+  tombol **Simpan** sendiri setelah membaca dan memperbaiki isinya.
+- **Field tanggal tidak dihasilkan AI.** `tanggal` (berita & pengumuman) serta
+  `tglMulai`/`tglSelesai`/`waktu` (agenda) tetap diisi admin. Tanggal adalah
+  data faktual yang paling rawan dikarang model.
+- **Nama orang tidak dihasilkan AI.** Pada modul `guru`, draf hanya berisi
+  jabatan dan deskripsi; nama, foto, dan urutan tampil tetap diisi admin.
+- **Modul berikut sengaja tidak didukung** karena isinya data faktual/terstruktur
+  yang tidak boleh dikarang: `jadwal` (jam pelajaran, mapel, guru pengampu),
+  `arsip` (metadata berkas), `bk` dan `prestasi` (data siswa). Menambah salah
+  satu ke `AI_CONTENT_MODULES` di `api/ai/index.php` akan terlihat jelas di diff.
+- **Perlu `AI_PROVIDER` + API key yang terisi** di `.env` server. Tanpa itu
+  endpoint membalas HTTP 503 dengan `aiAvailable: false` dan
+  `reason: "not_configured"` — bukan draf palsu.
+- Status lain yang perlu ditangani: `provider_error` (502, layanan AI gagal) dan
+  `invalid_response` (502, jawaban model tidak terbaca sebagai JSON). Keduanya
+  juga **tidak** berisi draf.
 
 ## 8. Keamanan
 

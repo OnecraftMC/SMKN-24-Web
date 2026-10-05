@@ -11,11 +11,15 @@
   },
   "dependencies": {
     "clsx": "2.1.1",
+    "gsap": "^3.15.0",
     "lucide-react": "1.47.0",
     "motion": "13.4.0",
     "next": "16.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-easy-crop": "^6.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "server-only": "0.0.1",
     "tailwind-merge": "3.7.0"
   },

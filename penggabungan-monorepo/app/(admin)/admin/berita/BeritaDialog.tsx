@@ -14,6 +14,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type BeritaDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type BeritaFormValues = {
   judul: string;
@@ -160,6 +161,23 @@ export default function BeritaDialog({
             <span>{error}</span>
           </p>
         )}
+
+        <AiWriterPanel<BeritaDraft>
+          module="berita"
+          label="berita"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            // Hanya field yang ada isinya yang ditimpa. Kalau model tidak
+            // menghasilkan ringkasan, isi ringkasan admin tidak dihapus.
+            setForm((prev) => ({
+              ...prev,
+              judul: draf.judul || prev.judul,
+              ringkasan: draf.ringkasan || prev.ringkasan,
+              isi: draf.isi || prev.isi,
+            }));
+          }}
+        />
 
         <Field htmlFor="berita-judul" label="Judul">
           <input

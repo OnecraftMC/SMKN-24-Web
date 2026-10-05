@@ -5,7 +5,8 @@ import Image from "next/image";
 
 export default function Hero() {
   return (
-    <div className="relative w-full overflow-hidden bg-primary text-on-primary">
+    <>
+      <div className="relative w-full overflow-hidden bg-primary text-on-primary">
       {/* Background decorative elements */}
       <div className="absolute inset-0 opacity-15 pointer-events-none">
         <svg className="w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1440 800">
@@ -48,6 +49,7 @@ export default function Hero() {
                 href="/#lokasi-sekolah"
                 className="inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
               >
+                <span className="material-symbols-outlined text-[20px]">location_on</span>
                 <span>Lihat Lokasi Sekolah</span>
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">
                   arrow_forward
@@ -117,6 +119,7 @@ export default function Hero() {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

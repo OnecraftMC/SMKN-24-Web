@@ -42,7 +42,7 @@ const PUBLIC_DATA_REVALIDATE_SECONDS = 10;
 // `perbaikan error dan bug.md` E.1: NEXT_PUBLIC_API_URL = host:3306).
 const PORT_DATABASE = new Set([3306, 5432]);
 
-function backendBaseUrl(): { url: string | null; error: string | null } {
+export function backendBaseUrl(): { url: string | null; error: string | null } {
   const value = process.env.BACKEND_URL?.trim();
   if (!value) return { url: null, error: null };
   let url: URL;
@@ -121,8 +121,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export async function getBerita(options: { utama?: boolean; limit?: number } = {}): Promise<ApiResult<BeritaView[]>> {
-  const query = options.utama ? "?utama=1" : "";
+export async function getBerita(options: {
+  utama?: boolean;
+  limit?: number;
+  kategori?: string;
+} = {}): Promise<ApiResult<BeritaView[]>> {
+  const params = new URLSearchParams();
+  if (options.utama) params.set("utama", "1");
+  if (options.kategori) params.set("kategori", options.kategori);
+  const query = params.size > 0 ? `?${params.toString()}` : "";
   const result = await request<BeritaDTO[]>(`api/berita/index.php${query}`);
   if (!result.data) return { data: null, error: result.error };
   const data = result.data.map((item) => mapBerita(item, backendUrl()));
@@ -222,7 +229,7 @@ export async function getJadwal(
  */
 
 export async function proxyPublicPost(
-  endpoint: "bk" | "chat",
+  endpoint: "bk" | "bk/chat" | "chat",
   payload: unknown,
 ): Promise<Response> {
   if (!isRecord(payload)) {
@@ -230,8 +237,68 @@ export async function proxyPublicPost(
   }
 
   const body = payload;
-  let requestBody: Record<string, string>;
-  if (endpoint === "bk") {
+  let requestBody: Record<string, unknown>;
+  if (endpoint === "bk/chat") {
+    // Percakapan Counsellor AI: array { role, text } dari sisi siswa.
+    //
+    // Frontend BKChatModal mengirim field `sender` ("user"/"bot"), sedangkan
+    // kontrak ke backend memakai `role`. Keduanya diterima lalu dinormalkan
+    // ke `role` di sini.
+    const { messages, deviceId } = body;
+    if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
+      return Response.json(
+        { error: "Ceritakan dulu apa yang sedang kamu rasakan." },
+        { status: 400 },
+      );
+    }
+
+    let totalChars = 0;
+    const cleaned: { role: string; text: string }[] = [];
+    for (const m of messages) {
+      if (!isRecord(m)) {
+        return Response.json({ error: "Format pesan tidak valid." }, { status: 400 });
+      }
+      // `sender` dipakai pertama karena itu yang dikirim frontend.
+      const rawRole = typeof m.role === "string" ? m.role : m.sender;
+      const role = typeof rawRole === "string" ? rawRole : "";
+      const text = typeof m.text === "string" ? m.text.trim() : "";
+      if (role !== "user" && role !== "bot") {
+        return Response.json({ error: "Format pesan tidak valid." }, { status: 400 });
+      }
+      if (text === "") {
+        continue;
+      }
+      totalChars += text.length;
+      // Batasi total panjang cerita agar tidak membanjiri provider AI.
+      if (totalChars > 8000) {
+        return Response.json(
+          { error: "Cerita terlalu panjang. Mohon ringkas sebagian." },
+          { status: 400 },
+        );
+      }
+      cleaned.push({ role, text });
+    }
+
+    if (cleaned.length === 0) {
+      return Response.json(
+        { error: "Ceritakan dulu apa yang sedang kamu rasakan." },
+        { status: 400 },
+      );
+    }
+
+    // deviceId hanya diteruskan bila formatnya UUID v4. Validasi ulang
+    // dilakukan backend; di sini cukup menyaring agar tidak mengirim
+    // apa pun yang tidak diperlukan.
+    const device =
+      typeof deviceId === "string" &&
+      /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[\da-f]{4}-[\da-f]{12}$/i.test(deviceId.trim())
+        ? deviceId.trim()
+        : null;
+
+    requestBody = device
+      ? { messages: cleaned, deviceId: device }
+      : { messages: cleaned };
+  } else if (endpoint === "bk") {
     const { nama, kelas, noHp, keperluan, pesan } = body;
     if (
       typeof nama !== "string" || !nama.trim() ||
@@ -281,9 +348,10 @@ export async function proxyPublicPost(
     return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
   }
 
-  // Endpoint chat memanggil model AI sehingga butuh jendela waktu lebih besar
-  // daripada POST data biasa; sisanya tetap memakai TIMEOUT_MS.
-  const timeoutMs = endpoint === "chat" ? CHAT_TIMEOUT_MS : TIMEOUT_MS;
+  // Endpoint chat dan triase BK sama-sama memanggil model AI sehingga butuh
+  // jendela waktu lebih besar daripada POST data biasa; sisanya tetap
+  // memakai TIMEOUT_MS.
+  const timeoutMs = endpoint === "chat" || endpoint === "bk/chat" ? CHAT_TIMEOUT_MS : TIMEOUT_MS;
 
   let response: Response;
   try {

@@ -13,6 +13,7 @@ import {
 } from "@/components/admin/ui/FormBits";
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import AiWriterPanel, { type GaleriDraft } from "@/components/admin/ui/AiWriterPanel";
 
 export type GaleriFormValues = {
   judul: string;
@@ -131,6 +132,16 @@ export default function GaleriDialog({
           </p>
         )}
 
+        <AiWriterPanel<GaleriDraft>
+          module="galeri"
+          label="judul galeri"
+          disabled={saving}
+          onUnauthorized={onUnauthorized}
+          onApply={(draf) => {
+            setForm((prev) => ({ ...prev, judul: draf.judul || prev.judul }));
+          }}
+        />
+
         <Field htmlFor="galeri-judul" label="Judul">
           <input
             id="galeri-judul"
@@ -153,6 +164,7 @@ export default function GaleriDialog({
           label="Gambar galeri (wajib)"
           value={form.gambar}
           onChange={(path) => update("gambar", path)}
+          cropAspectRatio={4 / 5}
         />
       </form>
     </Modal>

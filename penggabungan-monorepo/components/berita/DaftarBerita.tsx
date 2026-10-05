@@ -5,18 +5,22 @@ import type { BeritaView } from "@/lib/shared/mappers";
 export default function DaftarBerita({
   berita,
   error,
+  eyebrow = "Jurnal Sekolah",
+  heading = "Berita Terbaru",
 }: {
   berita: BeritaView[];
   error: string | null;
+  eyebrow?: string;
+  heading?: string;
 }) {
   return (
     <div id="daftar-berita" className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-2xl">
         <section aria-labelledby="judul-berita" className="space-y-space-xl">
           <div className="space-y-2">
-            <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Jurnal Sekolah</span>
+            <span className="font-label-md uppercase tracking-wider text-secondary font-bold">{eyebrow}</span>
             <h2 id="judul-berita" className="font-headline-md text-headline-md text-primary font-bold tracking-tight">
-              Berita Terbaru
+              {heading}
             </h2>
           </div>
           {berita.length > 0 ? (

@@ -1,19 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
 import PillNavIndicator from "./PillNavIndicator";
+import BKChatModal from "@/components/bk/BKChatModal";
 
 /** id dropdown mobile — dipakai tombol toggle untuk `aria-controls`. */
 const MOBILE_MENU_ID = "navbar-mobile-menu";
 
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isBKOpen, setIsBKOpen] = useState(false);
+  const [indonesiaTime, setIndonesiaTime] = useState("--:--:--");
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
+
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    });
+    const updateTime = () => setIndonesiaTime(formatter.format(new Date()));
+    updateTime();
+    const interval = window.setInterval(updateTime, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const navLinks = [
     { href: "/", label: "Beranda", icon: "home" },
@@ -43,6 +60,10 @@ export default function Navbar() {
               <span className="material-symbols-outlined text-[15px]">schedule</span>
               Senin - Jumat: 07.00 - 15.00 WIB
             </span>
+            <span className="flex items-center gap-1 tabular-nums" aria-label={`Waktu Indonesia Barat ${indonesiaTime}`}>
+              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">schedule</span>
+              {indonesiaTime} WIB
+            </span>
           </div>
           <div className="flex items-center gap-space-sm">
             <span className="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold text-[11px] tracking-wide uppercase">
@@ -61,21 +82,21 @@ export default function Navbar() {
       </div>
 
       {/* Main nav */}
-      <div className="h-20 max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md">
+      <div className="h-16 md:h-20 max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md">
         {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-space-sm text-left group">
+        <Link href="/" className="flex items-center gap-2 md:gap-space-sm text-left group min-w-0 shrink">
           <Image
             src="/logo-smkn24.png"
             alt="Logo SMK Negeri 24 Jakarta"
             width={36}
             height={36}
-            className="h-9 w-auto object-contain rounded-md shadow-sm"
+            className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
           />
-          <span className="flex flex-col">
-            <span className="font-headline-sm text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors">
+          <span className="flex flex-col min-w-0">
+            <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
               SMKN 24 Jakarta
             </span>
-            <span className="font-label-sm text-label-sm text-on-surface-variant font-normal leading-none hidden sm:inline">
+            <span className="font-label-sm text-[10px] md:text-label-sm text-on-surface-variant font-normal leading-tight truncate whitespace-nowrap">
               Sekolah • Unggul &amp; Berkarakter
             </span>
           </span>
@@ -98,13 +119,14 @@ export default function Navbar() {
             <span className="material-symbols-outlined text-[18px]">open_in_new</span>
           </a>
 
-          <Link
-            href="/#lokasi-sekolah"
+          <button
+            type="button"
+            onClick={() => setIsBKOpen(true)}
             className="hidden sm:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-md hover:bg-secondary-fixed-dim transition-all"
           >
-            <span>Lokasi Sekolah</span>
-            <span className="material-symbols-outlined text-[18px]">location_on</span>
-          </Link>
+            <span>Bimbingan Konseling</span>
+            <span className="material-symbols-outlined text-[18px]">forum</span>
+          </button>
 
           <button
             aria-controls={MOBILE_MENU_ID}
@@ -127,7 +149,14 @@ export default function Navbar() {
         isOpen={isMobileOpen}
         onClose={() => setIsMobileOpen(false)}
         navLinks={navLinks}
+        onOpenBK={() => {
+          setIsMobileOpen(false);
+          setIsBKOpen(true);
+        }}
       />
+
+      {/* Layanan Bimbingan Konseling (counsellor AI) */}
+      <BKChatModal open={isBKOpen} onClose={() => setIsBKOpen(false)} />
     </header>
   );
 }
