@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import BKChatModal from "@/components/bk/BKChatModal";
 
 export default function Hero() {
+  const [isBKOpen, setIsBKOpen] = useState(false);
+
   return (
     <>
       <div className="relative w-full overflow-hidden bg-primary text-on-primary">
