@@ -10,7 +10,7 @@ export default function KalenderUnduhan({
   error: string | null;
 }) {
   return (
-    <section aria-labelledby="pusat-arsip-heading" className="space-y-space-lg lg:col-span-7">
+    <section aria-labelledby="pusat-arsip-heading" className="space-y-space-lg">
       <div>
         <span className="font-label-md font-bold uppercase tracking-wider text-secondary">
           Pusat Arsip
@@ -64,12 +64,6 @@ export default function KalenderUnduhan({
         </p>
       )}
 
-      <Link
-        href="/akademik/pengajuan-prestasi"
-        className="inline-flex min-h-11 items-center justify-center rounded-lg bg-primary px-space-md py-2.5 font-label-md font-bold text-on-primary hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-      >
-        Ajukan prestasi siswa
-      </Link>
     </section>
   );
 }

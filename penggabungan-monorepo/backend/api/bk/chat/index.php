@@ -76,7 +76,7 @@ try {
         ['role' => 'user', 'content' => "Ceritakan masalah yang sedang kamu rasakan:\n\n" . $story],
     ];
 
-    $raw = callAiProvider($messagesAi);
+    $raw = callAiProvider($messagesAi, aiFeatureOptions('bk'));
     $data = extractJsonObject($raw);
 
     if ($data !== null) {

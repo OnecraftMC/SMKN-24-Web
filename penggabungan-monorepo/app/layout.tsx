@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import "react-easy-crop/react-easy-crop.css";
 
 /**
  * Root layout aplikasi gabungan SMKN 24 Jakarta.

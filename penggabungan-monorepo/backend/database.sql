@@ -294,3 +294,4 @@ SELECT 'galeri', kategori FROM galeri WHERE TRIM(kategori) <> '' GROUP BY katego
 INSERT IGNORE INTO admin_categories (module_name, category_name)
 SELECT 'arsip', kategori FROM arsip WHERE TRIM(kategori) <> '' GROUP BY kategori;
 INSERT IGNORE INTO admin_categories (module_name, category_name) VALUES ('arsip', 'Akademik');
+INSERT IGNORE INTO admin_categories (module_name, category_name) VALUES ('berita', 'Prestasi & Akademik');

@@ -8,7 +8,7 @@ const highlights = [
   {
     icon: "school",
     label: "Pendidik",
-    value: "52 Guru",
+    value: "58 Guru",
     desc: "100% Tersertifikasi Profesional",
   },
   {

@@ -178,6 +178,42 @@ define('AI_CONTENT_UNAVAILABLE_MESSAGE', "Fitur draf AI sedang tidak dapat "
     . "dipakai. Periksa konfigurasi AI_PROVIDER dan API key pada server.");
 
 // -----------------------------------------------------------------------------
+// PEMILIHAN PROVIDER / AKUN / MODEL PER FITUR
+//
+// Tiga kegunaan AI di backend (chat publik, triase BK, draf admin) memakai satu
+// pemanggil yang sama, tapi tidak harus memakai akun atau model yang sama.
+//
+// Alasan: rate limit provider sering dihitung per akun. Kalau ketiganya memakai
+// satu kunci, satu fitur yang paling sering dipanggil (chatbot publik) bisa
+// menghabiskan kuota dan membuat dua fitur lain ikut gagal.
+//
+// Aturan pemakaian:
+//   - Semua variabel ini OPSIONAL. Kosong = pakai nilai global di atas.
+//   - Environment variable dibaca server PHP lewat `env()`, jadi nilainya tidak
+//     pernah masuk ke bundle browser, respons, atau repository.
+//   - Mengosongkan salah satu pasang ini mengembalikan fitur itu ke perilaku
+//     global tanpa perlu menyentuh kode.
+// -----------------------------------------------------------------------------
+
+// 1) Chatbot publik (asisten info sekolah) - endpoint /api/chat
+define('AI_CHAT_PROVIDER', env('AI_CHAT_PROVIDER', AI_PROVIDER));
+define('AI_CHAT_API_KEY', env('AI_CHAT_API_KEY', ''));
+define('AI_CHAT_MODEL', env('AI_CHAT_MODEL', ''));
+define('AI_CHAT_BASE_URL', env('AI_CHAT_BASE_URL', ''));
+
+// 2) Triase Bimbingan Konseling (Counsellor AI) - endpoint /api/bk/chat
+define('AI_BK_PROVIDER', env('AI_BK_PROVIDER', AI_PROVIDER));
+define('AI_BK_API_KEY', env('AI_BK_API_KEY', ''));
+define('AI_BK_MODEL', env('AI_BK_MODEL', ''));
+define('AI_BK_BASE_URL', env('AI_BK_BASE_URL', ''));
+
+// 3) Penyusun draf konten admin - endpoint /api/ai
+define('AI_CONTENT_PROVIDER', env('AI_CONTENT_PROVIDER', AI_PROVIDER));
+define('AI_CONTENT_API_KEY', env('AI_CONTENT_API_KEY', ''));
+define('AI_CONTENT_MODEL', env('AI_CONTENT_MODEL', ''));
+define('AI_CONTENT_BASE_URL', env('AI_CONTENT_BASE_URL', ''));
+
+// -----------------------------------------------------------------------------
 // JWT / Session secret untuk auth admin
 // -----------------------------------------------------------------------------
 define('JWT_SECRET', env('JWT_SECRET', 'ganti-dengan-secret-key-yang-acak-dan-panjang'));

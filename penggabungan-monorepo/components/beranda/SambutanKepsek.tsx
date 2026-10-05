@@ -65,10 +65,10 @@ export default function SambutanKepsek() {
             <div className="pt-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm bg-surface-container-low p-space-md rounded-xl">
               <div>
                 <h3 className="font-title-md text-title-md text-primary font-bold">
-                  Dra. Isfariani Marlena, M.Pd.
+                  Dra. Isfariani
                 </h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Kepala Sekolah SMK Negeri 24 Jakarta
+                  Kepala SMK Negeri 24 Jakarta
                 </p>
               </div>
               <div className="flex items-center gap-2 text-secondary-container">

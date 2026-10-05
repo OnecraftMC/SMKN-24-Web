@@ -55,6 +55,9 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    kategori. Statement `ALTER TABLE` tidak idempoten: jangan jalankan ulang,
    dan jangan jalankan pada database fresh-install yang sudah dibuat dari
    `database.sql` versi ini.
+   Untuk pilihan berita `Prestasi & Akademik`, jalankan
+   `backend/migrations/20261005_add_prestasi_akademik_news_category.sql` satu
+   kali setelah migration kategori admin di atas.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env

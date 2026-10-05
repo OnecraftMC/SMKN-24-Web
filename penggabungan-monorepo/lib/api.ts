@@ -121,8 +121,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-export async function getBerita(options: { utama?: boolean; limit?: number } = {}): Promise<ApiResult<BeritaView[]>> {
-  const query = options.utama ? "?utama=1" : "";
+export async function getBerita(options: {
+  utama?: boolean;
+  limit?: number;
+  kategori?: string;
+} = {}): Promise<ApiResult<BeritaView[]>> {
+  const params = new URLSearchParams();
+  if (options.utama) params.set("utama", "1");
+  if (options.kategori) params.set("kategori", options.kategori);
+  const query = params.size > 0 ? `?${params.toString()}` : "";
   const result = await request<BeritaDTO[]>(`api/berita/index.php${query}`);
   if (!result.data) return { data: null, error: result.error };
   const data = result.data.map((item) => mapBerita(item, backendUrl()));
@@ -341,9 +348,10 @@ export async function proxyPublicPost(
     return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
   }
 
-  // Endpoint chat memanggil model AI sehingga butuh jendela waktu lebih besar
-  // daripada POST data biasa; sisanya tetap memakai TIMEOUT_MS.
-  const timeoutMs = endpoint === "chat" ? CHAT_TIMEOUT_MS : TIMEOUT_MS;
+  // Endpoint chat dan triase BK sama-sama memanggil model AI sehingga butuh
+  // jendela waktu lebih besar daripada POST data biasa; sisanya tetap
+  // memakai TIMEOUT_MS.
+  const timeoutMs = endpoint === "chat" || endpoint === "bk/chat" ? CHAT_TIMEOUT_MS : TIMEOUT_MS;
 
   let response: Response;
   try {

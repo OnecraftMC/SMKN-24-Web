@@ -74,7 +74,7 @@ if (mb_strlen($catatan) > 2000) {
     jsonError('Catatan terlalu panjang. Maksimal 2000 karakter.', 400);
 }
 
-if (!aiProviderConfigured()) {
+if (!aiProviderConfigured(aiFeatureOptions('content'))) {
     error_log('[SMKN24] Draf AI dilewati: API key provider belum diisi di .env.');
     jsonError(AI_CONTENT_UNAVAILABLE_MESSAGE, 503, [
         'aiAvailable' => false,
@@ -94,7 +94,15 @@ $messages = [
 try {
     // Draf berita butuh ruang lebih panjang daripada balasan chat, jadi
     // max_tokens dinaikkan HANYA untuk endpoint ini (chat & BK tetap 400).
-    $raw = callAiProvider($messages, ['max_tokens' => 1600, 'temperature' => 0.7]);
+    // Opsi provider diambil dari variabel `AI_CONTENT_*` supaya endpoint ini
+    // bisa memakai akun dan model sendiri (lihat helpers/ai.php).
+    $raw = callAiProvider(
+        $messages,
+        array_merge(
+            aiFeatureOptions('content'),
+            ['max_tokens' => 1600, 'temperature' => 0.7],
+        )
+    );
     $parsed = extractJsonObject($raw);
 } catch (Throwable $e) {
     error_log('[SMKN24] Draf AI gagal: ' . $e->getMessage());
@@ -233,21 +241,8 @@ function normaliseGaleriDraft(array $data): array
 }
 
 /**
- * True bila API key untuk AI_PROVIDER yang dipilih sudah terisi di .env.
- *
- * Disalin secara lokal (bukan memanggil versi di /api/chat) supaya endpoint ini
- * berdiri sendiri dan tidak bergantung pada file lain yang kebetulan punya
- * fungsi bernama sama.
+ * Catatan: pemeriksaan "API key sudah terisi" memakai `aiProviderConfigured()`
+ * dari `helpers/ai.php` (sudah dimuat oleh bootstrap.php) dengan opsi
+ * per-fitur. Salinan lokal versi lama dihapus agar verifikasi key per-fitur
+ * hanya punya satu sumber kebenaran.
  */
-function aiProviderConfigured(): bool
-{
-    switch (AI_PROVIDER) {
-        case 'gemini':
-            return !empty(GEMINI_API_KEY);
-        case 'anthropic':
-            return !empty(ANTHROPIC_API_KEY);
-        case 'openai':
-        default:
-            return !empty(OPENAI_API_KEY);
-    }
-}

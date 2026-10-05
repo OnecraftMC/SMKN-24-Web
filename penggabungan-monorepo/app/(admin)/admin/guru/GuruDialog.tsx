@@ -212,6 +212,8 @@ export default function GuruDialog({
           label="Foto guru"
           value={form.gambar}
           onChange={(path) => update("gambar", path)}
+          cropAspectRatio={1}
+          cropShape="round"
         />
 
         <Field htmlFor="guru-deskripsi" label="Deskripsi singkat">

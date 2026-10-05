@@ -36,7 +36,7 @@ $context = buildSchoolContext($db);
 $aiAvailable = true;
 $reason = null;
 
-if (!aiProviderConfigured()) {
+if (!aiProviderConfigured(chatAiOptions())) {
     error_log('[SMKN24] Chat AI dilewati: API key provider belum diisi di .env.');
     $aiAvailable = false;
     $reason = 'not_configured';
@@ -67,26 +67,11 @@ jsonResponse([
 ]);
 
 // -----------------------------------------------------------------------------
-
-/**
- * True bila API key untuk AI_PROVIDER yang dipilih sudah terisi di .env.
- *
- * Dicek sebelum memanggil layanan AI supaya kondisi "belum dikonfigurasi"
- * dapat dibedakan dari "provider gagal" pada respons publik. Kunci dibaca lewat
- * `env()` di config/config.php, jadi nilainya tidak pernah keluar dari server.
- */
-function aiProviderConfigured(): bool
-{
-    switch (AI_PROVIDER) {
-        case 'gemini':
-            return !empty(GEMINI_API_KEY);
-        case 'anthropic':
-            return !empty(ANTHROPIC_API_KEY);
-        case 'openai':
-        default:
-            return !empty(OPENAI_API_KEY);
-    }
-}
+// Catatan: pemeriksaan "API key sudah terisi" TIDAK diulang di sini. Fungsi
+// `aiProviderConfigured($options)` yang dipakai berada di `helpers/ai.php` dan
+// menerima opsi provider per-fitur. Versi lama salinan lokal yang hanya
+// membaca konstanta global sudah dihapus supaya verifikasi per-fitur tidak
+// bisa lolos karena satu salinan lupa diperbarui.
 
 function ensureSession(PDO $db, string $sessionId): void
 {
@@ -133,9 +118,21 @@ function buildSchoolContext(PDO $db): string
 }
 
 /**
- * Meneruskan percakapan ke AI provider yang dipilih di config (AI_PROVIDER).
+ * Opsi provider untuk endpoint ini.
  *
- * Pemanggilan provider sendiri TIDAK diulang di sini â€” semuanya memakai
+ * Chat memakai set variabel `AI_CHAT_*` sendiri supaya bisa dipisahkan dari
+ * triase BK dan draf admin, terutama saat rate limit provider dihitung per akun.
+ * Semua variabel itu opsional; yang kosong jatuh ke konstanta global.
+ */
+function chatAiOptions(): array
+{
+    return aiFeatureOptions('chat');
+}
+
+/**
+ * Meneruskan percakapan ke AI provider yang dipilih untuk endpoint ini.
+ *
+ * Pemanggilan provider sendiri TIDAK diulang di sini - semuanya memakai
  * `callAiProvider()` dari `helpers/ai.php`, yang juga dipakai Counsellor AI
  * Bimbingan Konseling. Yang membedakan hanya system prompt: file ini memakai
  * AI_SYSTEM_PROMPT (info sekolah), sedangkan endpoint BK memakai
@@ -154,5 +151,5 @@ function generateAiReply(string $message, array $history, string $context): stri
         ];
     }
 
-    return callAiProvider($messages);
+    return callAiProvider($messages, chatAiOptions());
 }

@@ -14,14 +14,16 @@ const backendImagePattern = (() => {
   try {
     const url = new URL(backendUrl);
     if (!["http:", "https:"].includes(url.protocol)) return [];
-    return [
-      {
+    const hostnames = new Set([url.hostname]);
+    if (url.hostname === "localhost") hostnames.add("127.0.0.1");
+    if (url.hostname === "127.0.0.1") hostnames.add("localhost");
+
+    return [...hostnames].map((hostname) => ({
         protocol: url.protocol.slice(0, -1) as "http" | "https",
-        hostname: url.hostname,
+        hostname,
         port: url.port,
         pathname: "/**",
-      },
-    ];
+      }));
   } catch {
     return [];
   }

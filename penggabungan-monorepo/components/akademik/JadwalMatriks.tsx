@@ -40,9 +40,9 @@ export default function JadwalMatriks({
     <div className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
         <div className="space-y-2">
-          <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Akademik</span>
+          <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Data pembelajaran</span>
           <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">
-            Jadwal Mata Pelajaran
+            Jadwal Program Keahlian
           </h2>
           <p className="font-body-md text-on-surface-variant">
             Jadwal pembelajaran per program keahlian, sesuai data dari sekolah.

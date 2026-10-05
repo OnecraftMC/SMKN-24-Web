@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
@@ -13,9 +13,24 @@ const MOBILE_MENU_ID = "navbar-mobile-menu";
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isBKOpen, setIsBKOpen] = useState(false);
+  const [indonesiaTime, setIndonesiaTime] = useState("--:--:--");
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
+
+  useEffect(() => {
+    const formatter = new Intl.DateTimeFormat("id-ID", {
+      timeZone: "Asia/Jakarta",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hourCycle: "h23",
+    });
+    const updateTime = () => setIndonesiaTime(formatter.format(new Date()));
+    updateTime();
+    const interval = window.setInterval(updateTime, 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   const navLinks = [
     { href: "/", label: "Beranda", icon: "home" },
@@ -44,6 +59,10 @@ export default function Navbar() {
             <span className="hidden md:flex items-center gap-1">
               <span className="material-symbols-outlined text-[15px]">schedule</span>
               Senin - Jumat: 07.00 - 15.00 WIB
+            </span>
+            <span className="flex items-center gap-1 tabular-nums" aria-label={`Waktu Indonesia Barat ${indonesiaTime}`}>
+              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">schedule</span>
+              {indonesiaTime} WIB
             </span>
           </div>
           <div className="flex items-center gap-space-sm">

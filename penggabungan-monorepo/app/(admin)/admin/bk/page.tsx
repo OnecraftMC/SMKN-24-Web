@@ -339,14 +339,16 @@ export default function BKPage() {
         ))}
       </ul>
 
-      <ConfirmDialog
-        title="Hapus pesan BK?"
-        description="Pesan yang dihapus tidak dapat dikembalikan."
-        busy={deleteBusy}
-        error={deleteError}
-        onConfirm={removeRow}
-        onCancel={() => setDeleting(null)}
-      />
+      {deleting && (
+        <ConfirmDialog
+          title="Hapus pesan BK?"
+          description="Pesan yang dihapus tidak dapat dikembalikan."
+          busy={deleteBusy}
+          error={deleteError}
+          onConfirm={removeRow}
+          onCancel={() => setDeleting(null)}
+        />
+      )}
     </div>
   );
 }

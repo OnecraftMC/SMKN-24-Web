@@ -49,8 +49,8 @@ export default function Hero() {
                 href="/#lokasi-sekolah"
                 className="inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
               >
-                <span className="material-symbols-outlined text-[20px]">location_on</span>
-                <span>Lihat Lokasi Sekolah</span>
+                <span className="material-symbols-outlined text-[20px]">forum</span>
+                <span>Bimbingan Konseling</span>
                 <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">
                   arrow_forward
                 </span>
@@ -120,6 +120,7 @@ export default function Hero() {
         </div>
       </div>
       </div>
+      <BKChatModal open={isBKOpen} onClose={() => setIsBKOpen(false)} />
     </>
   );
 }

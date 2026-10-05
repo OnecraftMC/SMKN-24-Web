@@ -26,8 +26,6 @@ const JUMLAH_CHIPE = 3;
 // Latar kartu: foto kegiatan resmi bila tersedia (slot
 // public/images/jurusan/<key>.jpg — lihat komentar `gambar` di lib/types.ts),
 // jika belum: fallback token berupa gradien surface + ikon watermark besar.
-// Diekspor dan dipakai ulang oleh app/jurusan/[key]/page.tsx supaya fallback
-// halaman detail identik dengan kartu di halaman daftar.
 export function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
   if (item.gambar) {
     return (
@@ -67,8 +65,8 @@ export default function DaftarJurusan() {
             Pilih Jurusan
           </h2>
           <p className="font-body-md text-on-surface-variant">
-            Klik kartu jurusan untuk melihat profil lengkap, mata pelajaran praktik,
-            dan kegiatan siswa tiap kompetensi keahlian.
+            Kenali bidang pembelajaran dan kompetensi tiap program keahlian. Buka
+            halaman khusus jurusan untuk informasi selengkapnya.
           </p>
         </div>
 
@@ -79,11 +77,7 @@ export default function DaftarJurusan() {
             const chipMapel = tata.unggulan ? mapel : mapel.slice(0, JUMLAH_CHIPE);
             return (
               <li key={item.key} className={tata.kolom}>
-                <Link
-                  href={`/jurusan/${item.key}`}
-                  title={`Lihat detail jurusan ${item.nama}`}
-                  className="group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
-                >
+                <article className="group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                   {/* Lapis 1 — latar penuh kartu (foto/fallback) + scrim bawah */}
                   <div className="absolute inset-0">
                     <LatarKartu item={item} sizes={tata.sizes} />
@@ -133,17 +127,18 @@ export default function DaftarJurusan() {
                       ))}
                     </ul>
 
-                    <div className="flex items-center gap-1 pt-space-xs font-label-md text-label-md font-bold text-secondary">
-                      <span>Lihat detail jurusan</span>
-                      <span
-                        className="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1"
-                        aria-hidden="true"
-                      >
+                    <Link
+                      href={`/jurusan/${item.key}.html`}
+                      title={`Lihat informasi jurusan ${item.nama}`}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      <span>Informasi Jurusan</span>
+                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
                         arrow_forward
                       </span>
-                    </div>
+                    </Link>
                   </div>
-                </Link>
+                </article>
               </li>
             );
           })}

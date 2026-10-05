@@ -164,6 +164,7 @@ export default function GaleriDialog({
           label="Gambar galeri (wajib)"
           value={form.gambar}
           onChange={(path) => update("gambar", path)}
+          cropAspectRatio={4 / 5}
         />
       </form>
     </Modal>

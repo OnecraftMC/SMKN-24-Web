@@ -2,31 +2,127 @@
 /**
  * Client AI bersama untuk seluruh kebutuhan AI di backend.
  *
- * Backend ini punya DUA kegunaan AI yang sengaja dipisah agar masing-masing
+ * Backend ini punya TIGA kegunaan AI yang sengaja dipisah agar masing-masing
  * fokus pada satu tujuan:
  *
- *  1. AI ASISTEN SEKOLAH â€” menjawab pertanyaan umum (PPDB, jurusan, jadwal,
+ *  1. AI ASISTEN SEKOLAH - menjawab pertanyaan umum (PPDB, jurusan, jadwal,
  *     fasilitas). Memakai AI_SYSTEM_PROMPT.
- *  2. AI BIMBINGAN KONSELING â€” triase keluhahan siswa: merangkum masalah dan
+ *  2. AI BIMBINGAN KONSELING - triase keluhahan siswa: merangkum masalah dan
  *     menentukan tingkat kesulitan untuk guru BK. Memakai AI_BK_SYSTEM_PROMPT.
  *
- * Keduanya memakai pemanggil provider yang sama (`callAiProvider`) supaya
+ *  3. AI PENYUSUN DRAF - menyusun draf konten untuk form admin. Memakai
+ *     AI_CONTENT_SYSTEM_PROMPT.
+ *
+ * Ketiganya memakai pemanggil provider yang sama (`callAiProvider`) supaya
  * credential, timeout, dan penanganan error hanya ada di satu tempat. Yang
- * membedakan hanya system prompt dan, untuk BK, mode output JSON.
+ * membedakan hanya system prompt dan, untuk BK/draf, mode output JSON.
+ *
+ * Provider, akun (API key), dan model boleh BERBEDA per kegunaan lewat opsi
+ * `provider`, `api_key`, `model`, dan `base_url`. Default-nya tetap konstanta
+ * global AI_PROVIDER serta konstanta key/model tiap provider, jadi tidak ada
+ * regresi saat opsi itu tidak diisi. Lihat `aiFeatureOptions()` di bawah.
  */
+
+/**
+ * Ambil satu nilai opsional dari `$options`. String kosong dianggap "tidak diisi"
+ * supaya fallback ke konstanta global tetap berlaku.
+ *
+ * @return string|null Nilai non-kosong, atau null bila tidak diisi.
+ */
+function aiOption(array $options, string $key): ?string
+{
+    $value = $options[$key] ?? '';
+    if (!is_string($value)) {
+        return null;
+    }
+    $value = trim($value);
+    return $value === '' ? null : $value;
+}
+
+/**
+ * Opsi provider untuk satu kegunaan AI.
+ *
+ * Dibaca dari konstanta per-fitur di config/config.php yang semuanya ber-default
+ * ke nilai global. `api_key`/`model`/`base_url` sengaja boleh kosong: pemanggil
+ * provider memakai konstanta global saat opsi itu null.
+ *
+ * @param string $feature 'chat' | 'bk' | 'content'
+ */
+function aiFeatureOptions(string $feature): array
+{
+    switch ($feature) {
+        case 'chat':
+            return [
+                'provider' => AI_CHAT_PROVIDER,
+                'api_key' => AI_CHAT_API_KEY,
+                'model' => AI_CHAT_MODEL,
+                'base_url' => AI_CHAT_BASE_URL,
+            ];
+        case 'bk':
+            return [
+                'provider' => AI_BK_PROVIDER,
+                'api_key' => AI_BK_API_KEY,
+                'model' => AI_BK_MODEL,
+                'base_url' => AI_BK_BASE_URL,
+            ];
+        case 'content':
+            return [
+                'provider' => AI_CONTENT_PROVIDER,
+                'api_key' => AI_CONTENT_API_KEY,
+                'model' => AI_CONTENT_MODEL,
+                'base_url' => AI_CONTENT_BASE_URL,
+            ];
+        default:
+            return [];
+    }
+}
+
+/**
+ * True bila kegunaan AI yang dimaksud punya kunci API yang terisi.
+ *
+ * Dipakai endpoint SEBELUM memanggil provider supaya request tidak sekali pun
+ * menyentuh layanan AI saat konfigurasi belum lengkap, dan supaya kondisi
+ * "belum dikonfigurasi" bisa dibedakan dari "provider gagal" pada respons.
+ *
+ * Fungsi ini sengaja hanya satu, dipakai bersama oleh ketiga endpoint. Versi
+ * sebelumnya disalin per-endpoint; salinan itu membuat fitur per-fitur rawan
+ * lolos karena satu salinan lupa diperbarui.
+ */
+function aiProviderConfigured(array $options = []): bool
+{
+    $provider = aiOption($options, 'provider') ?? AI_PROVIDER;
+
+    // Kunci khusus per-fitur, kalau diisi, menggantikan kunci global.
+    if (aiOption($options, 'api_key') !== null) {
+        return true;
+    }
+
+    switch ($provider) {
+        case 'gemini':
+            return !empty(GEMINI_API_KEY);
+        case 'anthropic':
+            return !empty(ANTHROPIC_API_KEY);
+        case 'openai':
+        default:
+            return !empty(OPENAI_API_KEY);
+    }
+}
 
 /**
  * Panggil provider AI sesuai AI_PROVIDER dan kembalikan teks balasannya.
  *
  * @param array $messages Daftar pesan [{role, content}, ...] sudah termasuk system.
- * @param array $options Tuning opsional: `max_tokens`, `temperature`.
- *                        Default-nya sama dengan sebelumnya (400 / 0.6) sehingga
- *                        pemanggil lama (chat & BK) tidak ikut berubah.
+ * @param array $options Tuning opsional: `max_tokens`, `temperature`, serta
+ *                        `provider`/`api_key`/`model`/`base_url` untuk memakai
+ *                        akun atau model lain per kegunaan. Yang empat terakhir
+ *                        default-nya ke konstanta global dan ke nilai tuning
+ *                        sebelumnya (400 / 0.6), sehingga pemanggil yang tidak
+ *                        mengisinya tidak ikut berubah.
  * @return string Teks balasan mentah dari provider.
  */
 function callAiProvider(array $messages, array $options = []): string
 {
-    switch (AI_PROVIDER) {
+    switch (aiOption($options, 'provider') ?? AI_PROVIDER) {
         case 'gemini':
             $reply = callAiGemini($messages, $options);
             break;
@@ -47,30 +143,35 @@ function callAiProvider(array $messages, array $options = []): string
  */
 function callAiOpenai(array $messages, array $options = []): string
 {
-    if (empty(OPENAI_API_KEY)) {
+    $apiKey = aiOption($options, 'api_key') ?? OPENAI_API_KEY;
+    if (empty($apiKey)) {
         throw new RuntimeException('OPENAI_API_KEY belum diisi di file .env');
     }
 
+    $model = aiOption($options, 'model') ?? OPENAI_MODEL;
+    $baseUrl = aiOption($options, 'base_url') ?? OPENAI_BASE_URL;
+
     $payload = [
-        'model' => OPENAI_MODEL,
+        'model' => $model,
         'messages' => $messages,
         'temperature' => $options['temperature'] ?? 0.6,
         'max_tokens' => $options['max_tokens'] ?? 400,
     ];
 
-    $response = httpPostJson(OPENAI_BASE_URL, $payload, [
-        'Authorization: Bearer ' . OPENAI_API_KEY,
+    $response = httpPostJson($baseUrl, $payload, [
+        'Authorization: Bearer ' . $apiKey,
     ]);
 
     return $response['choices'][0]['message']['content'] ?? 'Maaf, tidak ada jawaban dari AI.';
 }
 
 /**
- * Anthropic Claude â€” `system` dikirim terpisah, messages hanya user/assistant.
+ * Anthropic Claude - `system` dikirim terpisah, messages hanya user/assistant.
  */
 function callAiAnthropic(array $messages, array $options = []): string
 {
-    if (empty(ANTHROPIC_API_KEY)) {
+    $apiKey = aiOption($options, 'api_key') ?? ANTHROPIC_API_KEY;
+    if (empty($apiKey)) {
         throw new RuntimeException('ANTHROPIC_API_KEY belum diisi di file .env');
     }
 
@@ -85,14 +186,14 @@ function callAiAnthropic(array $messages, array $options = []): string
     }
 
     $payload = [
-        'model' => ANTHROPIC_MODEL,
+        'model' => aiOption($options, 'model') ?? ANTHROPIC_MODEL,
         'system' => $system,
         'messages' => $chatMessages,
         'max_tokens' => $options['max_tokens'] ?? 400,
     ];
 
     $response = httpPostJson('https://api.anthropic.com/v1/messages', $payload, [
-        'x-api-key: ' . ANTHROPIC_API_KEY,
+        'x-api-key: ' . $apiKey,
         'anthropic-version: 2023-06-01',
     ]);
 
@@ -100,11 +201,12 @@ function callAiAnthropic(array $messages, array $options = []): string
 }
 
 /**
- * Google Gemini â€” `systemInstruction` terpisah dari `contents`.
+ * Google Gemini - `systemInstruction` terpisah dari `contents`.
  */
 function callAiGemini(array $messages, array $options = []): string
 {
-    if (empty(GEMINI_API_KEY)) {
+    $apiKey = aiOption($options, 'api_key') ?? GEMINI_API_KEY;
+    if (empty($apiKey)) {
         throw new RuntimeException('GEMINI_API_KEY belum diisi di file .env');
     }
 
@@ -131,7 +233,7 @@ function callAiGemini(array $messages, array $options = []): string
     ];
 
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
-        . GEMINI_MODEL . ':generateContent?key=' . GEMINI_API_KEY;
+        . (aiOption($options, 'model') ?? GEMINI_MODEL) . ':generateContent?key=' . $apiKey;
 
     $response = httpPostJson($url, $payload, []);
 
@@ -149,13 +251,18 @@ function httpPostJson(string $url, array $payload, array $extraHeaders = []): ar
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($payload),
         CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json'], $extraHeaders),
-        CURLOPT_TIMEOUT => 30,
+        // Harus lebih kecil dari timeout proxy `POST /api/chat` di frontend
+        // (CHAT_TIMEOUT_MS = 25 detik) supaya provider yang lambat atau error
+        // tetap sempat dibalas dari sini, bukan dipotong proxy menjadi 504.
+        CURLOPT_TIMEOUT => 20,
     ]);
 
     $responseBody = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlError = curl_error($ch);
-    curl_close($ch);
+    // curl_close() sengaja tidak dipanggil: sejak PHP 8.0 resource cURL
+    // dibebaskan otomatis, dan di PHP 8.5 pemanggilannya hanya memunculkan
+    // notice deprecation yang mengotori error_log.
 
     if ($responseBody === false) {
         throw new RuntimeException('Gagal menghubungi layanan AI: ' . $curlError);
@@ -176,7 +283,7 @@ function httpPostJson(string $url, array $payload, array $extraHeaders = []): ar
  * jawaban dalam pagar markdown (```json ... ```) atau menambah penjelasan di
  * luar objek JSON.
  *
- * Mengembalikan null bila tidak ada JSON yang bisa diambil â€” pemanggil wajib
+ * Mengembalikan null bila tidak ada JSON yang bisa diambil - pemanggil wajib
  * punya nilai cadangan agar hasil triase tidak hilang.
  */
 function extractJsonObject(string $text): ?array
