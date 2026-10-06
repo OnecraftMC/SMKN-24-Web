@@ -10,12 +10,12 @@ export default function VisiMisi() {
               </div>
               <h2 className="font-headline-md text-headline-md text-primary font-bold">Visi Sekolah</h2>
               <blockquote className="text-body-lg text-on-surface leading-relaxed border-l-4 border-secondary-container pl-4 italic">
-                &quot;Mewujudkan pendidikan kejuruan yang berlandaskan imtaq, mandiri, dan berwawasan lingkungan.&quot;
+                &quot;Menghasilkan lulusan yang berkarakter, mandiri dan berwawasan global&quot;
               </blockquote>
             </div>
             <div className="pt-space-lg flex items-center gap-3 text-secondary font-label-md font-bold">
               <span className="material-symbols-outlined text-[20px]">stars</span>
-              <span>Kompeten • Mandiri • Berwawasan Lingkungan</span>
+              <span>Berkarakter • Mandiri • Berwawasan global</span>
             </div>
           </div>
           <div className="p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm space-y-space-md">
@@ -26,15 +26,19 @@ export default function VisiMisi() {
             <ul className="space-y-3 font-body-md text-on-surface-variant">
               <li className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-secondary-fixed text-secondary font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                <span>Menanamkan keimanan dan ketakwaan kepada Tuhan Yang Maha Esa dalam setiap aktivitas pembelajaran.</span>
+                <span>Menanamkan keimanan dan ketaqwaan kepada Tuhan Yang Maha Esa.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-secondary-fixed text-secondary font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                <span>Menyelenggarakan pembelajaran yang menyenangkan dengan mengintegrasikan kompetensi keterampilan 4C (Creativity, Critical Thinking, Collaboration, Communication).</span>
+                <span>Menyelenggarakan pembelajaran yang bermakna dan menyenangkan.</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="w-6 h-6 rounded-full bg-secondary-fixed text-secondary font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                <span>Memberdayakan sarana dan prasarana pendidikan yang berkualitas serta berbasis lingkungan, terhubung dengan dunia usaha dan dunia industri.</span>
+                <span>Menyelenggarakan pembelajaran yang berbasis industri.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full bg-secondary-fixed text-secondary font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">4</span>
+                <span>Menanamkan jiwa kewirausahaan.</span>
               </li>
             </ul>
           </div>

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Download, FileText } from "lucide-react";
+import { ArrowRight, Download, FileText } from "lucide-react";
 import type { ArsipPublicDTO } from "@/lib/api";
 
 export default function KalenderUnduhan({
@@ -21,6 +21,9 @@ export default function KalenderUnduhan({
         >
           Dokumen &amp; Silabus Pembelajaran
         </h2>
+        <p className="mt-2 max-w-2xl text-sm text-on-surface-variant">
+          Akses dokumen akademik dan berkas resmi sekolah yang tersedia untuk diunduh.
+        </p>
       </div>
 
       {error ? (
@@ -29,7 +32,7 @@ export default function KalenderUnduhan({
         </p>
       ) : dokumen && dokumen.length > 0 ? (
         <ul className="space-y-3">
-          {dokumen.map((item) => (
+          {dokumen.slice(0, 3).map((item) => (
             <li
               key={item.id}
               className="flex flex-col justify-between gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-md sm:flex-row sm:items-center"
@@ -64,6 +67,20 @@ export default function KalenderUnduhan({
         </p>
       )}
 
+      <div className="flex flex-col gap-3 rounded-2xl border border-primary/15 bg-primary/5 p-space-md sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-on-surface-variant">
+          {dokumen && dokumen.length > 3
+            ? `Lihat seluruh ${dokumen.length} dokumen dalam direktori arsip.`
+            : "Jelajahi direktori untuk mencari dokumen berdasarkan kategori."}
+        </p>
+        <Link
+          href="/akademik/arsip"
+          className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-label-sm font-bold text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        >
+          Buka direktori arsip
+          <ArrowRight aria-hidden className="h-4 w-4" />
+        </Link>
+      </div>
     </section>
   );
 }
