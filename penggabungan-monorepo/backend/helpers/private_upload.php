@@ -36,6 +36,19 @@ function privateUploadDirectory(): string
     return rtrim($realDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 }
 
+function privateBKUploadDirectory(): string
+{
+    $directory = privateUploadDirectory() . 'bk-evidence' . DIRECTORY_SEPARATOR;
+    if (!is_dir($directory) && !mkdir($directory, 0700, true) && !is_dir($directory)) {
+        jsonError('Penyimpanan bukti BK belum dapat disiapkan.', 500);
+    }
+    $realDirectory = realpath($directory);
+    if ($realDirectory === false || !chmod($realDirectory, 0700)) {
+        jsonError('Penyimpanan bukti BK tidak tersedia.', 500);
+    }
+    return rtrim($realDirectory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+}
+
 /**
  * Validate and store a single uploaded file. Returns only server-generated keys
  * and sanitized display metadata; never use the submitted filename as a path.

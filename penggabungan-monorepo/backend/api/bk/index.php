@@ -80,6 +80,7 @@ function handleGet(PDO $db): void
             'kategori' => $r['kategori'] ?? null,
             'butuhPerhatian' => (bool)($r['butuh_perhatian'] ?? 0),
             'transkrip' => $r['transkrip'] ?? null,
+            'media' => json_decode((string)($r['media_json'] ?? '[]'), true) ?: [],
         ];
     }, $stmt->fetchAll());
 

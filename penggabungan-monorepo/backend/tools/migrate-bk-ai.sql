@@ -6,6 +6,7 @@
 --
 -- Import lewat phpMyAdmin (shared hosting) atau:
 --   mysql -u <user> -p <nama_database> < backend/tools/migrate-bk-ai.sql
+-- Untuk unggahan BK: PHP perlu upload_max_filesize >= 10M dan post_max_size >= 22M.
 -- =============================================================================
 
 -- Ringkasan masalah yang dirangkum AI.
@@ -67,6 +68,16 @@ SET @exist := (
 );
 SET @sql := IF(@exist = 0,
   'ALTER TABLE pesan_bk ADD COLUMN device_id VARCHAR(64) DEFAULT NULL AFTER transkrip',
+  'DO 0');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Metadata lampiran konsultasi; file fisik disimpan di luar document root.
+SET @exist := (
+  SELECT COUNT(*) FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'pesan_bk' AND COLUMN_NAME = 'media_json'
+);
+SET @sql := IF(@exist = 0,
+  'ALTER TABLE pesan_bk ADD COLUMN media_json MEDIUMTEXT DEFAULT NULL AFTER device_id',
   'DO 0');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 

@@ -221,11 +221,10 @@ export async function getJadwal(
 /**
  * POST publik (BK & chatbot) TIDAK lewat helper di file ini.
  *
- * FormBK.tsx dan ChatbotWidget.tsx memanggil route Next.js (`/api/bk`,
- * `/api/chat`) langsung dari browser; route tersebut memakai
- * `proxyPublicPost()` di bawah untuk meneruskan ke PHP. Jadi tidak ada helper
- * `postBK`/`postChat` yang mengarahkan browser langsung ke backend — jangan
- * ditambahkannya kembali, karena itu melewati normalisasi & validasi proxy.
+ * FormBK.tsx, ChatbotWidget.tsx, dan pesan teks BK memakai route Next.js
+ * (`/api/bk`, `/api/chat`, `/api/bk/chat`) dengan proxy/validasi di bawah.
+ * Finalisasi chat BK berisi berkas besar dan dikirim langsung ke endpoint PHP;
+ * endpoint PHP memvalidasi ulang setiap field dan isi berkas.
  */
 
 export async function proxyPublicPost(
@@ -244,7 +243,10 @@ export async function proxyPublicPost(
     // Frontend BKChatModal mengirim field `sender` ("user"/"bot"), sedangkan
     // kontrak ke backend memakai `role`. Keduanya diterima lalu dinormalkan
     // ke `role` di sini.
-    const { messages, deviceId } = body;
+    const { messages, deviceId, mode } = body;
+    if (mode !== undefined && mode !== "chat") {
+      return Response.json({ error: "Mode percakapan tidak valid." }, { status: 400 });
+    }
     if (!Array.isArray(messages) || messages.length === 0 || messages.length > 50) {
       return Response.json(
         { error: "Ceritakan dulu apa yang sedang kamu rasakan." },
@@ -296,8 +298,8 @@ export async function proxyPublicPost(
         : null;
 
     requestBody = device
-      ? { messages: cleaned, deviceId: device }
-      : { messages: cleaned };
+      ? { mode: "chat", messages: cleaned, deviceId: device }
+      : { mode: "chat", messages: cleaned };
   } else if (endpoint === "bk") {
     const { nama, kelas, noHp, keperluan, pesan } = body;
     if (

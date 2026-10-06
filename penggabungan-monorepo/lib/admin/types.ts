@@ -175,6 +175,13 @@ export interface JadwalMatriksDTO {
 
 export type StatusPesanBK = "Baru" | "Diproses" | "Selesai";
 
+export interface BKEvidenceDTO {
+  storedName: string;
+  mime: string;
+  size: number;
+  label: string;
+}
+
 export interface PesanBKDTO {
   id: number;
   nama: string;
@@ -195,6 +202,8 @@ export interface PesanBKDTO {
   butuhPerhatian: boolean;
   /** Transkrip percakapan siswa dengan counseller AI (JSON string). */
   transkrip: string | null;
+  /** Lampiran bukti privat; file hanya dapat dibaca admin terautentikasi. */
+  media: BKEvidenceDTO[];
 }
 
 export interface ArsipDTO {

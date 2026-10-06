@@ -42,6 +42,7 @@ $dokumen = [];
 // Bagian 3: penanda "### KB-xx Judul".
 $bagianKb = substr($raw, $posKb, $posQa - $posKb);
 preg_match_all('/^### (KB-[0-9]+[A-Z]? .+?)\s*$\n(.*?)(?=^### |^## |^# |\z)/ms', $bagianKb, $m, PREG_SET_ORDER);
+foreach ($m as $blok) {
     $judul = normalizeJudul($blok[1]);
     $konten = normalizeKonten($blok[2]);
     if ($judul !== '' && $konten !== '') {
@@ -51,7 +52,7 @@ preg_match_all('/^### (KB-[0-9]+[A-Z]? .+?)\s*$\n(.*?)(?=^### |^## |^# |\z)/ms',
 
 // Bagian 4: penanda "**QA-xx | Iyy**" diikuti pertanyaan dalam tanda miring.
 $bagianQa = substr($raw, $posQa, $posQaEnd - $posQa);
-preg_match_all('/^\*\*QA-[0-9]+\s*\|\s*I[0-9]+\*\*\s*.?([^\n]+?)\*?\s*\n(.*?)(?=^\*\*QA-|^### |^# |\z)/ms', $bagianQa, $m, PREG_SET_ORDER);
+preg_match_all('/^\*\*QA-[0-9]+\s*\|\s*I[0-9]+(?:\/I[0-9]+)*\*\*\s*(?:—|--)?\s*([^\n]+?)\*?\s*\n(.*?)(?=^\*\*QA-|^### |^# |\z)/ms', $bagianQa, $m, PREG_SET_ORDER);
 foreach ($m as $blok) {
     $judul = normalizeJudul(trim($blok[1], " \t\"\xE2\x80\x9C\xE2\x80\x9D*"));
     // Buang penanda ujung ("| KB-27", "| 2.5", "| —").

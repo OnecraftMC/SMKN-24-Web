@@ -5,12 +5,7 @@ export function OPTIONS() {
 	return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-/**
- * Counsellor AI Bimbingan Konseling.
- *
- * Berbeda dari `/api/chat` (asisten info sekolah), route ini khusus triase:
- * backend merangkum cerita siswa dan menentukan tingkat kesusahannya.
- */
+/** Proxies live counselling chat turns. Final evidence uploads go to PHP directly. */
 export async function POST(request: Request) {
 	let payload: unknown;
 	try {
