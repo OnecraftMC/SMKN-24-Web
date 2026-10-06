@@ -1,7 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Loader2, Search, ShieldAlert, Trash2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Copy,
+  Loader2,
+  MessageSquareText,
+  Search,
+  ShieldAlert,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import {
@@ -39,6 +48,52 @@ const GAYA_KESULITAN: Record<TingkatKesulitanBK, string> = {
   Berat: "bg-error-container text-on-error-container",
 };
 
+function parseTranskrip(transkrip: string | null): Array<{ sender: string; text: string }> {
+  if (!transkrip) return [];
+
+  try {
+    const parsed = JSON.parse(transkrip);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((entry) => {
+        if (!entry || typeof entry !== "object") return null;
+        const sender = typeof entry.sender === "string" ? entry.sender : "user";
+        const text = typeof entry.text === "string" ? entry.text : "";
+        return text ? { sender, text } : null;
+      })
+      .filter((entry): entry is { sender: string; text: string } => entry !== null);
+  } catch {
+    return [];
+  }
+}
+
+function buildAssistantPlan(row: PesanBKDTO) {
+  const transcript = parseTranskrip(row.transkrip);
+  const recentText = transcript.slice(-2).map((item) => item.text).join(" ");
+  const stressLevel = row.butuhPerhatian ? "perlu penanganan segera" : row.tingkatKesulitan ?? "belum ditentukan";
+  const priorityText =
+    row.butuhPerhatian || row.tingkatKesulitan === "Berat"
+      ? "Jangan diproses secepatnya. Beri ruang aman dan tindak lanjut yang terstruktur."
+      : "Tetap lakukan follow-up ringan dengan jadwal monitoring yang jelas.";
+
+  const draft = [
+    "Terima kasih sudah berbagi kondisi yang sedang kamu hadapi.",
+    `Saya memahami bahwa situasi ini termasuk ${stressLevel}.`,
+    "Kita akan fokus pada langkah yang aman, tenang, dan dapat ditindaklanjuti dengan jelas.",
+    "Silakan lanjutkan dengan sesi konseling singkat, lalu catat apa yang paling terasa berat dan apa yang sudah kamu coba.",
+    recentText ? `Berdasarkan cerita yang sudah disampaikan, ${recentText.trim()}` : "Berdasarkan cerita yang sudah disampaikan, mari kita fokus pada kondisi yang paling membebani saat ini.",
+  ].join(" ");
+
+  const bullets = [
+    "Validasi situasi: pastikan siswa merasa didengar dan aman sebelum membahas solusi.",
+    "Jelaskan langkah yang bisa diambil hari ini, seperti jeda, komunikasi dengan wali kelas, atau sesi konseling lanjutan.",
+    "Catat tindak lanjut yang realistis: kapan follow-up dilakukan, siapa yang terlibat, dan indikator keberhasilan yang jelas.",
+  ];
+
+  return { priorityText, draft, bullets };
+}
+
 const FILTER_KESULITAN: (TingkatKesulitanBK | "semua")[] = [
   "semua",
   "Berat",
@@ -62,6 +117,13 @@ export default function BKPage() {
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const selectedRow = useMemo(
+    () => rows.find((row) => row.id === selectedId) ?? rows[0] ?? null,
+    [rows, selectedId],
+  );
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -94,6 +156,15 @@ export default function BKPage() {
       cancelled = true;
     };
   }, [reloadKey, logout]);
+
+  useEffect(() => {
+    if (!selectedId && rows.length > 0) {
+      setSelectedId(rows[0].id);
+    }
+    if (selectedId && rows.length > 0 && !rows.some((row) => row.id === selectedId)) {
+      setSelectedId(rows[0].id);
+    }
+  }, [rows, selectedId]);
 
   /** Ubah status penanganan (Baru -> Diproses -> Selesai). */
   const changeStatus = async (row: PesanBKDTO, status: StatusPesanBK) => {
@@ -163,6 +234,19 @@ export default function BKPage() {
 
   const jumlahButuhPerhatian = rows.filter((r) => r.butuhPerhatian).length;
 
+  const copyDraft = async () => {
+    if (!selectedRow) return;
+    const plan = buildAssistantPlan(selectedRow);
+
+    try {
+      await navigator.clipboard.writeText(plan.draft);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   return (
     <div className="space-y-space-lg">
       <header className="space-y-space-xs">
@@ -181,6 +265,93 @@ export default function BKPage() {
             keselamatan. Tangani lebih dahulu.
           </span>
         </p>
+      )}
+
+      {selectedRow && (
+        <section className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 via-surface-container-lowest to-secondary-container p-space-lg shadow-sm">
+          <div className="flex flex-wrap items-start justify-between gap-space-sm">
+            <div className="flex items-start gap-space-sm">
+              <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/10 text-primary">
+                <Sparkles aria-hidden className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="font-label-md text-label-md font-bold text-primary">AI Asisten BK</p>
+                <h2 className="mt-1 font-headline-sm text-headline-sm font-bold text-on-surface">
+                  Rencana tindak lanjut untuk {selectedRow.nama}
+                </h2>
+              </div>
+            </div>
+
+            <button type="button" onClick={copyDraft} className={buttonGhostClass}>
+              <Copy aria-hidden className="h-4 w-4" />
+              {copied ? "Tersalin" : "Salin respons"}
+            </button>
+          </div>
+
+          <div className="mt-space-md grid gap-space-md lg:grid-cols-[1.2fr_0.8fr]">
+            <div className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
+              <p className="font-label-md text-label-md font-bold text-on-surface">Ringkasan situasi</p>
+              <p className="mt-2 font-body-sm text-body-sm text-on-surface">{selectedRow.ringkasan ?? selectedRow.pesan}</p>
+              <div className="mt-space-sm flex flex-wrap gap-2 text-xs">
+                <span className="rounded-full bg-surface-container-high px-2 py-1 font-bold text-on-surface-variant">
+                  {selectedRow.kelas}
+                </span>
+                {selectedRow.tingkatKesulitan && (
+                  <span className={`rounded-full px-2 py-1 font-bold ${GAYA_KESULITAN[selectedRow.tingkatKesulitan]}`}>
+                    {selectedRow.tingkatKesulitan}
+                  </span>
+                )}
+                {selectedRow.butuhPerhatian && (
+                  <span className="rounded-full bg-error px-2 py-1 font-bold text-on-error">Perlu perhatian</span>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
+              <p className="font-label-md text-label-md font-bold text-on-surface">Riwayat chat</p>
+              <div className="mt-2 space-y-2">
+                {parseTranskrip(selectedRow.transkrip).slice(-3).length > 0 ? (
+                  parseTranskrip(selectedRow.transkrip)
+                    .slice(-3)
+                    .map((entry, index) => (
+                      <div
+                        key={`${selectedRow.id}-${index}`}
+                        className={`rounded-lg px-3 py-2 text-xs leading-relaxed ${
+                          entry.sender === "user"
+                            ? "bg-primary/10 text-on-surface"
+                            : "bg-surface-container-high text-on-surface-variant"
+                        }`}
+                      >
+                        {entry.text}
+                      </div>
+                    ))
+                ) : (
+                  <p className="text-xs text-on-surface-variant">
+                    Belum ada riwayat percakapan sebelumnya.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
+            <p className="flex items-center gap-2 font-label-md text-label-md font-bold text-on-surface">
+              <MessageSquareText aria-hidden className="h-4 w-4 text-primary" />
+              Saran tindak lanjut
+            </p>
+            <ul className="mt-space-sm list-disc space-y-2 pl-5 font-body-sm text-body-sm text-on-surface">
+              {buildAssistantPlan(selectedRow).bullets.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <textarea
+              readOnly
+              value={buildAssistantPlan(selectedRow).draft}
+              rows={5}
+              className={`${fieldClass} mt-space-sm bg-surface-container-high text-on-surface`}
+            />
+          </div>
+        </section>
       )}
 
       <div className="flex flex-wrap gap-space-sm">
@@ -302,6 +473,17 @@ export default function BKPage() {
               {busyId === row.id && (
                 <Loader2 aria-hidden className="h-4 w-4 animate-spin text-on-surface-variant" />
               )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedId(row.id);
+                  setExpanded(row.id);
+                }}
+                className={buttonGhostClass}
+              >
+                Lanjutkan percakapan
+              </button>
 
               <button
                 type="button"
