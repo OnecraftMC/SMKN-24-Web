@@ -282,6 +282,29 @@ INSERT INTO guru (nama, jabatan, deskripsi, kategori, urutan) VALUES
 INSERT INTO fasilitas (judul, deskripsi) VALUES
 ('Hotel Training', 'Laboratorium perhotelan dan housekeeping dilengkapi kamar simulasi dan peralatan standar industri.');
 
+-- ---------------------------------------------------------------------------
+-- Knowledge base chatbot (fakta sekolah untuk AI, diisi lewat CLI import)
+--
+-- Tabel ini adalah bahan retrieval chatbot: import dari Markdown/CSV lewat
+-- backend/tools/import-chat-knowledge.php. Kategori dibatasi agar konteks
+-- tetap seputar topik sekolah yang diizinkan AI_SYSTEM_PROMPT.
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS knowledge (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  judul VARCHAR(255) NOT NULL,
+  kategori ENUM('PPDB','Jurusan','Jadwal','Fasilitas','Umum') NOT NULL DEFAULT 'Umum',
+  konten TEXT NOT NULL,
+  tags VARCHAR(255) NOT NULL DEFAULT '',
+  sumber VARCHAR(255) NOT NULL DEFAULT '',
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_knowledge_judul (judul)
+) ENGINE=InnoDB;
+
+-- Pencarian chatbot. FULLTEXT memakai tata bahasa (parser) bawaan server, jadi
+-- aman baik di MySQL 5.6+/8.0 maupun MariaDB. Retrieval tetap punya fallback LIKE
+-- bila query FULLTEXT ditolak server (lihat retrieveChatKnowledge()).
+ALTER TABLE knowledge ADD FULLTEXT INDEX ft_knowledge (judul, konten, tags);
+
 -- Kategori awal per modul; pilihan baru disimpan melalui API admin.
 INSERT IGNORE INTO admin_categories (module_name, category_name)
 SELECT 'berita', kategori FROM berita WHERE TRIM(kategori) <> '' GROUP BY kategori;
