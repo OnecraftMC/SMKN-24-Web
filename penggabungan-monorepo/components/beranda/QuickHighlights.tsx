@@ -2,7 +2,7 @@ const highlights = [
   {
     icon: "groups",
     label: "Siswa Aktif",
-    value: "1.000+",
+    value: "1.200+",
     desc: "5 Kompetensi Keahlian Terpadu",
   },
   {

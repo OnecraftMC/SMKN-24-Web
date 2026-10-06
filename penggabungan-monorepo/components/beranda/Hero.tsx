@@ -74,7 +74,7 @@ export default function Hero() {
                 <span className="material-symbols-outlined text-secondary-container text-[20px]">
                   workspace_premium
                 </span>
-                <span className="font-label-sm text-label-sm">Terakreditasi A • BAN-S/M 2021</span>
+                <span className="font-label-sm text-label-sm">Terakreditasi A • BAN-S/M 2026</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary-container text-[20px]">
