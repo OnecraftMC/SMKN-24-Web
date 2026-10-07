@@ -181,7 +181,9 @@ function normaliseBeritaDraft(array $data): array
     return [
         'judul' => cleanText($data['judul'] ?? '', 255),
         'ringkasan' => cleanText($data['ringkasan'] ?? '', 1000),
-        'isi' => cleanText($data['isi'] ?? '', 20000),
+        // Isi berita berupa HTML terstruktur dari model (Fase editor rich-text);
+        // bersihkan via sanitizer allowlist, bukan cleanText yang membuang tag.
+        'isi' => sanitizeBeritaHtml($data['isi'] ?? '', 20000),
     ];
 }
 

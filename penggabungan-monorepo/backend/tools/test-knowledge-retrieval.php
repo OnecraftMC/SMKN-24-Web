@@ -69,25 +69,46 @@ function ujiRetrieve(PDO $db, string $pesan): array
 
 function ujiFallback(PDO $db, array $kata, string $alasan): array
 {
+    // Duplikat logika Tahap 2 di api/chat/index.php (semua kata + varian dasar,
+    // kandidat 20 baris, skor PHP, syarat jujur >=2 kata untuk query panjang).
     try {
         $where = [];
         $params = [];
-        foreach (array_slice($kata, 0, 2) as $w) {
-            $where[] = '(judul LIKE ? OR konten LIKE ? OR tags LIKE ?)';
-            $like = '%' . $w . '%';
-            $params = array_merge($params, [$like, $like, $like]);
+        foreach ($kata as $w) {
+            $varian = array_values(array_filter(
+                array_unique(array_merge([$w], [ujiKataDasar($w)])),
+                fn($v) => strlen($v) >= 3
+            ));
+            $sub = [];
+            foreach ($varian as $v) {
+                $sub[] = '(judul LIKE ? OR konten LIKE ? OR tags LIKE ?)';
+                $like = '%' . $v . '%';
+                $params = array_merge($params, [$like, $like, $like]);
+            }
+            $where[] = '(' . implode(' OR ', $sub) . ')';
         }
-        $stmt = $db->prepare('SELECT judul, konten FROM knowledge WHERE '
-            . implode(' OR ', $where) . ' LIMIT 3');
+        $stmt = $db->prepare('SELECT judul, konten, tags FROM knowledge WHERE '
+            . implode(' OR ', $where) . ' LIMIT 20');
         foreach ($params as $i => $p) {
             $stmt->bindValue($i + 1, $p);
         }
         $stmt->execute();
-        $rows = $stmt->fetchAll();
-        if ($rows === []) {
+        $kandidat = $stmt->fetchAll();
+        if ($kandidat === []) {
             return ['metode' => 'LIKE 0 baris (' . $alasan . ')', 'teks' => ''];
         }
-        return ['metode' => 'LIKE (' . $alasan . ')', 'teks' => ujiFormat($rows, 500)];
+        $skor = [];
+        foreach ($kandidat as $r) {
+            $skor[] = ['baris' => $r, 'nilai' => ujiSkor($r, $kata)];
+        }
+        usort($skor, fn($a, $b) => $b['nilai']['skor'] <=> $a['nilai']['skor']);
+        $butuh = count($kata) >= 3 ? 2 : 1;
+        $atas = array_values(array_filter($skor, fn($s) => $s['nilai']['cocok'] >= $butuh));
+        if ($atas === []) {
+            return ['metode' => 'LIKE ditolak skor lemah (' . $alasan . ')', 'teks' => ''];
+        }
+        $rows = array_map(fn($s) => $s['baris'], array_slice($atas, 0, 3));
+        return ['metode' => 'LIKE berskor (' . $alasan . ')', 'teks' => ujiFormat($rows, 500)];
     } catch (PDOException $e) {
         return ['metode' => 'fallback gagal: ' . $e->getMessage(), 'teks' => ''];
     }
@@ -107,13 +128,19 @@ function ujiKataKunci(string $message): array
 {
     $clean = strtolower(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $message) ?? $message);
     $potong = preg_split('/\s+/', trim($clean)) ?: [];
+    $stop = [
+        'yang', 'dan', 'untuk', 'dari', 'ini', 'itu', 'apa', 'saya', 'ada',
+        'bagaimana', 'cara', 'gimana', 'di', 'ke', 'dengan', 'sebagai',
+        'adalah', 'dalam', 'pada', 'juga', 'tidak', 'bisa', 'saja', 'agar',
+        'supaya', 'tolong', 'mohon', 'apakah',
+    ];
     $kata = [];
     foreach ($potong as $w) {
         $w = trim($w);
         if (strlen($w) < 3) {
             continue;
         }
-        if (!in_array($w, ['yang', 'dan', 'untuk', 'dari', 'ini', 'itu', 'apa', 'saya', 'ada', 'bagaimana', 'cara'], true)) {
+        if (!in_array($w, $stop, true)) {
             $kata[] = $w;
         }
         if (count($kata) >= 8) {
@@ -121,6 +148,82 @@ function ujiKataKunci(string $message): array
         }
     }
     return $kata;
+}
+
+/** Duplikat kataDasar() produksi (lihat api/chat/index.php). */
+function ujiKataDasar(string $w): string
+{
+    $w = strtolower(trim($w));
+    if (strlen($w) < 5) {
+        return $w;
+    }
+    $awalan = ['memper', 'mempel', 'mem', 'men', 'meny', 'meng', 'menge', 'peng', 'pen', 'pem', 'per', 'ber', 'ter', 'di', 'ke', 'se'];
+    foreach ($awalan as $a) {
+        if (str_starts_with($w, $a) && strlen($w) - strlen($a) >= 3) {
+            $sisa = substr($w, strlen($a));
+            if (in_array($a, ['meny', 'meng', 'menge'], true) && !str_starts_with($sisa, 'a')) {
+                if ($a === 'meny') {
+                    $w = 's' . $sisa;
+                    break;
+                }
+                $w = $sisa;
+                break;
+            }
+            if (in_array($a, ['mem', 'pem'], true) && str_starts_with($sisa, 'injam')) {
+                $w = 'pinjam';
+                break;
+            }
+            $w = $sisa;
+            break;
+        }
+    }
+    foreach (['kan', 'nya', 'lah', 'kah', 'an'] as $akhir) {
+        if (str_ends_with($w, $akhir) && strlen($w) - strlen($akhir) >= 3) {
+            $w = substr($w, 0, -strlen($akhir));
+            break;
+        }
+    }
+    if (str_starts_with($w, 'per') && strlen($w) > 5) {
+        $w = substr($w, 3);
+    }
+    return $w;
+}
+
+/** Duplikat skorKnowledge() produksi (lihat api/chat/index.php). */
+function ujiSkor(array $baris, array $kata): array
+{
+    $judul = strtolower((string) ($baris['judul'] ?? ''));
+    $konten = strtolower((string) ($baris['konten'] ?? ''));
+    $tags = strtolower((string) ($baris['tags'] ?? ''));
+    $skor = 0;
+    $cocok = 0;
+    foreach ($kata as $w) {
+        $varian = array_unique([$w, ujiKataDasar($w)]);
+        $kena = false;
+        foreach ($varian as $v) {
+            if (strlen($v) < 3) {
+                continue;
+            }
+            $bobot = 1 + intdiv(strlen($v), 4);
+            if ($v !== $w) {
+                $bobot = max(1, $bobot - 1);
+            }
+            if ($judul !== '' && str_contains($judul, $v)) {
+                $skor += $bobot + 2;
+                $kena = true;
+            } elseif ($tags !== '' && str_contains($tags, $v)) {
+                $skor += $bobot + 1;
+                $kena = true;
+            } elseif (str_contains($konten, $v)) {
+                $skor += $bobot;
+                $kena = true;
+            }
+        }
+        if ($kena) {
+            $cocok++;
+        }
+    }
+    return ['skor' => $skor, 'cocok' => $cocok];
 }
 
 function ujiStrcut(string $s, int $max): string

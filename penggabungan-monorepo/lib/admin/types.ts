@@ -50,6 +50,8 @@ export interface BeritaDTO {
   status: BeritaStatus | null;
   /** Flag highlight. Sejak B6 backend menegakkan hanya satu berita utama. */
   utama: boolean;
+  /** True bila isi mengandung HTML (editor rich-text). */
+  isiHtml?: boolean;
 }
 
 // -----------------------------------------------------------------------------

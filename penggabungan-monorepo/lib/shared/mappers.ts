@@ -9,6 +9,8 @@ export interface BeritaDTO {
   isi: string | null;
   status: "draft" | "terbit" | null;
   utama: boolean;
+  /** True bila isi mengandung HTML (editor rich-text); selain itu teks polos. */
+  isiHtml?: boolean;
 }
 
 export interface PengumumanDTO {

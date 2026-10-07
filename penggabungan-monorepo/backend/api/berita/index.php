@@ -80,6 +80,8 @@ function handleCreate(PDO $db): void
     $body = getJsonBody();
     validateBerita($body, $db);
     $body['kategori'] = validateCategorySelection($db, 'berita', $body['kategori']);
+    // Isi boleh HTML dari editor rich-text / draf AI: sanitasi allowlist dulu.
+    $body['isi'] = sanitizeBeritaHtml($body['isi'] ?? null);
 
     $gambar = $body['gambar'] ?? null;
 
@@ -128,6 +130,8 @@ function handleUpdate(PDO $db): void
     $body = getJsonBody();
     validateBerita($body, $db);
     $body['kategori'] = validateCategorySelection($db, 'berita', $body['kategori']);
+    // Isi boleh HTML dari editor rich-text / draf AI: sanitasi allowlist dulu.
+    $body['isi'] = sanitizeBeritaHtml($body['isi'] ?? null);
 
     $db->beginTransaction();
     try {
@@ -220,6 +224,9 @@ function formatRow(array $row): array
         'gambar' => $row['gambar'],
         'ringkasan' => $row['ringkasan'],
         'isi' => $row['isi'] ?? null,
+        // Flag untuk frontend: true bila isi mengandung HTML (editor rich-text),
+        // supaya halaman publik tahu harus render HTML vs teks polos (data lama).
+        'isiHtml' => isBeritaHtmlContent($row['isi'] ?? null),
         'status' => $row['status'] ?? null,
         'utama' => (bool)($row['utama'] ?? 0),
     ];

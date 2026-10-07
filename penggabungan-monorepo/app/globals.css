@@ -63,6 +63,112 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* =============================================================================
+ * .prose-berita — styling isi artikel hasil editor rich-text (Tiptap).
+ *
+ * Dipakai di:
+ *   - app/(public)/berita/[slug]/page.tsx (render publik, bila isiHtml)
+ *   - app/(admin)/admin/berita/BeritaEditorForm.tsx (pratinjau admin)
+ *
+ * Hanya tag yang ada di allowlist backend/helpers/sanitize_html.php.
+ * Nilai mengikuti token design system (tokens.css) — jangan hardcode warna.
+ * ========================================================================== */
+.prose-berita {
+  font-size: var(--text-body-md);
+  line-height: var(--text-body-md--line-height);
+  color: var(--color-on-surface);
+  overflow-wrap: break-word;
+}
+
+.prose-berita > * + * {
+  margin-top: var(--spacing-space-md);
+}
+
+.prose-berita h1 { font-size: var(--text-headline-lg); line-height: var(--text-headline-lg--line-height); font-weight: 700; letter-spacing: -0.02em; color: var(--color-primary); }
+.prose-berita h2 { font-size: var(--text-headline-md); line-height: var(--text-headline-md--line-height); font-weight: 700; letter-spacing: -0.02em; color: var(--color-primary); }
+.prose-berita h3 { font-size: var(--text-title-md); line-height: var(--text-title-md--line-height); font-weight: 600; color: var(--color-on-surface); }
+.prose-berita h4,
+.prose-berita h5,
+.prose-berita h6 { font-size: var(--text-body-lg); line-height: 1.5; font-weight: 700; color: var(--color-on-surface); }
+
+.prose-berita p { margin-top: var(--spacing-space-sm); }
+.prose-berita p:first-child { margin-top: 0; }
+
+.prose-berita ul,
+.prose-berita ol {
+  margin-top: var(--spacing-space-sm);
+  padding-left: 1.5rem;
+}
+.prose-berita ul { list-style: disc; }
+.prose-berita ol { list-style: decimal; }
+.prose-berita li { margin-top: var(--spacing-space-2xs); }
+.prose-berita li::marker { color: var(--color-primary); }
+
+.prose-berita strong { font-weight: 700; }
+.prose-berita a {
+  color: var(--color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-berita a:hover { color: var(--color-secondary); }
+
+.prose-berita blockquote {
+  margin-top: var(--spacing-space-md);
+  padding: var(--spacing-space-sm) var(--spacing-space-md);
+  border-left: 4px solid var(--color-secondary);
+  background: var(--color-surface-container-low);
+  border-radius: var(--radius-lg);
+  color: var(--color-on-surface-variant);
+  font-style: italic;
+}
+
+.prose-berita hr {
+  margin-top: var(--spacing-space-md);
+  border: 0;
+  border-top: 1px solid var(--color-outline-variant);
+}
+
+.prose-berita img {
+  margin-top: var(--spacing-space-md);
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-xl);
+}
+
+.prose-berita figure { margin-top: var(--spacing-space-md); }
+.prose-berita figcaption {
+  margin-top: var(--spacing-space-2xs);
+  font-size: var(--text-body-sm);
+  line-height: var(--text-body-sm--line-height);
+  color: var(--color-on-surface-variant);
+  text-align: center;
+}
+
+.prose-berita table {
+  margin-top: var(--spacing-space-md);
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-body-sm);
+  border: 1px solid var(--color-outline-variant);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.prose-berita th,
+.prose-berita td {
+  padding: var(--spacing-space-xs) var(--spacing-space-sm);
+  border: 1px solid var(--color-outline-variant);
+  text-align: left;
+  vertical-align: top;
+}
+.prose-berita th {
+  background: var(--color-surface-container-low);
+  font-weight: 700;
+  color: var(--color-on-surface);
+}
+
+.prose-berita .tableWrapper { overflow-x: auto; }
+
 /* ========== Loading Animation Keyframes (splash website publik) ========== */
 @keyframes shieldIntro {
   0% { opacity: 0; transform: scale(0.82); }

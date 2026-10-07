@@ -97,8 +97,21 @@ export default async function BeritaDetailPage({
           />
         </div>
       )}
-      <div className="mt-space-xl whitespace-pre-line font-body-md leading-relaxed text-on-surface">
-        {berita.isi || berita.ringkasan || "Belum ada isi berita."}
+      <div className="mt-space-xl">
+        {berita.isiHtml ? (
+          // Isi hasil editor rich-text; sudah disanitasi backend (allowlist tag)
+          // sebelum disimpan. Styling lewat kelas .prose-berita di globals.css.
+          <div
+            className="prose-berita font-body-md text-on-surface"
+            dangerouslySetInnerHTML={{
+              __html: berita.isi || "<p>Belum ada isi berita.</p>",
+            }}
+          />
+        ) : (
+          <div className="whitespace-pre-line font-body-md leading-relaxed text-on-surface">
+            {berita.isi || berita.ringkasan || "Belum ada isi berita."}
+          </div>
+        )}
       </div>
     </article>
   );

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Loader2, Pencil, Plus, Search, Star, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
+import Link from "next/link";
 import { apiRequest, assetUrl, isUnauthorized } from "@/lib/admin/api";
 import { formatDateId } from "@/lib/admin/format";
 import type { BeritaDTO } from "@/lib/admin/types";
@@ -14,7 +15,6 @@ import {
   buttonPrimaryClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
-import BeritaDialog from "./BeritaDialog";
 
 type StatusFilter = "semua" | "draft" | "terbit";
 
@@ -25,8 +25,7 @@ export default function BeritaPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<BeritaDTO | null>(null);
+  // Tambah/edit kini halaman penuh (/admin/berita/baru, /admin/berita/[id]).
 
   const [deleting, setDeleting] = useState<BeritaDTO | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -136,17 +135,10 @@ export default function BeritaPage() {
             utama aktif pada satu waktu.
           </p>
         </div>
-        <button
-          type="button"
-          className={buttonPrimaryClass}
-          onClick={() => {
-            setEditing(null);
-            setDialogOpen(true);
-          }}
-        >
+        <Link href="/admin/berita/baru" className={buttonPrimaryClass}>
           <Plus aria-hidden className="h-4 w-4" />
           Tambah berita
-        </button>
+        </Link>
       </header>
 
       <div className="flex flex-wrap items-end gap-space-md">
@@ -293,18 +285,14 @@ export default function BeritaPage() {
                           )}
                           {utama ? "Batalkan" : "Utamakan"}
                         </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setEditing(row);
-                            setDialogOpen(true);
-                          }}
+                        <Link
+                          href={`/admin/berita/${row.id}`}
                           className={buttonGhostClass}
                           aria-label={`Edit ${row.judul}`}
                         >
                           <Pencil aria-hidden className="h-4 w-4" />
                           Edit
-                        </button>
+                        </Link>
                         <button
                           type="button"
                           onClick={() => {
@@ -325,18 +313,6 @@ export default function BeritaPage() {
             </tbody>
           </table>
         </div>
-      )}
-
-      {dialogOpen && (
-        <BeritaDialog
-          editing={editing}
-          onClose={() => setDialogOpen(false)}
-          onSaved={() => {
-            setDialogOpen(false);
-            reload();
-          }}
-          onUnauthorized={logout}
-        />
       )}
 
       {deleting && (
