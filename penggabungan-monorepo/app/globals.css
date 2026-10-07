@@ -20,6 +20,12 @@ body {
   min-height: 100%;
 }
 
+@media (min-width: 768px) and (min-height: 600px) {
+  body {
+    zoom: 0.75;
+  }
+}
+
 body {
   background: var(--color-surface);
   color: var(--color-on-surface);

@@ -166,20 +166,19 @@ function parseMarkdown(string $raw): array
 {
     $rows = [];
 
-    // Pola B: blok frontmatter '--- ... ---' lalu body.
-    if (preg_match_all('/^---[ \t]*\n(.*?)\n---[ \t]*\n(.+?)(?=\n---[ \t]*\n|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
+    // Pola A: heading '#' sebagai pemisah dokumen.
+    if (preg_match_all('/^#\s+(.+?)\s*$(.*?)(?=^#\s+|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
         foreach ($m as $block) {
-            $meta = [];
-            foreach (preg_split('/\r?\n/', $block[1]) as $line) {
-                if (preg_match('/^\s*([A-Za-z_]+)\s*:\s*(.*)$/', $line, $kv)) {
-                    $meta[strtolower(trim($kv[1]))] = trim($kv[2], " \"'");
-                }
+            $judul = trim($block[1]);
+            // Lewati header sampul dari convert-dataset.php (bukan dokumen knowledge).
+            if ($judul === 'Knowledge base chatbot SMK Negeri 24 Jakarta') {
+                continue;
             }
             $rows[] = [
-                'judul' => $meta['judul'] ?? '',
-                'kategori' => $meta['kategori'] ?? '',
-                'tags' => $meta['tags'] ?? '',
-                'sumber' => $meta['sumber'] ?? '',
+                'judul' => $judul,
+                'kategori' => '',
+                'tags' => '',
+                'sumber' => '',
                 'konten' => trim(stripHeading($block[2])),
             ];
         }
@@ -188,14 +187,20 @@ function parseMarkdown(string $raw): array
         }
     }
 
-    // Pola A: heading '#' sebagai pemisah dokumen.
-    if (preg_match_all('/^#\s+(.+?)\s*$(.*?)(?=^#\s+|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
+    // Pola B: blok frontmatter '--- ... ---' lalu body.
+    if (preg_match_all('/^---[ \t]*\n(.*?)\n---[ \t]*\n(.+?)(?=\n---[ \t]*\n|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
         foreach ($m as $block) {
+            $meta = [];
+            foreach (preg_split('/\r?\n/', $block[1]) as $line) {
+                if (preg_match('/^\s*([A-Za-z_]+)\s*:\s*(.*)$/', $line, $kv)) {
+                    $meta[strtolower(trim($kv[1]))] = trim($kv[2], " \t\"'");
+                }
+            }
             $rows[] = [
-                'judul' => trim($block[1]),
-                'kategori' => '',
-                'tags' => '',
-                'sumber' => '',
+                'judul' => $meta['judul'] ?? '',
+                'kategori' => $meta['kategori'] ?? '',
+                'tags' => $meta['tags'] ?? '',
+                'sumber' => $meta['sumber'] ?? '',
                 'konten' => trim(stripHeading($block[2])),
             ];
         }

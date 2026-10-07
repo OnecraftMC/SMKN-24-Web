@@ -2,17 +2,19 @@ import ProfilHeader from '@/components/profil/ProfilHeader';
 import VisiMisi from '@/components/profil/VisiMisi';
 import DewanGuru from '@/components/profil/DewanGuru';
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
+import KalenderKegiatan from '@/components/profil/KalenderKegiatan';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
-import { getBerita, getFasilitas, getGuru } from '@/lib/api';
+import { getAgendaCalendar, getBerita, getFasilitas, getGuru } from '@/lib/api';
 
 export default async function ProfilPage() {
   // Hotnews compact memakai sumber yang sama dengan `/kabar`: `utama: true`.
   // Fetch paralel bersama data profil agar tidak menambah waterfall request.
-  const [guruRes, fasilitasRes, utamaRes] = await Promise.all([
+  const [guruRes, fasilitasRes, utamaRes, agendaRes] = await Promise.all([
     getGuru(),
     getFasilitas({ unggulan: true }),
     getBerita({ utama: true }),
+    getAgendaCalendar(),
   ]);
   const guru = guruRes.data ?? [];
   const fasilitas = fasilitasRes.data ?? [];
@@ -24,6 +26,9 @@ export default async function ProfilPage() {
       </Reveal>
       <Reveal>
         <VisiMisi />
+      </Reveal>
+      <Reveal>
+        <KalenderKegiatan events={agendaRes.data ?? []} error={agendaRes.error} />
       </Reveal>
       <Reveal>
         <FeaturedNews

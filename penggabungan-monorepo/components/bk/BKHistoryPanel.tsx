@@ -93,7 +93,7 @@ export default function BKHistoryPanel({
 
   return (
     <div className="flex flex-col min-h-0 flex-1">
-      <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-surface-container">
+      <div className="flex items-center justify-between gap-2 px-4 py-2.5 border-b border-surface-container">
         <h3 className="font-label-md text-label-md font-bold text-on-surface">
           Riwayat Ceritamu
         </h3>
@@ -101,36 +101,36 @@ export default function BKHistoryPanel({
           type="button"
           onClick={() => void load()}
           aria-label="Muat ulang riwayat"
-          className="rounded-full p-2 text-on-surface-variant hover:bg-surface-container"
+          className="rounded-full p-1.5 text-on-surface-variant hover:bg-surface-container"
         >
           <RefreshCw aria-hidden className="h-4 w-4" />
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-3 space-y-2">
+      <div className="flex-1 overflow-y-auto px-4 py-2.5 space-y-1.5">
         {loading && (
-          <p className="flex items-center gap-2 py-4 text-sm text-on-surface-variant">
+          <p className="flex items-center gap-2 py-3 text-xs text-on-surface-variant">
             <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
             Memuat riwayat…
           </p>
         )}
 
         {!loading && error && (
-          <p className="rounded-2xl bg-error-container px-4 py-2.5 text-sm text-on-error-container">
+          <p className="rounded-xl bg-error-container px-3 py-2 text-xs text-on-error-container">
             {error}
           </p>
         )}
 
         {!loading && !error && items.length === 0 && (
-          <div className="py-6 text-center">
-            <p className="text-sm text-on-surface-variant">
+          <div className="py-5 text-center">
+            <p className="text-xs text-on-surface-variant">
               Belum ada riwayat. Ceritakan dulu apa yang sedang kamu rasakan.
             </p>
             {onMulaiBaru && (
               <button
                 type="button"
                 onClick={onMulaiBaru}
-                className="mt-3 rounded-full bg-primary px-5 py-2.5 shadow-sm text-surface font-label-md font-bold"
+                className="mt-3 rounded-full bg-primary px-4 py-2 shadow-sm text-surface text-sm font-bold"
               >
                 Mulai bercerita
               </button>
@@ -144,7 +144,7 @@ export default function BKHistoryPanel({
             return (
               <article
                 key={item.id}
-                className={`rounded-3xl border p-4 shadow-sm ${
+                className={`rounded-2xl border p-3 shadow-sm ${
                   item.butuhPerhatian
                     ? "border-error bg-error-container/20"
                     : "border-surface-container bg-surface-container-lowest"
@@ -170,11 +170,11 @@ export default function BKHistoryPanel({
                   </span>
                 </div>
 
-                <p className="mt-1.5 text-sm text-on-surface">
+                <p className="mt-1 text-xs leading-relaxed text-on-surface">
                   {item.ringkasan ?? "Cerita kamu sudah tercatat."}
                 </p>
 
-                <div className="mt-2 flex items-center gap-3">
+                <div className="mt-1.5 flex items-center gap-2.5">
                   <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-[11px] font-bold text-on-surface-variant">
                     {item.status}
                   </span>
@@ -190,7 +190,7 @@ export default function BKHistoryPanel({
                 </div>
 
                 {isOpen && item.messages && (
-                  <div className="mt-2 space-y-2 rounded-2xl bg-surface-container/70 p-3">
+                  <div className="mt-2 space-y-1.5 rounded-xl bg-surface-container/70 p-2.5">
                     {item.messages.map((m, i) => {
                       const isUser = (m.sender ?? m.role) === "user";
                       const text = m.text ?? "";

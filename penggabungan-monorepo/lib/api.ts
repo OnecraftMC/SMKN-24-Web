@@ -159,6 +159,10 @@ export async function getAgenda(): Promise<ApiResult<AgendaView[]>> {
     : { data: null, error: result.error };
 }
 
+export async function getAgendaCalendar(): Promise<ApiResult<AgendaDTO[]>> {
+  return request<AgendaDTO[]>("api/agenda/index.php");
+}
+
 export async function getGuru(): Promise<ApiResult<GuruView[]>> {
   const result = await request<GuruDTO[]>("api/guru/index.php");
   return result.data
