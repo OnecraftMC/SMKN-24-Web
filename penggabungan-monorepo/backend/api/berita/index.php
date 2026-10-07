@@ -60,7 +60,7 @@ function handleGet(PDO $db): void
     // Jika request datang dengan token admin valid, tampilkan semua (termasuk draft)
     $token = getBearerToken();
     if ($token && verifyJwt($token)) {
-        $where = '1=1';
+        $where = 'WHERE 1=1';
         $params = [];
         if (!empty($_GET['kategori'])) {
             $where .= ' AND kategori = ?';
