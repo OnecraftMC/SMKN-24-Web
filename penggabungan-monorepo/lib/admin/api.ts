@@ -88,6 +88,23 @@ export function clearStoredToken(): void {
   window.localStorage.removeItem(TOKEN_STORAGE_KEY);
 }
 
+function notifyPublicDataChanged(): void {
+  if (typeof window === "undefined") return;
+  const key = "smkn24:public-data-changed";
+  const timestamp = Date.now().toString();
+  window.dispatchEvent(new Event(key));
+  if (typeof BroadcastChannel !== "undefined") {
+    const channel = new BroadcastChannel(key);
+    channel.postMessage(timestamp);
+    channel.close();
+  }
+  try {
+    window.localStorage.setItem(key, timestamp);
+  } catch {
+    // BroadcastChannel and same-tab event still cover supported contexts.
+  }
+}
+
 export type ApiRequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   /** Objek akan di-JSON.stringify; abaikan untuk request tanpa body. */
@@ -150,6 +167,7 @@ export async function apiRequest<T>(
     );
   }
 
+  if (method !== "GET") notifyPublicDataChanged();
   return parsed as T;
 }
 
@@ -203,6 +221,7 @@ export async function apiUpload<T>(
     throw new ApiError("Respons server tidak berformat JSON. Periksa log backend.", response.status);
   }
 
+  notifyPublicDataChanged();
   return parsed as T;
 }
 

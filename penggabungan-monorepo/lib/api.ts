@@ -35,8 +35,6 @@ const TIMEOUT_MS = 5000;
 // daripada pembacaan data statis. Nilai ini mencegah jawaban model dipotong proxy
 // menjadi 504; backend PHP sendiri membatasi 20 detik (lihat backend/api/chat/index.php).
 const CHAT_TIMEOUT_MS = 25000;
-const PUBLIC_DATA_REVALIDATE_SECONDS = 10;
-
 // Port yang menandakan BACKEND_URL diisi dengan host database, bukan URL HTTP
 // backend — kesalahan konfigurasi nyata yang pernah terjadi (lihat
 // `perbaikan error dan bug.md` E.1: NEXT_PUBLIC_API_URL = host:3306).
@@ -80,7 +78,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
       ...init,
       headers: { Accept: "application/json", ...init?.headers },
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      next: init?.method ? undefined : { revalidate: PUBLIC_DATA_REVALIDATE_SECONDS },
+      cache: "no-store",
     });
     let body: unknown = null;
     try {
@@ -487,7 +485,7 @@ export async function proxyPublicGet(
     response = await fetch(`${baseUrl}/api/${endpoint}/index.php${suffix}`, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(TIMEOUT_MS),
-      next: { revalidate: PUBLIC_DATA_REVALIDATE_SECONDS },
+      cache: "no-store",
     });
   } catch (error) {
     if (error instanceof Error && error.name === "TimeoutError") {
