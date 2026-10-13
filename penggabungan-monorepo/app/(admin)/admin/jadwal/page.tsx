@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
-import type { JadwalRowDTO, JurusanKey, SesiKey } from "@/lib/admin/types";
+import type { JadwalDataDTO, JadwalKelasDTO, JadwalRowDTO, JurusanKey } from "@/lib/admin/types";
 import {
   ConfirmDialog,
   ListState,
@@ -12,32 +12,37 @@ import {
   buttonPrimaryClass,
 } from "@/components/admin/ui/FormBits";
 import JadwalSlotDialog from "./JadwalSlotDialog";
+import KelasDialog from "./KelasDialog";
 
-const JURUSAN_LABEL: Record<JurusanKey, string> = {
-  perhotelan: "Perhotelan",
-  boga: "Kuliner (Tata Boga)",
-  busana: "Tata Busana",
-  pplg: "Rekayasa Perangkat Lunak",
-  pariwisata: "Usaha Layanan Pariwisata",
-};
-
-const JURUSAN_KEYS = Object.keys(JURUSAN_LABEL) as JurusanKey[];
-const SLOT_NUMBERS = [0, 1, 2, 3, 4];
+const PROGRAMS: { key: JurusanKey; label: string }[] = [
+  { key: "perhotelan", label: "Perhotelan" },
+  { key: "boga", label: "Kuliner / Tata Boga" },
+  { key: "busana", label: "Tata Busana" },
+  { key: "pplg", label: "Rekayasa Perangkat Lunak" },
+  { key: "pariwisata", label: "Usaha Layanan Wisata (ULW)" },
+];
+const DAYS = [
+  { key: "senin", label: "Senin" },
+  { key: "selasa", label: "Selasa" },
+  { key: "rabu", label: "Rabu" },
+  { key: "kamis", label: "Kamis" },
+  { key: "jumat", label: "Jumat" },
+  { key: "sabtu", label: "Sabtu" },
+] as const;
 
 export default function JadwalPage() {
   const { logout } = useAuth();
-  const [rows, setRows] = useState<JadwalRowDTO[]>([]);
+  const [data, setData] = useState<JadwalDataDTO>({ classes: [], schedules: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-
-  const [jurusan, setJurusan] = useState<JurusanKey>("perhotelan");
-  const [sesi, setSesi] = useState<SesiKey>("pagi");
-
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingSlot, setEditingSlot] = useState<JadwalRowDTO | null>(null);
-  const [defaultUrutan, setDefaultUrutan] = useState(0);
-
+  const [program, setProgram] = useState<JurusanKey>("pplg");
+  const [classId, setClassId] = useState<number | null>(null);
+  const [day, setDay] = useState<(typeof DAYS)[number]["key"]>("senin");
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [editingSchedule, setEditingSchedule] = useState<JadwalRowDTO | null>(null);
+  const [classDialogOpen, setClassDialogOpen] = useState(false);
+  const [editingClass, setEditingClass] = useState<JadwalKelasDTO | null>(null);
   const [deleting, setDeleting] = useState<JadwalRowDTO | null>(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -52,17 +57,17 @@ export default function JadwalPage() {
     let cancelled = false;
     void (async () => {
       try {
-        const data = await apiRequest<JadwalRowDTO[]>("/api/jadwal/index.php?admin=1");
+        const result = await apiRequest<JadwalDataDTO>("/api/jadwal/index.php?admin=1");
         if (cancelled) return;
-        setRows(data);
+        setData(result);
         setError(null);
-      } catch (err) {
+      } catch (loadError) {
         if (cancelled) return;
-        if (isUnauthorized(err)) {
+        if (isUnauthorized(loadError)) {
           logout();
           return;
         }
-        setError(err instanceof Error ? err.message : "Gagal memuat jadwal.");
+        setError(loadError instanceof Error ? loadError.message : "Gagal memuat jadwal.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -72,53 +77,18 @@ export default function JadwalPage() {
     };
   }, [reloadKey, logout]);
 
-  const slots = useMemo(
-    () =>
-      rows
-        .filter((row) => row.jurusan === jurusan && row.sesi === sesi)
-        .sort((a, b) => a.urutan - b.urutan),
-    [rows, jurusan, sesi],
+  const programClasses = useMemo(
+    () => data.classes.filter((item) => item.jurusan === program),
+    [data.classes, program],
   );
-
-  const freeUrutans = useMemo(() => {
-    const occupied = new Set(slots.map((row) => row.urutan));
-    return SLOT_NUMBERS.filter((n) => !occupied.has(n));
-  }, [slots]);
-
-  const takenForDialog = useMemo(() => {
-    const list = rows.filter(
-      (row) =>
-        row.jurusan === jurusan &&
-        row.sesi === sesi &&
-        (!editingSlot || row.id !== editingSlot.id),
-    );
-    return list.map((row) => row.urutan);
-  }, [rows, jurusan, sesi, editingSlot]);
-
-  /** Baris matriks pratinjau per nomor urutan (0–4) untuk jurusan aktif. */
-  const matrix = useMemo(() => {
-    const pagi = rows.filter((r) => r.jurusan === jurusan && r.sesi === "pagi");
-    const siang = rows.filter((r) => r.jurusan === jurusan && r.sesi === "siang");
-    const pick = (list: JadwalRowDTO[], n: number) => list.find((r) => r.urutan === n);
-    return SLOT_NUMBERS.map((n) => ({
-      n,
-      header: pick(pagi, n)?.jam ?? pick(siang, n)?.jam ?? null,
-      pagi: pick(pagi, n) ?? null,
-      siang: pick(siang, n) ?? null,
-    }));
-  }, [rows, jurusan]);
-
-  function openAdd() {
-    setEditingSlot(null);
-    setDefaultUrutan(freeUrutans[0] ?? 0);
-    setDialogOpen(true);
-  }
-
-  function openEdit(row: JadwalRowDTO) {
-    setEditingSlot(row);
-    setDefaultUrutan(row.urutan);
-    setDialogOpen(true);
-  }
+  const selectedClass = data.classes.find((item) => item.id === classId) ?? programClasses[0] ?? null;
+  const scheduleRows = useMemo(
+    () =>
+      data.schedules
+        .filter((row) => row.kelasId === selectedClass?.id && row.hari === day)
+        .sort((a, b) => a.jamMulai.localeCompare(b.jamMulai)),
+    [data.schedules, day, selectedClass?.id],
+  );
 
   async function confirmDelete() {
     if (!deleting) return;
@@ -128,12 +98,12 @@ export default function JadwalPage() {
       await apiRequest(`/api/jadwal/index.php?id=${deleting.id}`, { method: "DELETE" });
       setDeleting(null);
       reload();
-    } catch (err) {
-      if (isUnauthorized(err)) {
+    } catch (deleteRequestError) {
+      if (isUnauthorized(deleteRequestError)) {
         logout();
         return;
       }
-      setDeleteError(err instanceof Error ? err.message : "Gagal menghapus slot jadwal.");
+      setDeleteError(deleteRequestError instanceof Error ? deleteRequestError.message : "Gagal menghapus jadwal.");
     } finally {
       setDeleteBusy(false);
     }
@@ -143,138 +113,171 @@ export default function JadwalPage() {
     <div className="space-y-space-lg">
       <header className="flex flex-wrap items-end justify-between gap-space-md">
         <div>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">
-            Jadwal Pembelajaran
-          </h1>
+          <h1 className="font-headline-md text-headline-md font-bold text-primary">Jadwal Pembelajaran</h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Slot unik: jurusan + sesi + urutan (0–4). Simpan memakai upsert backend per slot.
+            Atur jadwal mingguan per kelas. Setiap perubahan hanya berlaku pada jam pelajaran yang dipilih.
           </p>
         </div>
-        <button
-          type="button"
-          className={buttonPrimaryClass}
-          onClick={openAdd}
-          disabled={loading || freeUrutans.length === 0}
-        >
-          <Plus aria-hidden className="h-4 w-4" />
-          Tambah slot
-        </button>
+        <div className="flex flex-wrap gap-space-xs">
+          <button
+            type="button"
+            className={buttonGhostClass}
+            onClick={() => {
+              setEditingClass(null);
+              setClassDialogOpen(true);
+            }}
+          >
+            <Plus aria-hidden className="h-4 w-4" />
+            Tambah kelas
+          </button>
+          <button
+            type="button"
+            className={buttonPrimaryClass}
+            onClick={() => {
+              setEditingSchedule(null);
+              setScheduleDialogOpen(true);
+            }}
+            disabled={loading || !selectedClass}
+          >
+            <Plus aria-hidden className="h-4 w-4" />
+            Tambah jam pelajaran
+          </button>
+        </div>
       </header>
 
       <div role="tablist" aria-label="Program keahlian" className="flex flex-wrap gap-space-xs">
-        {JURUSAN_KEYS.map((key) => (
+        {PROGRAMS.map(({ key, label }) => (
           <button
             key={key}
             type="button"
             role="tab"
-            aria-selected={jurusan === key}
-            onClick={() => setJurusan(key)}
+            aria-selected={program === key}
+            onClick={() => {
+              setProgram(key);
+              setClassId(data.classes.find((item) => item.jurusan === key)?.id ?? null);
+            }}
             className={`rounded-lg px-space-md py-2 font-label-md text-label-md font-bold transition-colors ${
-              jurusan === key
+              program === key
                 ? "bg-primary text-surface"
                 : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container"
             }`}
           >
-            {JURUSAN_LABEL[key]}
+            {label}
           </button>
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-space-md">
-        <span className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant">
-          Sesi:
-        </span>
-        {(["pagi", "siang"] as SesiKey[]).map((value) => (
-          <button
-            key={value}
-            type="button"
-            aria-pressed={sesi === value}
-            onClick={() => setSesi(value)}
-            className={`rounded-lg px-space-md py-2 font-label-md text-label-md font-bold transition-colors ${
-              sesi === value
-                ? "bg-primary text-surface"
-                : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container"
-            }`}
+      <div className="flex flex-wrap items-end gap-space-md">
+        <label className="flex min-w-56 flex-col gap-2 font-label-sm text-label-sm font-bold text-on-surface-variant">
+          Pilih kelas
+          <select
+            value={selectedClass?.id ?? ""}
+            onChange={(event) => setClassId(Number(event.target.value) || null)}
+            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface"
+            disabled={programClasses.length === 0}
           >
-            {value === "pagi" ? "Pagi" : "Siang"}
+            {programClasses.length === 0 && <option value="">Belum ada kelas</option>}
+            {programClasses.map((item) => (
+              <option key={item.id} value={item.id}>{item.nama} · Kelas {item.tingkat}</option>
+            ))}
+          </select>
+        </label>
+        {selectedClass && (
+          <button
+            type="button"
+            onClick={() => {
+              setEditingClass(selectedClass);
+              setClassDialogOpen(true);
+            }}
+            className={buttonGhostClass}
+          >
+            <Pencil aria-hidden className="h-4 w-4" />
+            Ubah nama kelas
           </button>
-        ))}
-        {!loading && freeUrutans.length === 0 && (
-          <span className="font-body-sm text-body-sm text-on-surface-variant">
-            Semua slot 0–4 terisi — hapus dulu salah satu untuk menambah.
-          </span>
         )}
       </div>
 
-      {error && rows.length > 0 && (
-        <p
-          role="alert"
-          className="rounded-lg bg-error-container px-space-md py-space-sm font-body-sm text-body-sm text-on-error-container"
-        >
+      <div className="flex flex-wrap gap-space-xs" role="tablist" aria-label="Hari dalam jadwal">
+        {DAYS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={day === key}
+            onClick={() => setDay(key)}
+            className={`rounded-lg px-space-md py-2 font-label-md text-label-md font-bold transition-colors ${
+              day === key
+                ? "bg-secondary-container text-on-secondary-container"
+                : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {error && data.classes.length > 0 && (
+        <p role="alert" className="rounded-lg bg-error-container px-space-md py-space-sm font-body-sm text-body-sm text-on-error-container">
           {error}
         </p>
       )}
-
       <ListState
         loading={loading}
-        error={rows.length === 0 ? error : null}
-        empty={rows.length === 0}
-        emptyLabel="Belum ada data jadwal. Tambahkan slot pertama."
+        error={data.classes.length === 0 ? error : null}
+        empty={data.classes.length === 0}
+        emptyLabel="Belum ada kelas. Tambahkan kelas sebelum mengatur jadwal."
         onRetry={reload}
       />
 
-      {!loading && rows.length > 0 && (
+      {!loading && data.classes.length > 0 && (
         <section className="space-y-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
-          <h2 className="font-title-md text-title-md font-bold text-primary">
-            Slot sesi {sesi === "pagi" ? "Pagi" : "Siang"} — {JURUSAN_LABEL[jurusan]}
-          </h2>
+          <div className="flex flex-wrap items-start justify-between gap-space-sm">
+            <div>
+              <h2 className="font-title-md text-title-md font-bold text-primary">
+                {selectedClass?.nama ?? "Pilih kelas"} · {DAYS.find((item) => item.key === day)?.label}
+              </h2>
+              <p className="mt-1 text-sm text-on-surface-variant">
+                Edit satu baris untuk mengubah jam tersebut tanpa menyentuh jam pelajaran lain.
+              </p>
+            </div>
+            <span className="rounded-full bg-surface-container-high px-3 py-1 text-xs font-bold text-on-surface-variant">
+              {scheduleRows.length} jam pelajaran
+            </span>
+          </div>
 
-          {slots.length === 0 ? (
+          {scheduleRows.length === 0 ? (
             <p className="rounded-lg border border-dashed border-outline-variant p-space-md text-center font-body-sm text-body-sm text-on-surface-variant">
-              Belum ada slot untuk jurusan + sesi ini. Klik &quot;Tambah slot&quot;.
+              Belum ada jadwal untuk {selectedClass?.nama} pada hari {DAYS.find((item) => item.key === day)?.label}.
             </p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full min-w-[44rem] text-left">
                 <thead className="bg-primary text-surface">
                   <tr>
-                    <th className="px-space-md py-space-sm font-label-sm font-bold">Urutan</th>
-                    <th className="px-space-md py-space-sm font-label-sm font-bold">Jam</th>
-                    <th className="px-space-md py-space-sm font-label-sm font-bold">
-                      Mata Pelajaran
-                    </th>
-                    <th className="px-space-md py-space-sm font-label-sm font-bold">Waktu</th>
-                    <th className="px-space-md py-space-sm font-label-sm font-bold">Guru</th>
-                    <th className="px-space-md py-space-sm">
-                      <span className="sr-only">Aksi</span>
-                    </th>
+                    <th scope="col" className="px-space-md py-space-sm font-label-sm font-bold">Jam pelajaran</th>
+                    <th scope="col" className="px-space-md py-space-sm font-label-sm font-bold">Mata pelajaran</th>
+                    <th scope="col" className="px-space-md py-space-sm font-label-sm font-bold">Guru</th>
+                    <th scope="col" className="px-space-md py-space-sm text-right"><span className="sr-only">Aksi</span></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {slots.map((row) => (
+                  {scheduleRows.map((row) => (
                     <tr key={row.id} className="border-t border-surface-container">
-                      <td className="px-space-md py-space-sm">
-                        <span className="tabular-nums font-bold text-primary">{row.urutan}</span>
+                      <td className="whitespace-nowrap px-space-md py-space-sm font-semibold tabular-nums text-primary">
+                        {row.jamMulai}–{row.jamSelesai}
                       </td>
-                      <td className="px-space-md py-space-sm text-on-surface-variant">
-                        {row.jam ?? "—"}
-                      </td>
-                      <td className="px-space-md py-space-sm font-bold text-primary">
-                        {row.mapel}
-                      </td>
-                      <td className="px-space-md py-space-sm text-on-surface-variant">
-                        {row.waktu ?? "—"}
-                      </td>
-                      <td className="px-space-md py-space-sm text-on-surface-variant">
-                        {row.guru ?? "—"}
-                      </td>
+                      <td className="px-space-md py-space-sm font-bold text-primary">{row.mapel}</td>
+                      <td className="px-space-md py-space-sm text-on-surface-variant">{row.guru || "—"}</td>
                       <td className="px-space-md py-space-sm">
                         <div className="flex justify-end gap-space-xs">
                           <button
                             type="button"
-                            onClick={() => openEdit(row)}
+                            onClick={() => {
+                              setEditingSchedule(row);
+                              setScheduleDialogOpen(true);
+                            }}
                             className={buttonGhostClass}
-                            aria-label={`Edit slot ${row.mapel}`}
+                            aria-label={`Edit jadwal ${row.mapel} pukul ${row.jamMulai}`}
                           >
                             <Pencil aria-hidden className="h-4 w-4" />
                             Edit
@@ -286,7 +289,7 @@ export default function JadwalPage() {
                               setDeleting(row);
                             }}
                             className={buttonGhostClass}
-                            aria-label={`Hapus slot ${row.mapel}`}
+                            aria-label={`Hapus jadwal ${row.mapel} pukul ${row.jamMulai}`}
                           >
                             <Trash2 aria-hidden className="h-4 w-4" />
                             Hapus
@@ -302,85 +305,38 @@ export default function JadwalPage() {
         </section>
       )}
 
-      {!loading && rows.length > 0 && (
-        <section
-          aria-label="Pratinjau matriks jadwal"
-          className="space-y-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm"
-        >
-          <div>
-            <p className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-secondary">
-              Pratinjau matriks (JadwalMatriks)
-            </p>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Header kolom memakai jam dari database — bukan teks hardcoded seperti komponen
-              publik saat ini.
-            </p>
-          </div>
-
-          <div className="overflow-x-auto rounded-2xl border border-surface-container shadow-sm">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-primary text-surface">
-                <tr>
-                  <th className="px-4 py-3 font-label-sm font-bold">Sesi</th>
-                  {matrix.map((col) => (
-                    <th key={col.n} className="px-4 py-3 font-label-sm font-bold">
-                      {col.header ? `Pukul ${col.header}` : `Slot ${col.n + 1}`}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="border-b border-surface-container">
-                  <td className="bg-surface-container-low px-4 py-3 font-bold">Pagi</td>
-                  {matrix.map((col) => (
-                    <td key={col.n} className="px-4 py-3">
-                      {col.pagi ? (
-                        <span className="font-bold text-primary">{col.pagi.mapel}</span>
-                      ) : (
-                        <span className="text-on-surface-variant">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  <td className="bg-surface-container-low px-4 py-3 font-bold">Siang</td>
-                  {matrix.map((col) => (
-                    <td key={col.n} className="px-4 py-3">
-                      {col.siang ? (
-                        <span className="font-bold text-primary">{col.siang.mapel}</span>
-                      ) : (
-                        <span className="text-on-surface-variant">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      )}
-
-      {dialogOpen && (
+      {scheduleDialogOpen && selectedClass && (
         <JadwalSlotDialog
-          editing={editingSlot}
-          jurusan={jurusan}
-          sesi={sesi}
-          taken={takenForDialog}
-          defaultUrutan={defaultUrutan}
-          onClose={() => setDialogOpen(false)}
+          editing={editingSchedule}
+          classId={selectedClass.id}
+          className={selectedClass.nama}
+          day={day}
+          onClose={() => setScheduleDialogOpen(false)}
           onSaved={() => {
-            setDialogOpen(false);
+            setScheduleDialogOpen(false);
             reload();
           }}
-          onRefresh={reload}
+          onUnauthorized={logout}
+        />
+      )}
+
+      {classDialogOpen && (
+        <KelasDialog
+          editing={editingClass}
+          initialProgram={program}
+          onClose={() => setClassDialogOpen(false)}
+          onSaved={() => {
+            setClassDialogOpen(false);
+            reload();
+          }}
           onUnauthorized={logout}
         />
       )}
 
       {deleting && (
         <ConfirmDialog
-          title="Hapus slot jadwal?"
-          description={`Slot urutan ${deleting.urutan} (${deleting.mapel}) akan dihapus permanen.`}
+          title="Hapus jam pelajaran?"
+          description={`${deleting.mapel} (${deleting.jamMulai}–${deleting.jamSelesai}) pada ${selectedClass?.nama}, ${DAYS.find((item) => item.key === day)?.label} akan dihapus.`}
           busy={deleteBusy}
           error={deleteError}
           onConfirm={() => void confirmDelete()}

@@ -16,13 +16,11 @@ import {
   type GaleriView,
   type GuruDTO,
   type GuruView,
-  type JadwalDTO,
+  type JadwalDataDTO,
   type PengumumanDTO,
   type PengumumanView,
 } from "@/lib/shared/mappers";
 import type { ArsipDTO } from "@/lib/admin/types";
-// JurusanKey tinggal di shared/types.ts (enum jadwal di backend), bukan di mappers.
-import type { JurusanKey } from "@/lib/shared/types";
 
 export interface ApiResult<T> {
   data: T | null;
@@ -31,10 +29,11 @@ export interface ApiResult<T> {
 }
 
 const TIMEOUT_MS = 5000;
-// Chatbot meneruskan pertanyaan ke provider AI, jadi latensinya jauh lebih tinggi
-// daripada pembacaan data statis. Nilai ini mencegah jawaban model dipotong proxy
-// menjadi 504; backend PHP sendiri membatasi 20 detik (lihat backend/api/chat/index.php).
-const CHAT_TIMEOUT_MS = 25000;
+// Chatbot (D18) memakai loop tool-call: tiap pesan bisa memicu 2-3 panggilan
+// model (maks AI_CHAT_MAX_TOOL_CALLS di backend). Timeout 60 detik mencegah
+// jawaban dipotong proxy menjadi 504; per putaran backend memakai timeout
+// lebih pendek (AI_CHAT_TOOL_TIMEOUT = 15 detik).
+const CHAT_TIMEOUT_MS = 60000;
 // Port yang menandakan BACKEND_URL diisi dengan host database, bukan URL HTTP
 // backend — kesalahan konfigurasi nyata yang pernah terjadi (lihat
 // `perbaikan error dan bug.md` E.1: NEXT_PUBLIC_API_URL = host:3306).
@@ -202,22 +201,10 @@ export async function getArsip(): Promise<ApiResult<ArsipPublicDTO[]>> {
   };
 }
 
-/**
- * Matriks jadwal publik.
- *
- * Bentuk respons backend BERBEDA tergantung filter, jadi tipenya ikut berbeda:
- *  - tanpa filter → `{ perhotelan: {pagi,siang}, boga: …, … }` (Record 5 jurusan)
- *  - `?jurusan=X` → `{ pagi: string[]; siang: string[] }` (objek tunggal, bukan Record)
- *
- * Overload di bawah memberi tipe yang benar ke pemanggil tanpa cast manual.
- */
-export async function getJadwal(): Promise<ApiResult<Record<JurusanKey, JadwalDTO>>>;
-export async function getJadwal(jurusan: JurusanKey): Promise<ApiResult<JadwalDTO>>;
-export async function getJadwal(
-  jurusan?: JurusanKey,
-): Promise<ApiResult<Record<JurusanKey, JadwalDTO> | JadwalDTO>> {
-  const query = jurusan ? `?jurusan=${encodeURIComponent(jurusan)}` : "";
-  return request(`api/jadwal/index.php${query}`);
+/** Data jadwal mingguan, beserta daftar kelas yang bisa dipilih. */
+export async function getJadwal(classId?: number): Promise<ApiResult<JadwalDataDTO>> {
+  const query = classId ? `?kelas_id=${encodeURIComponent(String(classId))}` : "";
+  return request<JadwalDataDTO>(`api/jadwal/index.php${query}`);
 }
 
 /**

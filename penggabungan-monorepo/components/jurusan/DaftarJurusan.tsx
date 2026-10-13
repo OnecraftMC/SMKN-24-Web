@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { JADWAL_DATA, jurusanData } from "@/lib/data";
+import { jurusanData } from "@/lib/data";
 import type { Jurusan, JurusanKey } from "@/lib/types";
 
 // Tata letak bento di desktop (3 kolom x 3 baris): satu kartu unggulan 2x2 dan
@@ -19,9 +19,6 @@ const TATA_LETAK: Record<
   pplg: { kolom: "", sizes: GAMBAR_SEMPIT },
   pariwisata: { kolom: "lg:col-span-2", sizes: GAMBAR_LEBAR },
 };
-
-// Chip mata pelajaran praktik yang tampil pada kartu non-unggulan.
-const JUMLAH_CHIPE = 3;
 
 // Latar kartu: foto kegiatan resmi bila tersedia (slot
 // public/images/jurusan/<key>.jpg — lihat komentar `gambar` di lib/types.ts),
@@ -53,7 +50,11 @@ export function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
   );
 }
 
-export default function DaftarJurusan() {
+export default function DaftarJurusan({
+  kelasByJurusan,
+}: {
+  kelasByJurusan: Partial<Record<JurusanKey, string[]>>;
+}) {
   return (
     <div className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
@@ -73,8 +74,8 @@ export default function DaftarJurusan() {
         <ul id="daftar-jurusan" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[16rem] md:auto-rows-[18rem] gap-gutter-md">
           {jurusanData.map((item) => {
             const tata = TATA_LETAK[item.key];
-            const mapel = JADWAL_DATA[item.key].pagi;
-            const chipMapel = tata.unggulan ? mapel : mapel.slice(0, JUMLAH_CHIPE);
+            const kelas = kelasByJurusan[item.key] ?? [];
+            const chipKelas = tata.unggulan ? kelas : kelas.slice(0, 3);
             return (
               <li key={item.key} className={tata.kolom}>
                 <article className="group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -117,14 +118,17 @@ export default function DaftarJurusan() {
                     </p>
 
                     <ul className="flex flex-wrap gap-1">
-                      {chipMapel.map((mapelPagi) => (
+                      {chipKelas.map((namaKelas) => (
                         <li
-                          key={mapelPagi}
+                          key={namaKelas}
                           className="rounded-full bg-surface-container-low px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-surface-variant"
                         >
-                          {mapelPagi}
+                          {namaKelas}
                         </li>
                       ))}
+                      {kelas.length === 0 && (
+                        <li className="text-xs text-on-surface-variant">Lihat kelas di jadwal Akademik</li>
+                      )}
                     </ul>
 
                     <Link

@@ -85,29 +85,6 @@ export const pengumumanBerandaData = [
   { id: 2, badge: "Akademik", status: null, judul: "Edaran Pelaksanaan Penilaian Akhir Semester (PAS)", deskripsi: "Pelaksanaan PAS Semester Ganjil TA 2025/2026 dilaksanakan serentak untuk seluruh kompetensi keahlian secara CBT.", linkLabel: "Lihat Kisi-kisi Ujian", linkHref: "/akademik", icon: "schedule", actionIcon: "arrow_forward", variant: "default" },
 ];
 
-export const JADWAL_DATA = {
-  perhotelan: {
-    pagi: ['Front Office', 'Housekeeping', 'F&B Service', 'Bahasa Inggris Profesi', 'Tata Graha'],
-    siang: ['Praktik Hotel Training', 'Praktik Hotel Training', 'Simulasi Check-in/out', 'Etika Pelayanan Tamu', 'Praktik Tata Hidang']
-  },
-  boga: {
-    pagi: ['Pengolahan Makanan Indonesia', 'Pengolahan Kue & Roti', 'Sanitasi Hygiene', 'Bahasa Inggris Profesi', 'Pengolahan Makanan Kontinental'],
-    siang: ['Praktik Dapur Produksi', 'Praktik Dapur Produksi', 'Pengelolaan Usaha Boga', 'Plating & Garnish', 'Praktik Pastry']
-  },
-  busana: {
-    pagi: ['Dasar Pola', 'Desain Busana', 'Tekstil', 'Bahasa Inggris Profesi', 'Menjahit Busana Custom'],
-    siang: ['Praktik Menjahit', 'Praktik Menjahit', 'Pembuatan Pola Industri', 'Grading & Finishing', 'Praktik Produksi Garmen']
-  },
-  pplg: {
-    pagi: ['Pemrograman Web', 'Basis Data', 'Pemrograman Berorientasi Objek', 'Bahasa Inggris Profesi', 'Pengembangan Gim'],
-    siang: ['Praktik Lab Komputer', 'Praktik Lab Komputer', 'Proyek Aplikasi Mobile', 'Jaringan Dasar', 'Praktik UI/UX']
-  },
-  pariwisata: {
-    pagi: ['Pengetahuan Pariwisata', 'Pemanduan Wisata', 'Ticketing & Reservasi', 'Bahasa Inggris Profesi', 'Geografi Pariwisata'],
-    siang: ['Praktik Tur Simulasi', 'Praktik Tur Simulasi', 'Pengelolaan Biro Perjalanan', 'Public Speaking', 'Studi Ekskursi']
-  }
-};
-
 export const guruData = [
   {
     id: 1,

@@ -1,106 +1,164 @@
 "use client";
 
-import { useState } from "react";
-import type { JurusanKey } from "@/lib/types";
+import { useMemo, useState } from "react";
+import type { JadwalDataDTO } from "@/lib/shared/mappers";
+import type { JurusanKey } from "@/lib/shared/types";
 
-/**
- * Bentuk data mengikuti kontrak backend `GET api/jadwal/index.php`:
- * `{ [jurusan]: { pagi: string[]; siang: string[] } }`.
- * (Bentuk row-based dengan kolom hari/tingkat/ruang tidak ada di tabel `jadwal`.)
- */
-export type JadwalMatriksData = Partial<Record<JurusanKey, { pagi: string[]; siang: string[] }>>;
+const PROGRAMS: { key: JurusanKey; label: string }[] = [
+  { key: "perhotelan", label: "Perhotelan" },
+  { key: "boga", label: "Kuliner / Tata Boga" },
+  { key: "busana", label: "Tata Busana" },
+  { key: "pplg", label: "Rekayasa Perangkat Lunak" },
+  { key: "pariwisata", label: "Usaha Layanan Wisata (ULW)" },
+];
 
-const LABEL: Record<JurusanKey, string> = {
-  perhotelan: "Perhotelan",
-  boga: "Kuliner (Tata Boga)",
-  busana: "Tata Busana",
-  pplg: "Rekayasa Perangkat Lunak",
-  pariwisata: "Usaha Layanan Pariwisata",
-};
-
-const SESI = [
-  { key: "pagi", judul: "Sesi Pagi" },
-  { key: "siang", judul: "Sesi Siang" },
+const DAYS = [
+  { key: "senin", label: "Senin" },
+  { key: "selasa", label: "Selasa" },
+  { key: "rabu", label: "Rabu" },
+  { key: "kamis", label: "Kamis" },
+  { key: "jumat", label: "Jumat" },
+  { key: "sabtu", label: "Sabtu" },
 ] as const;
 
 export default function JadwalMatriks({
   jadwal,
   error,
 }: {
-  jadwal: JadwalMatriksData;
+  jadwal: JadwalDataDTO;
   error: string | null;
 }) {
-  const jurusanList = (Object.keys(jadwal) as JurusanKey[]).filter(
-    (key) => jadwal[key]?.pagi.length || jadwal[key]?.siang.length,
+  const [program, setProgram] = useState<JurusanKey | "">(
+    jadwal.classes[0]?.jurusan ?? "",
   );
-  const [selectedJurusan, setSelectedJurusan] = useState<JurusanKey | "">(jurusanList[0] ?? "");
-  const sesi = selectedJurusan ? jadwal[selectedJurusan] : null;
+  const [classId, setClassId] = useState(String(jadwal.classes[0]?.id ?? ""));
+  const [day, setDay] = useState<(typeof DAYS)[number]["key"]>("senin");
+
+  const programClasses = useMemo(
+    () => jadwal.classes.filter((item) => item.jurusan === program),
+    [jadwal.classes, program],
+  );
+  const selectedClass = jadwal.classes.find((item) => String(item.id) === classId);
+  const daySchedules = useMemo(
+    () =>
+      jadwal.schedules
+        .filter((row) => row.kelasId === selectedClass?.id && row.hari === day)
+        .sort((a, b) => a.jamMulai.localeCompare(b.jamMulai)),
+    [day, jadwal.schedules, selectedClass?.id],
+  );
 
   return (
-    <div className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
-      <div className="max-w-container-max mx-auto space-y-space-xl">
+    <section className="w-full bg-surface-container-low px-margin-mobile py-space-4xl md:px-margin-tablet lg:px-margin-desktop">
+      <div className="mx-auto max-w-container-max space-y-space-xl">
         <div className="space-y-2">
-          <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Data pembelajaran</span>
-          <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">
+          <span className="font-label-md font-bold uppercase tracking-wider text-secondary">
+            Data pembelajaran
+          </span>
+          <h2 className="font-headline-lg text-headline-lg font-bold tracking-tight text-primary">
             Jadwal Program Keahlian
           </h2>
           <p className="font-body-md text-on-surface-variant">
-            Jadwal pembelajaran per program keahlian, sesuai data dari sekolah.
+            Pilih program, kelas, dan hari untuk melihat mata pelajaran beserta jam dan guru pengampu.
           </p>
         </div>
 
-        {sesi ? (
+        {jadwal.classes.length > 0 ? (
           <>
-            <label className="flex max-w-md flex-col gap-2 font-label-md text-label-md text-primary">
-              Program Keahlian
-              <select
-                value={selectedJurusan}
-                onChange={(event) => setSelectedJurusan(event.target.value as JurusanKey)}
-                className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
-              >
-                {jurusanList.map((key) => (
-                  <option key={key} value={key}>
-                    {LABEL[key]}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-gutter-md">
-              {SESI.map((sesiItem) => (
-                <section
-                  key={sesiItem.key}
-                  className="overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm"
+            <div className="grid gap-space-md sm:grid-cols-2">
+              <label className="flex flex-col gap-2 font-label-md text-label-md font-bold text-primary">
+                Program keahlian
+                <select
+                  value={program}
+                  onChange={(event) => {
+                    const nextProgram = event.target.value as JurusanKey;
+                    setProgram(nextProgram);
+                    setClassId(String(jadwal.classes.find((item) => item.jurusan === nextProgram)?.id ?? ""));
+                  }}
+                  className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
                 >
-                  <h3 className="bg-primary px-space-md py-space-sm font-title-md text-title-md text-surface">
-                    {sesiItem.judul}
-                  </h3>
-                  <ol className="divide-y divide-surface-container">
-                    {sesi[sesiItem.key].map((mapel, index) => (
-                      <li
-                        key={mapel}
-                        className="flex items-center gap-3 px-space-md py-space-sm font-body-sm text-body-sm text-on-surface-variant"
-                      >
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-container font-label-sm text-label-sm text-primary">
-                          {index + 1}
-                        </span>
-                        {mapel}
-                      </li>
-                    ))}
-                  </ol>
-                </section>
+                  {PROGRAMS.filter(({ key }) => jadwal.classes.some((item) => item.jurusan === key)).map(({ key, label }) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-2 font-label-md text-label-md font-bold text-primary">
+                Kelas
+                <select
+                  value={classId}
+                  onChange={(event) => setClassId(event.target.value)}
+                  className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
+                >
+                  {programClasses.map((item) => (
+                    <option key={item.id} value={item.id}>{item.nama}</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
+            <div className="flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Hari jadwal">
+              {DAYS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  role="tab"
+                  aria-selected={day === key}
+                  onClick={() => setDay(key)}
+                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-bold transition ${
+                    day === key
+                      ? "bg-primary text-surface"
+                      : "border border-outline-variant bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"
+                  }`}
+                >
+                  {label}
+                </button>
               ))}
             </div>
+
+            <section className="overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm">
+              <div className="border-b border-surface-container bg-primary px-space-md py-space-sm text-surface">
+                <h3 className="font-title-md text-title-md font-bold">
+                  Jadwal {selectedClass?.nama} · {DAYS.find((item) => item.key === day)?.label}
+                </h3>
+              </div>
+              {daySchedules.length > 0 ? (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[36rem] text-left">
+                    <thead className="bg-surface-container-low text-xs font-bold uppercase tracking-wide text-on-surface-variant">
+                      <tr>
+                        <th scope="col" className="px-4 py-3">Waktu</th>
+                        <th scope="col" className="px-4 py-3">Mata pelajaran</th>
+                        <th scope="col" className="px-4 py-3">Guru pengampu</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {daySchedules.map((row) => (
+                        <tr key={row.id} className="border-t border-surface-container">
+                          <td className="whitespace-nowrap px-4 py-3 font-semibold tabular-nums text-primary">
+                            {row.jamMulai}–{row.jamSelesai}
+                          </td>
+                          <td className="px-4 py-3 font-bold text-on-surface">{row.mapel}</td>
+                          <td className="px-4 py-3 text-on-surface-variant">{row.guru || "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="px-4 py-8 text-center font-body-sm text-body-sm text-on-surface-variant">
+                  Belum ada jadwal untuk kelas dan hari ini.
+                </p>
+              )}
+            </section>
           </>
         ) : (
           <p
             className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-lg font-body-md text-on-surface-variant"
             role="status"
           >
-            {error ? `Jadwal belum dapat dimuat: ${error}` : "Belum ada jadwal pembelajaran."}
+            {error ? `Jadwal belum dapat dimuat: ${error}` : "Belum ada kelas atau jadwal pembelajaran."}
           </p>
         )}
       </div>
-    </div>
+    </section>
   );
 }

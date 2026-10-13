@@ -160,7 +160,7 @@ function callAiOpenai(array $messages, array $options = []): string
 
     $response = httpPostJson($baseUrl, $payload, [
         'Authorization: Bearer ' . $apiKey,
-    ]);
+    ], (int) ($options['timeout'] ?? 20));
 
     return $response['choices'][0]['message']['content'] ?? 'Maaf, tidak ada jawaban dari AI.';
 }
@@ -195,7 +195,7 @@ function callAiAnthropic(array $messages, array $options = []): string
     $response = httpPostJson('https://api.anthropic.com/v1/messages', $payload, [
         'x-api-key: ' . $apiKey,
         'anthropic-version: 2023-06-01',
-    ]);
+    ], (int) ($options['timeout'] ?? 20));
 
     return $response['content'][0]['text'] ?? 'Maaf, tidak ada jawaban dari AI.';
 }
@@ -235,15 +235,19 @@ function callAiGemini(array $messages, array $options = []): string
     $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
         . (aiOption($options, 'model') ?? GEMINI_MODEL) . ':generateContent?key=' . $apiKey;
 
-    $response = httpPostJson($url, $payload, []);
+    $response = httpPostJson($url, $payload, [], (int) ($options['timeout'] ?? 20));
 
     return $response['candidates'][0]['content']['parts'][0]['text'] ?? 'Maaf, tidak ada jawaban dari AI.';
 }
 
 /**
  * Helper cURL generik untuk POST JSON ke API eksternal.
+ *
+ * $timeoutSeconds bisa dioverride per panggilan (mis. loop tool chat yang
+ * memanggil provider beberapa kali dalam satu request); default 20 detik
+ * dipertahankan agar endpoint lain tidak berubah perilaku.
  */
-function httpPostJson(string $url, array $payload, array $extraHeaders = []): array
+function httpPostJson(string $url, array $payload, array $extraHeaders = [], int $timeoutSeconds = 20): array
 {
     $ch = curl_init($url);
     curl_setopt_array($ch, [
@@ -251,10 +255,11 @@ function httpPostJson(string $url, array $payload, array $extraHeaders = []): ar
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($payload),
         CURLOPT_HTTPHEADER => array_merge(['Content-Type: application/json'], $extraHeaders),
-        // Harus lebih kecil dari timeout proxy `POST /api/chat` di frontend
-        // (CHAT_TIMEOUT_MS = 25 detik) supaya provider yang lambat atau error
-        // tetap sempat dibalas dari sini, bukan dipotong proxy menjadi 504.
-        CURLOPT_TIMEOUT => 20,
+        // Batas ini harus lebih kecil dari timeout proxy frontend per panggilan
+        // (CHAT_TIMEOUT_MS = 60 detik sejak D18; loop tool memakai timeout
+        // lebih pendek per putaran) supaya provider lambat tetap sempat dibalas
+        // dari sini, bukan dipotong proxy menjadi 504.
+        CURLOPT_TIMEOUT => max(1, $timeoutSeconds),
     ]);
 
     $responseBody = curl_exec($ch);

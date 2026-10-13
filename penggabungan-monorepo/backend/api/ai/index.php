@@ -91,6 +91,19 @@ $messages = [
     ['role' => 'user', 'content' => "Catatan admin:\n\n" . $catatan],
 ];
 
+// D18 — prapra-fetch referensi LIVE dari database (tanpa loop tool): bila
+// catatan admin menyentuh topik yang sudah ada datanya (berita lama,
+// dokumen prosedur), model menerimanya sebagai bahan — bukan mengarang.
+// Gagal mengambil referensi tidak mematikan draf; cukup tanpa referensi.
+try {
+    $referensi = buildDraftReferences(getDB(), $catatan);
+    if ($referensi !== '') {
+        $messages[1]['content'] .= "\n\n" . $referensi;
+    }
+} catch (Throwable $e) {
+    error_log('[SMKN24] Referensi draf AI dilewati: ' . $e->getMessage());
+}
+
 try {
     // Draf berita butuh ruang lebih panjang daripada balasan chat, jadi
     // max_tokens dinaikkan HANYA untuk endpoint ini (chat & BK tetap 400).

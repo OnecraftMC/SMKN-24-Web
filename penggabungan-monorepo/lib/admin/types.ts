@@ -146,29 +146,31 @@ export interface FasilitasDTO {
 }
 
 // -----------------------------------------------------------------------------
-// Jadwal pembelajaran  (slot unik: jurusan + sesi + urutan)
+// Jadwal mingguan per kelas, hari, dan rentang jam pelajaran
 // -----------------------------------------------------------------------------
 
 export type JurusanKey = "perhotelan" | "boga" | "busana" | "pplg" | "pariwisata";
-export type SesiKey = "pagi" | "siang";
+
+export interface JadwalKelasDTO {
+  id: number;
+  nama: string;
+  jurusan: JurusanKey;
+  tingkat: number;
+}
 
 export interface JadwalRowDTO {
   id: number;
-  jurusan: JurusanKey;
-  sesi: SesiKey;
-  /** Posisi jam ke-berapa (0..4) — bagian dari unique key. */
-  urutan: number;
+  kelasId: number;
+  hari: string;
+  jamMulai: string;
+  jamSelesai: string;
   mapel: string;
-  jam: string | null;
-  waktu: string | null;
   guru: string | null;
-  kategori: string | null;
 }
 
-/** Bentuk matriks jadwal publik: hanya nama mapel per sesi. */
-export interface JadwalMatriksDTO {
-  pagi: string[];
-  siang: string[];
+export interface JadwalDataDTO {
+  classes: JadwalKelasDTO[];
+  schedules: JadwalRowDTO[];
 }
 
 // -----------------------------------------------------------------------------
@@ -291,4 +293,67 @@ export interface ChatMessageDTO {
   sender: "user" | "bot";
   text: string;
   created_at: string;
+}
+
+// -----------------------------------------------------------------------------
+// Analytics chatbot (GET /api/chat/analytics.php, /insights.php)
+// -----------------------------------------------------------------------------
+
+export interface ChatMetrik {
+  totalSesi: number;
+  aktifHariIni: number;
+  totalPertanyaan: number;
+  totalJawaban: number;
+  dijawab: number;
+  persenDijawab: number;
+  eskalasi: number;
+  persenEskalasi: number;
+  luarKonteks: number;
+  persenLuarKonteks: number;
+}
+
+export interface ChatTren {
+  tanggal: string;
+  sesi: number;
+}
+
+export interface ChatKategori {
+  kategori: string;
+  jumlah: number;
+}
+
+export interface ChatTop {
+  pertanyaan: string;
+  jumlah: number;
+  kategori: string | null;
+  statusTerakhir: string | null;
+  terakhir: string;
+}
+
+export interface ChatAnalyticsResponse {
+  periode: { dari: string; sampai: string };
+  metrik: ChatMetrik;
+  tren: ChatTren[];
+  kategori: ChatKategori[];
+  sentimen: { positif: number; netral: number; negatif: number };
+  top: ChatTop[];
+}
+
+export type ChatInsightTipe = "tren" | "konten_kurang" | "rekomendasi" | "teknis" | "faq";
+
+export interface ChatInsight {
+  id: number;
+  tipe: ChatInsightTipe;
+  judul: string;
+  isi: string;
+  sumber: "ai" | "heuristik";
+  periodeMulai: string | null;
+  periodeSelesai: string | null;
+  status: "baru" | "selesai" | "diabaikan";
+  createdAt: string;
+}
+
+export interface ChatInsightsResponse {
+  aktif: ChatInsight[];
+  riwayat: ChatInsight[];
 }

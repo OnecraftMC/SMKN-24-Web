@@ -1,3 +1,5 @@
+import type { JurusanKey } from "./types";
+
 export interface BeritaDTO {
   id: number;
   judul: string;
@@ -78,9 +80,26 @@ export interface GaleriDTO {
   gambar: string;
 }
 
-export interface JadwalDTO {
-  pagi: string[];
-  siang: string[];
+export interface JadwalKelasDTO {
+  id: number;
+  nama: string;
+  jurusan: JurusanKey;
+  tingkat: number;
+}
+
+export interface JadwalPelajaranDTO {
+  id: number;
+  kelasId: number;
+  hari: string;
+  jamMulai: string;
+  jamSelesai: string;
+  mapel: string;
+  guru: string | null;
+}
+
+export interface JadwalDataDTO {
+  classes: JadwalKelasDTO[];
+  schedules: JadwalPelajaranDTO[];
 }
 
 export interface BeritaView extends Omit<BeritaDTO, "gambar"> {

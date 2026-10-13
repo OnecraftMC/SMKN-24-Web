@@ -131,30 +131,7 @@ export interface Guru {
 }
 
 // ---------------------------------------------------------------------------
-// Jadwal (Schedule)
-// ---------------------------------------------------------------------------
-// Dipakai di: apps/main-web/lib/data.ts (JADWAL_DATA),
-//   apps/main-web/app/api/jadwal/route.ts,
-//   apps/main-web/components/akademik/JadwalMatriks.tsx
-// JADWAL_DATA dan admin/Jadwal.tsx TIDAK disentuh per instruksi.
-
 export type JurusanKey = 'perhotelan' | 'boga' | 'busana' | 'pplg' | 'pariwisata';
-
-export interface JadwalSesi {
-  pagi: string[];
-  siang: string[];
-}
-
-export type JadwalData = Record<JurusanKey, JadwalSesi>;
-
-// Bentuk jadwal di admin page (row-based).
-// Dipakai di: apps/main-web/components/admin/pages/Jadwal.tsx
-export interface JadwalAdminRow {
-  jam: string;
-  waktu: string;
-  mapel: string;
-  guru: string;
-}
 
 // ---------------------------------------------------------------------------
 // Galeri (Gallery)

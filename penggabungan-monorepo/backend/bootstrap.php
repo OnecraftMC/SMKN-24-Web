@@ -15,8 +15,10 @@ require_once __DIR__ . '/helpers/upload.php';
 require_once __DIR__ . '/helpers/private_upload.php';
 require_once __DIR__ . '/helpers/admin_categories.php';
 require_once __DIR__ . '/helpers/ai.php';
+require_once __DIR__ . '/helpers/chat_analytics.php';
 require_once __DIR__ . '/helpers/sanitize_html.php';
 require_once __DIR__ . '/helpers/website.php';
+require_once __DIR__ . '/helpers/chat_tools.php';
 
 applyCors();
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   AlertTriangle,
+  Bot,
   Building2,
   CalendarDays,
   GraduationCap,
@@ -13,13 +14,17 @@ import {
   MessageSquareHeart,
   Newspaper,
   RefreshCw,
+  Sparkles,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
+import ChatStatsSection, { type ChatStatsState } from "@/components/admin/overview/ChatStatsSection";
 import type {
   AgendaDTO,
   BeritaDTO,
+  ChatAnalyticsResponse,
+  ChatInsightsResponse,
   FasilitasDTO,
   GaleriDTO,
   GuruDTO,
@@ -42,6 +47,8 @@ const INITIAL_CARDS: Cards = {
   fasilitas: { kind: "loading" },
   galeri: { kind: "loading" },
   bk: { kind: "loading" },
+  chat: { kind: "loading" },
+  insight: { kind: "loading" },
 };
 
 const CARD_META: { id: string; label: string; icon: LucideIcon; href: string }[] = [
@@ -52,6 +59,8 @@ const CARD_META: { id: string; label: string; icon: LucideIcon; href: string }[]
   { id: "fasilitas", label: "Fasilitas", icon: Building2, href: "/admin/fasilitas" },
   { id: "galeri", label: "Galeri", icon: Images, href: "/admin/galeri" },
   { id: "bk", label: "Pesan BK Baru", icon: MessageSquareHeart, href: "/admin/bk" },
+  { id: "chat", label: "Sesi Chatbot (7 hari)", icon: Bot, href: "/admin/chat" },
+  { id: "insight", label: "Insight Aktif", icon: Sparkles, href: "/admin/chat" },
 ];
 
 function formatNumber(value: number): string {
@@ -68,6 +77,7 @@ function todayISO(): string {
 
 export default function OverviewPage() {
   const [cards, setCards] = useState<Cards>(INITIAL_CARDS);
+  const [chatStats, setChatStats] = useState<ChatStatsState>({ kind: "loading" });
   const [attempt, setAttempt] = useState(0);
   const { logout } = useAuth();
 
@@ -85,6 +95,8 @@ export default function OverviewPage() {
       apiRequest<FasilitasDTO[]>("/api/fasilitas/index.php"),
       apiRequest<GaleriDTO[]>("/api/galeri/index.php"),
       apiRequest<PesanBKDTO[]>("/api/bk/index.php"),
+      apiRequest<ChatAnalyticsResponse>("/api/chat/analytics.php"),
+      apiRequest<ChatInsightsResponse>("/api/chat/insights.php"),
     ]).then((results) => {
       if (cancelled) return;
 
@@ -97,7 +109,7 @@ export default function OverviewPage() {
         return;
       }
 
-      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk] =
+      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk, chat, insight] =
         results;
 
       const errMessage = (r: PromiseSettledResult<unknown>): string =>
@@ -162,6 +174,44 @@ export default function OverviewPage() {
       };
 
       next.bk = inboxCard(bk);
+
+      next.chat =
+        chat.status === "fulfilled"
+          ? {
+              kind: "ok",
+              value: formatNumber(chat.value.metrik.totalSesi),
+              hint: `${chat.value.metrik.persenDijawab}% dijawab · ${chat.value.metrik.aktifHariIni} sesi hari ini`,
+            }
+          : { kind: "error", message: errMessage(chat.reason) };
+
+      // Insight tidak kritis untuk Overview: gagal = 0, bukan error merah.
+      next.insight =
+        insight.status === "fulfilled"
+          ? {
+              kind: "ok",
+              value: formatNumber(insight.value.aktif.length),
+              hint: "insight menunggu tindak lanjut",
+            }
+          : { kind: "ok", value: "0", hint: "belum ada insight" };
+
+      // Seksi statistik mendetail di bawah ringkasan kartu.
+      if (chat.status === "fulfilled") {
+        const terbaru =
+          insight.status === "fulfilled" && insight.value.aktif.length > 0
+            ? insight.value.aktif[0]
+            : null;
+        setChatStats({
+          kind: "ok",
+          analytics: chat.value,
+          insightAktif:
+            insight.status === "fulfilled" ? insight.value.aktif.length : 0,
+          insightTerbaru: terbaru
+            ? { id: terbaru.id, judul: terbaru.judul, isi: terbaru.isi }
+            : null,
+        });
+      } else {
+        setChatStats({ kind: "error", message: errMessage(chat.reason) });
+      }
 
       setCards(next);
     });
@@ -251,10 +301,12 @@ export default function OverviewPage() {
         })}
       </section>
 
+      <ChatStatsSection state={chatStats} />
+
       <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
         <p className="font-body-sm text-body-sm text-on-surface-variant">
-          Modul konten (Berita, Pengumuman, Agenda, Guru, Fasilitas, Galeri, Jadwal, Pesan BK)
-          sudah aktif. Arsip, Pengajuan Prestasi, Riwayat Chatbot, dan Pengaturan dibangun
+          Modul konten (Berita, Pengumuman, Agenda, Guru, Fasilitas, Galeri, Jadwal, Pesan BK,
+          Riwayat Chatbot) sudah aktif. Arsip, Pengajuan Prestasi, dan Pengaturan dibangun
           bertahap sesuai rencana. Item menu yang nonaktif di sidebar menandai modul yang
           belum tersedia.
         </p>

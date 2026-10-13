@@ -16,6 +16,10 @@ function isoDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
+function isoMonth(date: Date): string {
+  return isoDate(date).slice(0, 7);
+}
+
 function parseIsoDate(value: string): Date {
   const [year, month, day] = value.slice(0, 10).split("-").map(Number);
   return new Date(year, month - 1, day);
@@ -34,9 +38,9 @@ export default function KalenderKegiatan({
   events: AgendaDTO[];
   error: string | null;
 }) {
-  const today = new Date();
+  const todayIso = isoDate(new Date());
   const [visibleMonth, setVisibleMonth] = useState(
-    () => new Date(today.getFullYear(), today.getMonth(), 1),
+    () => new Date(`${todayIso}T00:00:00`),
   );
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -61,11 +65,11 @@ export default function KalenderKegiatan({
         date,
         dateIso,
         inCurrentMonth: date.getMonth() === visibleMonth.getMonth(),
-        isToday: dateIso === isoDate(today),
+        isToday: dateIso === todayIso,
         events: events.filter((event) => isDateInEventRange(dateIso, event)),
       };
     });
-  }, [visibleMonth, events, today]);
+  }, [visibleMonth, events, todayIso]);
 
   const selectedEvents = selectedDate
     ? events.filter((event) => isDateInEventRange(selectedDate, event))
@@ -96,9 +100,27 @@ export default function KalenderKegiatan({
         <div className="grid gap-space-lg lg:grid-cols-[minmax(0,1.3fr)_minmax(17rem,0.7fr)]">
           <div className="rounded-3xl border border-surface-container bg-surface-container-lowest p-space-md shadow-sm sm:p-space-lg">
             <div className="mb-space-md flex items-center justify-between gap-3">
-              <h3 className="min-w-0 font-title-lg font-bold capitalize text-on-surface">
-                {MONTH_FORMATTER.format(visibleMonth)}
-              </h3>
+              <div className="min-w-0">
+                <h3 className="font-title-lg font-bold capitalize text-on-surface">
+                  {MONTH_FORMATTER.format(visibleMonth)}
+                </h3>
+                <label className="mt-1 inline-flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
+                  <span>Pilih bulan</span>
+                  <input
+                    type="month"
+                    aria-label="Pilih bulan dan tahun kalender"
+                    value={isoMonth(visibleMonth)}
+                    onChange={(event) => {
+                      const [year, month] = event.target.value.split("-").map(Number);
+                      if (year && month) {
+                        setVisibleMonth(new Date(year, month - 1, 1));
+                        setSelectedDate(null);
+                      }
+                    }}
+                    className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-on-surface"
+                  />
+                </label>
+              </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button
                   type="button"
@@ -110,7 +132,7 @@ export default function KalenderKegiatan({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setVisibleMonth(new Date(today.getFullYear(), today.getMonth(), 1))}
+                  onClick={() => setVisibleMonth(new Date(`${todayIso}T00:00:00`))}
                   className="rounded-full border border-outline-variant px-4 py-2 font-label-sm text-label-sm font-semibold text-on-surface transition hover:bg-surface-container-low"
                 >
                   Hari ini

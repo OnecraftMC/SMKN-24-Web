@@ -73,7 +73,7 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     heading: "Monitoring",
-    items: [{ href: `${ADMIN_BASE}/chat`, label: "Riwayat Chatbot", icon: Bot, ready: false }],
+    items: [{ href: `${ADMIN_BASE}/chat`, label: "Riwayat Chatbot", icon: Bot, ready: true }],
   },
   {
     heading: "Pengaturan",

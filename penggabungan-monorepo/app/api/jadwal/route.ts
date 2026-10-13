@@ -9,8 +9,8 @@ export function OPTIONS() {
 export async function GET(request: Request) {
 	const { searchParams } = new URL(request.url);
 	const params: Record<string, string> = {};
-	const jurusan = searchParams.get("jurusan");
-	if (jurusan) params.jurusan = jurusan;
+	const classId = searchParams.get("kelas_id");
+	if (classId) params.kelas_id = classId;
 
 	return withCors(await proxyPublicGet("jadwal", params));
 }

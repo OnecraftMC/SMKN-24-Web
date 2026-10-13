@@ -1,13 +1,23 @@
 import JurusanBanner from '@/components/jurusan/JurusanBanner';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
-import { getBerita } from '@/lib/api';
+import { getBerita, getJadwal } from '@/lib/api';
 import DaftarJurusan from '@/components/jurusan/DaftarJurusan';
 import JurusanCta from '@/components/jurusan/JurusanCta';
+import type { JurusanKey } from '@/lib/shared/types';
 
 export default async function JurusanPage() {
   // Sumber data sama dengan `/kabar`: satu berita dengan flag `utama` dari backend.
-  const utamaRes = await getBerita({ utama: true });
+  const [utamaRes, jadwalRes] = await Promise.all([
+    getBerita({ utama: true }),
+    getJadwal(),
+  ]);
+  const kelasByJurusan = (jadwalRes.data?.classes ?? []).reduce<
+    Partial<Record<JurusanKey, string[]>>
+  >((classesByProgram, kelas) => {
+    (classesByProgram[kelas.jurusan] ??= []).push(kelas.nama);
+    return classesByProgram;
+  }, {});
 
   return (
     <>
@@ -22,7 +32,7 @@ export default async function JurusanPage() {
         />
       </Reveal>
       <Reveal>
-        <DaftarJurusan />
+        <DaftarJurusan kelasByJurusan={kelasByJurusan} />
       </Reveal>
       <Reveal>
         <JurusanCta />

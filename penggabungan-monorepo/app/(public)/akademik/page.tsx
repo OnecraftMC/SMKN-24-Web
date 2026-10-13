@@ -20,7 +20,7 @@ export default async function AkademikPage() {
     getBerita({ kategori: "Prestasi & Akademik" }),
     getArsip(),
   ]);
-  const jadwal = jadwalRes.data ?? {};
+  const jadwal = jadwalRes.data ?? { classes: [], schedules: [] };
 
   return (
     <>

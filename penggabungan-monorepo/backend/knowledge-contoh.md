@@ -13,15 +13,13 @@ dan halaman berita website.
 SMKN 24 Jakarta memiliki lima jurusan: Perhotelan, Tata Boga, Tata Busana,
 PPLG (Pengembangan Perangkat Lunak dan Gim), serta Pariwisata.
 
-Setiap jurusan memiliki jadwal belajar pagi dan siang. Peminatan jurusan
-ditentukan saat pendaftaran PPDB sesuai kuota yang tersedia.
+Peminatan jurusan ditentukan saat pendaftaran PPDB sesuai kuota yang tersedia.
 
 # Jadwal masuk sekolah
 
-Jam pelajaran sesi pagi dimulai pukul 06.30 dan sesi siang dimulai pukul
-12.30. Siswa wajib hadir 15 menit sebelum pelajaran dimulai.
-
-Jadwal detail per jurusan tersedia pada halaman akademik website sekolah.
+Jadwal pelajaran dikelola per kelas dan hari, dengan jam mulai dan selesai
+untuk setiap mata pelajaran. Jadwal terbaru dapat dilihat pada halaman
+akademik website sekolah.
 
 # Fasilitas sekolah SMKN 24 Jakarta
 
