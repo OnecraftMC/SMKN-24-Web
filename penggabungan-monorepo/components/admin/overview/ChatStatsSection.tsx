@@ -2,25 +2,24 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import {
-  ArrowRight,
-  Bot,
-  FileText,
-  MessageSquareHeart,
-  Sparkles,
-  TriangleAlert,
-} from "lucide-react";
+import { ArrowRight, Bot, FileText } from "lucide-react";
 import type { ChatAnalyticsResponse, ChatInsightsResponse } from "@/lib/admin/types";
 
 /**
  * Seksi statistik chatbot di halaman Overview admin.
- * Adaptasi tata letak template-and-promt/stats-template.txt (grid kartu +
- * grafik tren + aksi cepat + sorotan insight) ke design system dashboard:
- * token surface dan space (mis. surface-container, space-lg), ikon lucide-react,
- * tanpa shadcn/recharts.
- * Grafik digambar murni SVG supaya tidak menambah dependensi.
+ * Referensi: template-and-promt/new-overview.md (grid KPI + RevenueChart +
+ * CategoryRankChart + sentiment + quick actions) dan stats-template.txt,
+ * diadaptasi ke design system dashboard: token surface/space, ikon
+ * lucide-react, tanpa shadcn/recharts (grafik SVG murni).
+ * Catatan layout: baris KPI dirender halaman Overview (bersama KPI BK),
+ * sehingga seksi ini fokus pada tren, aksi cepat, insight, kategori, sentimen.
+ * Kontrol periode (7/30 hari) memicu refetch analytics di halaman induk.
  * Semua angka dari props (respons backend nyata), bukan hardcode.
  */
+
+/** Periode statistik yang didukung endpoint /api/chat/analytics.php. */
+export type PeriodeStatistik = "7" | "30";
+
 export type ChatStatsState =
   | { kind: "loading" }
   | { kind: "error"; message: string }
@@ -41,12 +40,13 @@ function labelTanggal(iso: string): string {
   return m ? `${m[3]}/${m[2]}` : iso;
 }
 
-/** Grafik garis tren sesi, SVG murni (peran RevenueChart pada template). */
+/** Grafik garis tren sesi, SVG murni (peran RevenueChart pada template).
+ *  `tren` sudah dipotong sesuai periode oleh pemanggil. */
 function TrenMini({ tren }: { tren: { tanggal: string; sesi: number }[] }) {
   const W = 520;
   const H = 150;
   const PAD = 26;
-  const data = tren.slice(-14);
+  const data = tren;
   const maks = Math.max(1, ...data.map((d) => d.sesi));
   const x = (i: number) =>
     data.length <= 1 ? W / 2 : PAD + (i * (W - PAD * 2)) / (data.length - 1);
@@ -60,7 +60,7 @@ function TrenMini({ tren }: { tren: { tanggal: string; sesi: number }[] }) {
       : "";
   return (
     <svg viewBox={`0 0 ${W} ${H}`} role="img"
-      aria-label="Grafik tren sesi chatbot 14 hari terakhir" className="h-36 w-full">
+      aria-label="Grafik tren sesi chatbot pada periode terpilih" className="h-36 w-full">
       {[0.33, 0.66, 1].map((f) => (
         <line key={f} x1={PAD} x2={W - PAD} y1={y(maks * f)} y2={y(maks * f)}
           stroke="currentColor" strokeOpacity={0.12} />
@@ -122,14 +122,20 @@ function KategoriMini({ kategori }: { kategori: { kategori: string; jumlah: numb
   );
 }
 
-export default function ChatStatsSection({ state }: { state: ChatStatsState }) {
+export default function ChatStatsSection({
+  state,
+  periode,
+  onPeriodeChange,
+}: {
+  state: ChatStatsState;
+  periode: PeriodeStatistik;
+  onPeriodeChange: (p: PeriodeStatistik) => void;
+}) {
   const skeleton = useMemo(
     () => (
-      <div aria-hidden className="grid grid-cols-1 gap-space-md md:grid-cols-2 xl:grid-cols-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i}
-            className="h-28 animate-pulse rounded-2xl border border-surface-container bg-surface-container-lowest" />
-        ))}
+      <div aria-hidden className="grid grid-cols-1 gap-space-md xl:grid-cols-3">
+        <div className="h-64 animate-pulse rounded-2xl border border-surface-container bg-surface-container-lowest xl:col-span-2" />
+        <div className="h-64 animate-pulse rounded-2xl border border-surface-container bg-surface-container-lowest" />
       </div>
     ),
     [],
@@ -158,61 +164,51 @@ export default function ChatStatsSection({ state }: { state: ChatStatsState }) {
     );
   }
 
-  const { analytics, insightAktif, insightTerbaru } = state;
+  const { analytics, insightTerbaru } = state;
   const m = analytics.metrik;
-  const tren14 = analytics.tren.slice(-14);
-  const totalSesi14 = tren14.reduce((acc, d) => acc + d.sesi, 0);
-  const kartu = [
-    { label: "Sesi Chatbot", nilai: formatNumber(m.totalSesi),
-      hint: `${m.aktifHariIni} sesi hari ini`, icon: Bot },
-    { label: "Dijawab AI", nilai: `${m.persenDijawab}%`,
-      hint: `${formatNumber(m.dijawab)} dari ${formatNumber(m.totalJawaban)}`, icon: MessageSquareHeart },
-    { label: "Butuh Intervensi", nilai: `${m.persenEskalasi}%`,
-      hint: `${formatNumber(m.eskalasi)} eskalasi`, icon: TriangleAlert },
-    { label: "Insight Aktif", nilai: formatNumber(insightAktif),
-      hint: "menunggu tindak lanjut", icon: Sparkles },
-  ];
+  const tren = analytics.tren.slice(-Number(periode));
+  const totalPeriode = tren.reduce((acc, d) => acc + d.sesi, 0);
 
   return (
     <section aria-label="Statistik chatbot" className="space-y-space-md">
-      <div className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-4">
-        {kartu.map(({ label, nilai, hint, icon: Icon }) => (
-          <article key={label}
-            className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm transition-colors hover:border-primary/40">
-            <div className="flex items-center justify-between gap-2">
-              <p className="font-label-md text-label-md font-bold text-on-surface-variant">{label}</p>
-              <Icon aria-hidden className="h-5 w-5 shrink-0 text-secondary" />
-            </div>
-            <p className="mt-space-sm tabular-nums font-headline-lg text-headline-lg font-bold text-primary">
-              {nilai}
-            </p>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">{hint}</p>
-          </article>
-        ))}
-      </div>
-
       <div className="grid grid-cols-1 gap-space-md xl:grid-cols-3">
         <article className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm xl:col-span-2">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-title-md text-title-md font-bold text-on-surface">Tren Sesi Chatbot</h2>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                14 hari terakhir · {formatNumber(totalSesi14)} sesi
+                {periode} hari terakhir · {formatNumber(totalPeriode)} sesi
               </p>
             </div>
-            <Link href="/admin/chat"
-              className="inline-flex items-center gap-1 font-label-md text-label-md font-bold text-primary hover:underline">
-              Lihat analytics
-              <ArrowRight aria-hidden className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-wrap items-center gap-space-sm">
+              <div role="group" aria-label="Periode statistik chatbot"
+                className="flex rounded-lg border border-outline-variant p-0.5">
+                {(["7", "30"] as const).map((p) => (
+                  <button key={p} type="button" onClick={() => onPeriodeChange(p)}
+                    aria-pressed={periode === p}
+                    className={`rounded-md px-2.5 py-1 font-label-sm text-label-sm font-bold transition-colors ${
+                      periode === p
+                        ? "bg-primary text-on-primary"
+                        : "text-on-surface-variant hover:bg-surface-container"
+                    }`}>
+                    {p} Hari
+                  </button>
+                ))}
+              </div>
+              <Link href="/admin/chat"
+                className="inline-flex items-center gap-1 font-label-md text-label-md font-bold text-primary hover:underline">
+                Lihat analytics
+                <ArrowRight aria-hidden className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
           <div className="mt-space-sm text-on-surface-variant">
-            {tren14.length === 0 ? (
+            {tren.length === 0 ? (
               <p className="font-body-sm text-body-sm italic text-on-surface-variant">
                 Belum ada sesi chatbot pada periode ini.
               </p>
             ) : (
-              <TrenMini tren={tren14} />
+              <TrenMini tren={tren} />
             )}
           </div>
         </article>

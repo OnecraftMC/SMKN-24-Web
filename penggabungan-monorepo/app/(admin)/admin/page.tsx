@@ -13,13 +13,19 @@ import {
   Megaphone,
   MessageSquareHeart,
   Newspaper,
-  RefreshCw,
   Sparkles,
+  TriangleAlert,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
-import ChatStatsSection, { type ChatStatsState } from "@/components/admin/overview/ChatStatsSection";
+import ChatStatsSection, {
+  type ChatStatsState,
+  type PeriodeStatistik,
+} from "@/components/admin/overview/ChatStatsSection";
+import OverviewHero from "@/components/admin/overview/OverviewHero";
+import BkQueueCard, { type BkRingkasState } from "@/components/admin/overview/BkQueueCard";
+import AgendaMendatang, { type AgendaListState } from "@/components/admin/overview/AgendaMendatang";
 import type {
   AgendaDTO,
   BeritaDTO,
@@ -46,38 +52,44 @@ const INITIAL_CARDS: Cards = {
   guru: { kind: "loading" },
   fasilitas: { kind: "loading" },
   galeri: { kind: "loading" },
-  bk: { kind: "loading" },
-  chat: { kind: "loading" },
-  insight: { kind: "loading" },
 };
 
-const CARD_META: { id: string; label: string; icon: LucideIcon; href: string }[] = [
+/**
+ * Enam modul konten inti (adaptasi "Website Content Grid" pada
+ * template-and-promt/new-overview.md). KPI chatbot/BK/insight tidak lagi
+ * jadi kartu di sini — dirender baris "Metrik utama" tersendiri.
+ */
+const CMS_META: { id: string; label: string; icon: LucideIcon; href: string }[] = [
   { id: "berita", label: "Berita", icon: Newspaper, href: "/admin/berita" },
   { id: "pengumuman", label: "Pengumuman", icon: Megaphone, href: "/admin/pengumuman" },
   { id: "agenda", label: "Agenda", icon: CalendarDays, href: "/admin/agenda" },
   { id: "guru", label: "Direktori Guru", icon: GraduationCap, href: "/admin/guru" },
   { id: "fasilitas", label: "Fasilitas", icon: Building2, href: "/admin/fasilitas" },
   { id: "galeri", label: "Galeri", icon: Images, href: "/admin/galeri" },
-  { id: "bk", label: "Pesan BK Baru", icon: MessageSquareHeart, href: "/admin/bk" },
-  { id: "chat", label: "Sesi Chatbot (7 hari)", icon: Bot, href: "/admin/chat" },
-  { id: "insight", label: "Insight Aktif", icon: Sparkles, href: "/admin/chat" },
 ];
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
-/** Tanggal hari ini zona lokal, format ISO YYYY-MM-DD (m cocok kolom tglMulai). */
-function todayISO(): string {
-  const now = new Date();
+/** Format ISO YYYY-MM-DD dari objek Date lokal (cocok kolom tglMulai). */
+function isoTanggal(now: Date): string {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+/** Tanggal hari ini zona lokal, format ISO YYYY-MM-DD. */
+function todayISO(): string {
+  return isoTanggal(new Date());
+}
+
 export default function OverviewPage() {
   const [cards, setCards] = useState<Cards>(INITIAL_CARDS);
+  const [bkRingkas, setBkRingkas] = useState<BkRingkasState>({ kind: "loading" });
+  const [agendaMendatang, setAgendaMendatang] = useState<AgendaListState>({ kind: "loading" });
   const [chatStats, setChatStats] = useState<ChatStatsState>({ kind: "loading" });
+  const [periode, setPeriode] = useState<PeriodeStatistik>("7");
   const [attempt, setAttempt] = useState(0);
   const { logout } = useAuth();
 
@@ -95,8 +107,6 @@ export default function OverviewPage() {
       apiRequest<FasilitasDTO[]>("/api/fasilitas/index.php"),
       apiRequest<GaleriDTO[]>("/api/galeri/index.php"),
       apiRequest<PesanBKDTO[]>("/api/bk/index.php"),
-      apiRequest<ChatAnalyticsResponse>("/api/chat/analytics.php"),
-      apiRequest<ChatInsightsResponse>("/api/chat/insights.php"),
     ]).then((results) => {
       if (cancelled) return;
 
@@ -109,7 +119,7 @@ export default function OverviewPage() {
         return;
       }
 
-      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk, chat, insight] =
+      const [berita, pengumuman, pengumumanBeranda, agenda, guru, fasilitas, galeri, bk] =
         results;
 
       const errMessage = (r: PromiseSettledResult<unknown>): string =>
@@ -149,53 +159,87 @@ export default function OverviewPage() {
 
       if (agenda.status === "fulfilled") {
         const batas = todayISO();
-        const mendatang = agenda.value.filter((a) => (a.tglMulai ?? "") >= batas).length;
+        // Agenda mendatang (tglMulai >= hari ini) untuk kartu Agenda Overview.
+        const keDepan = agenda.value
+          .filter((a) => (a.tglMulai ?? "") >= batas)
+          .sort((a, b) => (a.tglMulai ?? "").localeCompare(b.tglMulai ?? ""));
         next.agenda = {
           kind: "ok",
           value: formatNumber(agenda.value.length),
-          hint: `${formatNumber(mendatang)} mendatang`,
+          hint: `${formatNumber(keDepan.length)} mendatang`,
         };
+        setAgendaMendatang({
+          kind: "ok",
+          items: keDepan.slice(0, 5).map((a) => ({
+            id: a.id,
+            judul: a.judul,
+            tglMulai: a.tglMulai,
+            badge: a.badge,
+          })),
+        });
       } else {
         next.agenda = { kind: "error", message: errMessage(agenda) };
+        setAgendaMendatang({ kind: "error", message: errMessage(agenda) });
       }
 
       next.guru = countCard(guru);
       next.fasilitas = countCard(fasilitas);
       next.galeri = countCard(galeri);
 
-      const inboxCard = (
-        r: PromiseSettledResult<{ status: string }[]>,
-      ): CardState => {
-        if (r.status === "fulfilled") {
-          const baru = r.value.filter((p) => p.status === "Baru").length;
-          return { kind: "ok", value: formatNumber(baru), hint: "status Baru" };
-        }
-        return { kind: "error", message: errMessage(r) };
-      };
+      // Ringkasan inbox BK (anonymized): hanya jumlah per status — nama dan
+      // isi pesan siswa tidak dirender di halaman Overview (privasi PRD §5);
+      // detail pesan tetap eksklusif di /admin/bk.
+      if (bk.status === "fulfilled") {
+        setBkRingkas({
+          kind: "ok",
+          baru: bk.value.filter((p) => p.status === "Baru").length,
+          diproses: bk.value.filter((p) => p.status === "Diproses").length,
+          selesai: bk.value.filter((p) => p.status === "Selesai").length,
+        });
+      } else {
+        setBkRingkas({ kind: "error", message: errMessage(bk) });
+      }
 
-      next.bk = inboxCard(bk);
+      setCards(next);
+    });
 
-      next.chat =
-        chat.status === "fulfilled"
-          ? {
-              kind: "ok",
-              value: formatNumber(chat.value.metrik.totalSesi),
-              hint: `${chat.value.metrik.persenDijawab}% dijawab · ${chat.value.metrik.aktifHariIni} sesi hari ini`,
-            }
-          : { kind: "error", message: errMessage(chat.reason) };
+    return () => {
+      cancelled = true;
+    };
+  }, [attempt, logout]);
 
-      // Insight tidak kritis untuk Overview: gagal = 0, bukan error merah.
-      next.insight =
-        insight.status === "fulfilled"
-          ? {
-              kind: "ok",
-              value: formatNumber(insight.value.aktif.length),
-              hint: "insight menunggu tindak lanjut",
-            }
-          : { kind: "ok", value: "0", hint: "belum ada insight" };
+  // Statistik chatbot + insight di effect terpisah: kontrol periode (7/30 hari)
+  // pada kartu Tren cukup memicu refetch analytics di sini, tanpa memuat ulang
+  // kartu konten. Query dari/sampai ikut dikirim ke /api/chat/analytics.php.
+  useEffect(() => {
+    let cancelled = false;
+    setChatStats({ kind: "loading" });
 
-      // Seksi statistik mendetail di bawah ringkasan kartu.
+    const akhir = new Date();
+    const mulai = new Date();
+    mulai.setDate(akhir.getDate() - (Number(periode) - 1));
+
+    void Promise.allSettled([
+      apiRequest<ChatAnalyticsResponse>(
+        `/api/chat/analytics.php?dari=${isoTanggal(mulai)}&sampai=${isoTanggal(akhir)}`,
+      ),
+      apiRequest<ChatInsightsResponse>("/api/chat/insights.php"),
+    ]).then(([chat, insight]) => {
+      if (cancelled) return;
+
+      if (chat.status === "rejected" && isUnauthorized(chat.reason)) {
+        // Sesi kedaluwarsa: buang token, guard layout mengarahkan ke /login.
+        logout();
+        return;
+      }
+
+      const errMessage = (r: PromiseSettledResult<unknown>): string =>
+        r.status === "rejected" && r.reason instanceof Error
+          ? r.reason.message
+          : "Gagal memuat statistik chatbot.";
+
       if (chat.status === "fulfilled") {
+        // Insight tidak kritis: gagal = tanpa insight, statistik tetap tampil.
         const terbaru =
           insight.status === "fulfilled" && insight.value.aktif.length > 0
             ? insight.value.aktif[0]
@@ -210,43 +254,136 @@ export default function OverviewPage() {
             : null,
         });
       } else {
-        setChatStats({ kind: "error", message: errMessage(chat.reason) });
+        setChatStats({ kind: "error", message: errMessage(chat) });
       }
-
-      setCards(next);
     });
 
     return () => {
       cancelled = true;
     };
-  }, [attempt, logout]);
+  }, [attempt, periode, logout]);
 
   const reload = useCallback(() => setAttempt((value) => value + 1), []);
 
+  const metrik = chatStats.kind === "ok" ? chatStats.analytics.metrik : null;
+  const insightAktif = chatStats.kind === "ok" ? chatStats.insightAktif : null;
+  const statusChat: "loading" | "error" | "ok" =
+    chatStats.kind === "ok" ? "ok" : chatStats.kind;
+  const statusBk: "loading" | "error" | "ok" =
+    bkRingkas.kind === "ok" ? "ok" : bkRingkas.kind;
+  const pesanChat = chatStats.kind === "error" ? chatStats.message : "";
+  const pesanBk = bkRingkas.kind === "error" ? bkRingkas.message : "";
+
+  // Baris KPI utama (adaptasi KPI-row template, angka dari backend nyata).
+  const kpiDefs: {
+    id: string;
+    label: string;
+    icon: LucideIcon;
+    status: "loading" | "error" | "ok";
+    value?: string;
+    hint?: string;
+    message: string;
+  }[] = [
+    {
+      id: "sesi",
+      label: "Sesi Chatbot",
+      icon: Bot,
+      status: statusChat,
+      value: metrik ? formatNumber(metrik.totalSesi) : undefined,
+      hint: metrik ? `${metrik.aktifHariIni} sesi hari ini · ${periode} hari` : undefined,
+      message: pesanChat,
+    },
+    {
+      id: "dijawab",
+      label: "Dijawab AI",
+      icon: Sparkles,
+      status: statusChat,
+      value: metrik ? `${metrik.persenDijawab}%` : undefined,
+      hint: metrik
+        ? `${formatNumber(metrik.dijawab)} dari ${formatNumber(metrik.totalJawaban)} jawaban`
+        : undefined,
+      message: pesanChat,
+    },
+    {
+      id: "eskalasi",
+      label: "Butuh Intervensi",
+      icon: TriangleAlert,
+      status: statusChat,
+      value: metrik ? `${metrik.persenEskalasi}%` : undefined,
+      hint: metrik ? `${formatNumber(metrik.eskalasi)} pesan eskalasi` : undefined,
+      message: pesanChat,
+    },
+    {
+      id: "bk",
+      label: "Pesan BK Baru",
+      icon: MessageSquareHeart,
+      status: statusBk,
+      value: bkRingkas.kind === "ok" ? formatNumber(bkRingkas.baru) : undefined,
+      hint:
+        bkRingkas.kind === "ok"
+          ? `${formatNumber(bkRingkas.diproses)} diproses · ${formatNumber(bkRingkas.selesai)} selesai`
+          : undefined,
+      message: pesanBk,
+    },
+  ];
+
   return (
     <div className="space-y-space-lg">
-      <header className="flex flex-wrap items-end justify-between gap-space-md">
-        <div>
-          <h1 className="font-headline-md text-headline-md font-bold text-primary">Overview</h1>
-          <p className="font-body-sm text-body-sm text-on-surface-variant">
-            Ringkasan kondisi konten dan inbox — data langsung dari backend.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={reload}
-          className="inline-flex items-center gap-space-xs rounded-lg bg-primary px-space-md py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container"
-        >
-          <RefreshCw aria-hidden className="h-4 w-4" />
-          Muat ulang
-        </button>
-      </header>
+      <OverviewHero
+        sesiHariIni={metrik ? metrik.aktifHariIni : null}
+        insightAktif={insightAktif}
+        bkBaru={bkRingkas.kind === "ok" ? bkRingkas.baru : null}
+        onReload={reload}
+      />
+
+      <section aria-label="Metrik utama" className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-4">
+        {kpiDefs.map(({ id, label, icon: Icon, status, value, hint, message }) => (
+          <article
+            key={id}
+            aria-live="polite"
+            className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm transition-colors hover:border-primary/40"
+          >
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-label-md text-label-md font-bold text-on-surface-variant">{label}</p>
+              <Icon aria-hidden className="h-5 w-5 shrink-0 text-secondary" />
+            </div>
+
+            {status === "loading" && (
+              <p className="mt-space-sm flex items-center gap-2 font-body-sm text-body-sm text-on-surface-variant">
+                <Loader2 aria-hidden className="h-4 w-4 animate-spin" />
+                Memuat…
+              </p>
+            )}
+
+            {status === "error" && (
+              <div className="mt-space-sm space-y-1">
+                <p className="flex items-center gap-1.5 font-body-sm text-body-sm font-bold text-error">
+                  <AlertTriangle aria-hidden className="h-4 w-4" />
+                  Gagal memuat
+                </p>
+                <p className="break-words font-body-sm text-body-sm text-on-surface-variant">
+                  {message}
+                </p>
+              </div>
+            )}
+
+            {status === "ok" && (
+              <div className="mt-space-sm">
+                <p className="tabular-nums font-headline-lg text-headline-lg font-bold text-primary">
+                  {value}
+                </p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">{hint}</p>
+              </div>
+            )}
+          </article>
+        ))}
+      </section>
 
       <section
-        aria-label="Ringkasan konten dan inbox"
-        className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-4"
+        aria-label="Ringkasan modul konten"
+        className="grid grid-cols-1 gap-space-md sm:grid-cols-2 xl:grid-cols-3"
       >
-        {CARD_META.map(({ id, label, icon: Icon, href }) => {
+        {CMS_META.map(({ id, label, icon: Icon, href }) => {
           const state = cards[id] ?? { kind: "loading" as const };
 
           return (
@@ -301,7 +438,20 @@ export default function OverviewPage() {
         })}
       </section>
 
-      <ChatStatsSection state={chatStats} />
+      <ChatStatsSection
+        state={chatStats}
+        periode={periode}
+        onPeriodeChange={setPeriode}
+      />
+
+      <section aria-label="Konseling dan agenda" className="grid grid-cols-1 gap-space-md lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <BkQueueCard state={bkRingkas} />
+        </div>
+        <div className="lg:col-span-7">
+          <AgendaMendatang state={agendaMendatang} />
+        </div>
+      </section>
 
       <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
         <p className="font-body-sm text-body-sm text-on-surface-variant">
