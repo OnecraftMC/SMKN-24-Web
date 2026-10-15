@@ -52,3 +52,6 @@ Desktop.ini
 /backend/uploads/*
 !/backend/uploads/.gitkeep
 !/backend/uploads/.htaccess
+# Android local SDK configuration
+local.properties
+.gradle/

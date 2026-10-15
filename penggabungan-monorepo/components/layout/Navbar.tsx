@@ -40,7 +40,6 @@ export default function Navbar() {
     { href: "/jurusan", label: "Jurusan", icon: "school" },
     { href: "/berita", label: "Berita", icon: "article" },
     { href: "/fasilitas", label: "Fasilitas", icon: "apartment" },
-    { href: "/kantin", label: "Kantin", icon: "restaurant" },
   ];
 
   return (

@@ -230,10 +230,27 @@ Browser tidak pernah menentukan status lunas; backend mencocokkan signature
 Midtrans dan jumlah transaksi sebelum mengirim pesanan ke penjual. Server key
 Midtrans hanya boleh disimpan di server.
 
-Penjual login melalui `/kantin/penjual` dengan akun yang dibuat admin. Kata
-sandi sementara ditampilkan satu kali di portal admin dan wajib diganti saat
-login pertama. Aplikasi penjual mengambil pesanan berbayar secara berkala; ini
-tidak memerlukan layanan WebSocket tambahan di shared hosting.
+### Aplikasi penjual Android
+
+Penjual menggunakan APK Android di `apps/kantin-penjual-android/`. Aplikasi
+memakai API penjual yang sama dengan backend ini, menerima pesanan hanya setelah
+pembayaran lunas, meminta penggantian kata sandi sementara saat login pertama,
+dan memperbarui status pesanan. Daftar pesanan disegarkan berkala, sehingga
+tidak memerlukan layanan WebSocket tambahan di shared hosting. Alamat API dapat
+diubah dari layar login; nilai awalnya `https://macdeep.my.id/backend`.
+
+Bangun APK debug dari PowerShell:
+
+```powershell
+cd apps/kantin-penjual-android
+.\gradlew.bat assembleDebug
+```
+
+APK hasil build berada di
+`app/build/outputs/apk/debug/app-debug.apk`. APK debug ini dapat dipasang untuk
+penggunaan internal; build rilis untuk distribusi publik perlu ditandatangani
+dengan kunci rilis organisasi. Portal `/kantin/penjual` tetap tersedia untuk
+akses web.
 
 Hasil validasi lokal dan gap yang masih terbuka: `MIGRATION_MATRIX.md` §8.
 
