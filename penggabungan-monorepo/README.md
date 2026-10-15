@@ -7,14 +7,14 @@ import berada di dalam folder ini.
 
 | Bagian | Isi |
 |---|---|
-| `app/(public)/` | Website publik (beranda, profil, akademik, kabar, fasilitas, berita, jurusan) |
+| `app/(public)/` | Website publik (beranda, profil, akademik, kabar, fasilitas, berita, jurusan, kantin) |
 | `app/(admin)/login/` | Halaman login admin — `/login` (satu origin, bukan redirect) |
 | `app/(admin)/admin/` | Dashboard admin — `/admin/...` |
 | `app/api/` | Route Next.js (BFF/proxy ke backend PHP untuk publik dan upload pengajuan) |
 | `components/` | Komponen publik; `components/admin/` komponen shell/dialog admin |
 | `lib/` | Client publik (`lib/api.ts`), `lib/admin/`, `lib/shared/` (token data gabungan) |
 | `styles/tokens.css` | Design token visual — SATU sumber untuk publik & admin |
-| `backend/` | REST API PHP + PDO/MySQL + JWT + upload |
+| `backend/` | REST API PHP + PDO/MySQL + JWT + upload, termasuk API kantin dan webhook pembayaran |
 
 Baca `MIGRATION_MATRIX.md` untuk daftar paritas sumber → target dan gap yang
 masih terbuka.
@@ -60,6 +60,7 @@ Catatan:
 | `NEXT_PUBLIC_ADMIN_URL` | public | Opsional; default tautan Login sudah `/login` |
 | `ADMIN_ORIGIN` | public | Hanya bila admin dipisah lintas-origin; **kosongkan untuk same-origin** |
 | `backend/.env` | **server-only** | Backend PHP: `APP_ENV`, `JWT_SECRET`, DB, provider AI |
+| `MIDTRANS_SERVER_KEY` | **server-only** | Server key Snap untuk pembayaran GoPay/QRIS kantin |
 
 Backend PHP butuh `backend/.env` (salinan `backend/.env.example`). Isi
 `APP_ENV=production` **dan** `JWT_SECRET` acak sebelum rilis — kalau tidak,
@@ -71,14 +72,14 @@ Backend PHP butuh `backend/.env` (salinan `backend/.env.example`). Isi
 ## 4. Setup database
 
 1. Buat database lalu import: `mysql -u root -p <db> < backend/database.sql`
-2. Akun admin **tidak** di-seed skema (keamanan). Buat satu akun:
+2. Jalankan migrasi kantin: `mysql -u root -p <db> < backend/migrations/20261015_add_canteen.sql`
+3. Isi `backend/.env` (DB_HOST/DB_NAME/DB_USER/DB_PASS sesuai lingkungan).
+4. Akun admin **tidak** di-seed skema (keamanan). Buat satu akun:
 
 ```bash
 cd backend
 php tools/create-admin.php <username> "<password-kuat>" "Administrator Sekolah"
 ```
-
-3. Isi `backend/.env` (DB_HOST/DB_NAME/DB_USER/DB_PASS sesuai lingkungan).
 
 ## 5. Menjalankan
 
@@ -114,6 +115,8 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 |---|---|
 | `/` | Beranda publik |
 | `/profil` · `/akademik` · `/kabar` · `/fasilitas` | Halaman publik |
+| `/kantin` | Katalog stand/menu, keranjang, checkout, dan pelacakan pembayaran |
+| `/kantin/penjual` | Aplikasi web responsif untuk penjual (pesanan lunas, polling 5 detik) |
 | `/berita` · `/berita/[slug]` | Daftar & detail berita (404 untuk slug salah) |
 | `/jurusan` · `/jurusan/[key]` | 5 kompetensi keahlian |
 | `/akademik/pengajuan-prestasi` | Form pengajuan prestasi (tidak ditautkan di navbar) |
@@ -121,15 +124,18 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/admin` | Overview dashboard |
 | `/admin/berita` · `pengumuman` · `agenda` · `guru` · `fasilitas` · `galeri` · `jadwal` | Modul CRUD aktif |
 | `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
+| `/admin/kantin` | Kelola stand, akun penjual, reset kata sandi, serta menu |
 | `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
 | `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
 | `/api/bk`, `/api/bk/chat`, `/api/bk/history`, `/api/chat` | Proxy publik ke backend (status dipertahankan) |
 | `/api/prestasi` | Proxy multipart pengajuan publik ke backend |
+| `backend/api/kantin/*.php` | API katalog/checkout, login penjual, administrasi, dan notifikasi pembayaran |
 | `/api/berita`, `pengumuman`, `agenda`, `jadwal` | Proxy baca ke backend PHP |
 | `backend/api/*.php` | REST API PHP (kontrak sumber, Bearer JWT untuk tulis) |
 
 | Fitur | Detail |
 |---|---|
+| Pembayaran kantin | Midtrans Snap dengan GoPay/QRIS; pesanan hanya masuk antrean penjual setelah webhook settlement/capture tervalidasi |
 | `/profil` hanya menampilkan fasilitas berflag `unggulan`; `/fasilitas` menampilkan semua | Flag dikelola di `/admin/fasilitas` (kolom `fasilitas.unggulan`, default `0`) |
 | Hotnews ringkas muncul di 5 halaman publik | Berita highlight diambil dari backend (`berita.utama`); `/kabar` tetap memakai hero |
 | Widget chatbot punya tombol fullscreen | Tidak memakai Browser Fullscreen API agar tombol Escape tidak bentrok |
@@ -198,6 +204,26 @@ curl -X POST https://domain-anda.id/backend/api/auth/login.php \
 
 Lalu buka `https://domain-anda.id/login`, masuk dengan akun admin, pastikan
 mengarah ke `/admin`, dan coba CRUD satu modul.
+
+### Kantin dan pembayaran
+
+Migrasi `backend/migrations/20261015_add_canteen.sql` membuat tabel stand,
+akun penjual, menu, pesanan, rincian pesanan, pembayaran, dan log notifikasi.
+Migrasi tersebut juga menambahkan **Stand Kang Asep** beserta enam menu contoh;
+admin dapat mengubahnya di `/admin/kantin` sebelum kantin digunakan.
+
+Isi `MIDTRANS_SERVER_KEY` pada `backend/.env` (atau environment PHP hosting),
+`MIDTRANS_IS_PRODUCTION=false` untuk sandbox dan `true` untuk produksi, lalu isi
+`CANTEEN_PUBLIC_URL` dengan URL publik website. Daftarkan endpoint notifikasi
+Midtrans sebagai `https://domain-anda.id/backend/api/kantin/payment-notification.php`.
+Browser tidak pernah menentukan status lunas; backend mencocokkan signature
+Midtrans dan jumlah transaksi sebelum mengirim pesanan ke penjual. Server key
+Midtrans hanya boleh disimpan di server.
+
+Penjual login melalui `/kantin/penjual` dengan akun yang dibuat admin. Kata
+sandi sementara ditampilkan satu kali di portal admin dan wajib diganti saat
+login pertama. Aplikasi penjual mengambil pesanan berbayar secara berkala; ini
+tidak memerlukan layanan WebSocket tambahan di shared hosting.
 
 Hasil validasi lokal dan gap yang masih terbuka: `MIGRATION_MATRIX.md` §8.
 

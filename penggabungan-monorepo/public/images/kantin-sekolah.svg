@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720" fill="none">
+  <defs>
+    <linearGradient id="wall" x1="124" x2="1085" y1="62" y2="655" gradientUnits="userSpaceOnUse"><stop stop-color="#F5E9D2"/><stop offset="1" stop-color="#DCEBDD"/></linearGradient>
+    <linearGradient id="awning" x1="242" x2="954" y1="157" y2="335" gradientUnits="userSpaceOnUse"><stop stop-color="#0E3B64"/><stop offset="1" stop-color="#16756B"/></linearGradient>
+    <filter id="shadow" width="1.2" height="1.4" x="-.1" y="-.2" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <path fill="#DDEBDD" d="M0 0h1200v720H0z"/><path fill="#EFF4E9" d="M0 0h1200v470H0z"/>
+  <path fill="#B8CFAF" d="M0 465h1200v255H0z"/><path fill="#D0B896" d="M0 594h1200v126H0z"/>
+  <ellipse cx="604" cy="630" fill="#375C4A" opacity=".18" rx="426" ry="49" filter="url(#shadow)"/>
+  <path fill="url(#wall)" d="M158 265h882v335H158z"/><path fill="#AC7445" d="M132 235h935v46H132z"/>
+  <path fill="#E0BB87" d="m131 235 77-95h780l77 95H131Z"/><path fill="url(#awning)" d="M211 266h777l-58 60H269l-58-60Z"/>
+  <path fill="#FFF5DB" d="M251 341h698v34H251z"/><path fill="#C88F53" d="M251 375h698v11H251z"/>
+  <path fill="#FFF9EA" d="M245 395h710v205H245z"/>
+  <path fill="#77A699" d="M277 421h184v134H277zM491 421h184v134H491zM705 421h216v134H705z"/>
+  <path stroke="#FFF7E7" stroke-width="10" d="M369 421v134m214-134v134m230-134v134"/>
+  <path fill="#173F61" d="M278 455h643v27H278z"/><path fill="#F2C36F" d="M338 462h84v12h-84zm214 0h85v12h-85zm214 0h118v12H766z"/>
+  <path fill="#0E3B64" d="M233 555h734v22H233zM289 577h15v86h-15zm606 0h15v86h-15z"/>
+  <path fill="#B77541" d="M346 590h510v20H346z"/><path fill="#8A5837" d="M374 610h18v63h-18zm436 0h18v63h-18z"/>
+  <path fill="#F3D49D" d="M368 565h464v24H368z"/><circle cx="1008" cy="420" r="58" fill="#F4D887"/><path fill="#2F7660" d="M64 535c37-75 90-115 144-120-30 48-31 91-15 130-42-20-86-24-129-10Z"/><path fill="#39846B" d="M1084 561c24-67 68-103 127-112-22 46-22 89-2 129-42-21-84-26-125-17Z"/>
+  <path fill="#fff" d="M365 288h466v50H365z"/><text x="598" y="321" fill="#0E3B64" font-family="Arial, sans-serif" font-size="27" font-weight="700" text-anchor="middle">KANTIN SMKN 24</text>
+  <circle cx="1061" cy="109" r="40" fill="#FFF6D9"/><path fill="#fff" d="M1061 86c-17 0-31 14-31 31h62c0-17-14-31-31-31Z"/><path stroke="#fff" stroke-width="7" d="M1042 121h38"/>
+</svg>
