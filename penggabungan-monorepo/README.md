@@ -126,7 +126,6 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/` | Beranda publik |
 | `/profil` · `/akademik` · `/kabar` · `/fasilitas` | Halaman publik |
 | `/kantin` | Katalog stand/menu, keranjang, checkout, dan pelacakan pembayaran |
-| `/kantin/penjual` | Aplikasi web responsif untuk penjual (pesanan lunas, polling 5 detik) |
 | `/berita` · `/berita/[slug]` | Daftar & detail berita (404 untuk slug salah) |
 | `/jurusan` · `/jurusan/[key]` | 5 kompetensi keahlian |
 | `/akademik/pengajuan-prestasi` | Form pengajuan prestasi (tidak ditautkan di navbar) |
@@ -222,13 +221,12 @@ akun penjual, menu, pesanan, rincian pesanan, pembayaran, dan log notifikasi.
 Migrasi tersebut juga menambahkan **Stand Kang Asep** beserta enam menu contoh;
 admin dapat mengubahnya di `/admin/kantin` sebelum kantin digunakan.
 
-Isi `MIDTRANS_SERVER_KEY` pada `backend/.env` (atau environment PHP hosting),
-`MIDTRANS_IS_PRODUCTION=false` untuk sandbox dan `true` untuk produksi, lalu isi
-`CANTEEN_PUBLIC_URL` dengan URL publik website. Daftarkan endpoint notifikasi
-Midtrans sebagai `https://domain-anda.id/backend/api/kantin/payment-notification.php`.
-Browser tidak pernah menentukan status lunas; backend mencocokkan signature
-Midtrans dan jumlah transaksi sebelum mengirim pesanan ke penjual. Server key
-Midtrans hanya boleh disimpan di server.
+Integrasi memakai Midtrans Snap dengan metode GoPay dan QRIS. Ikuti
+[panduan konfigurasi Midtrans kantin](docs/PANDUAN_MIDTRANS_KANTIN.md) untuk
+mengaktifkan kanal, menyimpan Server Key di Hostinger, mendaftarkan URL
+notifikasi, menguji mode sandbox, dan beralih ke produksi. Server hanya
+meneruskan pesanan ke APK penjual setelah callback pembayaran tervalidasi;
+Server Key hanya disimpan di server dan tidak boleh masuk Git atau frontend.
 
 ### Aplikasi penjual Android
 
@@ -249,8 +247,8 @@ cd apps/kantin-penjual-android
 APK hasil build berada di
 `app/build/outputs/apk/debug/app-debug.apk`. APK debug ini dapat dipasang untuk
 penggunaan internal; build rilis untuk distribusi publik perlu ditandatangani
-dengan kunci rilis organisasi. Portal `/kantin/penjual` tetap tersedia untuk
-akses web.
+dengan kunci rilis organisasi. Penjual menggunakan APK Android; tidak ada portal
+login penjual pada website. API backend penjual tetap digunakan oleh APK.
 
 Hasil validasi lokal dan gap yang masih terbuka: `MIGRATION_MATRIX.md` §8.
 
