@@ -14,8 +14,21 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import PengumumanDialog from "./PengumumanDialog";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 type BerandaFilter = "semua" | "beranda" | "lain";
+
+function todayIsoLocal() {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+}
 
 export default function PengumumanPage() {
   const { logout } = useAuth();
@@ -227,16 +240,16 @@ export default function PengumumanPage() {
           <label htmlFor="peng-beranda-filter" className="sr-only">
             Filter tampil beranda
           </label>
-          <select
-            id="peng-beranda-filter"
-            className={fieldClass}
-            value={berandaFilter}
-            onChange={(e) => setBerandaFilter(e.target.value as BerandaFilter)}
-          >
-            <option value="semua">Semua</option>
-            <option value="beranda">Tampil di beranda</option>
-            <option value="lain">Tidak tampil di beranda</option>
-          </select>
+          <MorphSelect value={berandaFilter} onValueChange={(v) => setBerandaFilter(v as BerandaFilter)}>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="semua">Semua</MorphSelectItem>
+              <MorphSelectItem value="beranda">Tampil di beranda</MorphSelectItem>
+              <MorphSelectItem value="lain">Tidak tampil di beranda</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
         </div>
       </div>
 
@@ -304,14 +317,29 @@ export default function PengumumanPage() {
                         )}
                         {row.penting && (
                           <span className="font-label-sm text-label-sm font-bold text-error">
-                            Penting
+                            Penting (perlu tindak lanjut)
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="px-space-md py-space-sm text-on-surface-variant">{row.kategori}</td>
                     <td className="px-space-md py-space-sm text-on-surface-variant">
-                      {formatDateId(row.tanggalIso ?? row.tanggal)}
+                      <div className="flex flex-col gap-1">
+                        <span
+                          className={
+                            (row.tanggalIso ?? "") < todayIsoLocal()
+                              ? "line-through text-on-surface-variant/70"
+                              : undefined
+                          }
+                        >
+                          {formatDateId(row.tanggalIso ?? row.tanggal)}
+                        </span>
+                        {(row.tanggalIso ?? "") < todayIsoLocal() && (
+                          <span className="w-fit rounded-full bg-surface-container-high px-2 py-0.5 text-xs font-bold text-on-surface-variant">
+                            Sudah lewat
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-space-md py-space-sm">
                       <button

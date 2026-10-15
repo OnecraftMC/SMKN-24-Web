@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 const INITIAL_FORM = {
   nama: "",
@@ -111,18 +117,22 @@ export default function FormBK() {
         </div>
         <div>
           <label htmlFor="bk-keperluan" className="block text-xs font-bold text-primary mb-1">Topik Bimbingan</label>
-          <select
-            id="bk-keperluan"
-            name="keperluan"
+          <MorphSelect
             value={formData.keperluan}
-            onChange={handleChange}
-            className="w-full text-sm rounded-xl border border-surface-container bg-surface-container-low px-3 py-2 text-on-surface"
+            onValueChange={(value) => setFormData((prev) => ({ ...prev, keperluan: value }))}
           >
-            <option>Persiapan PKL & Penempatan Kerja</option>
-            <option>Kesulitan Belajar & Manajemen Waktu</option>
-            <option>Adaptasi Sosial & Masalah Emosional</option>
-            <option>Persiapan LKS & Portofolio Prestasi</option>
-          </select>
+            <MorphSelectTrigger
+              className="w-full text-sm rounded-xl border border-surface-container bg-surface-container-low px-3 py-2 text-on-surface"
+            >
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="Persiapan PKL & Penempatan Kerja">Persiapan PKL & Penempatan Kerja</MorphSelectItem>
+              <MorphSelectItem value="Kesulitan Belajar & Manajemen Waktu">Kesulitan Belajar & Manajemen Waktu</MorphSelectItem>
+              <MorphSelectItem value="Adaptasi Sosial & Masalah Emosional">Adaptasi Sosial & Masalah Emosional</MorphSelectItem>
+              <MorphSelectItem value="Persiapan LKS & Portofolio Prestasi">Persiapan LKS & Portofolio Prestasi</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
         </div>
         <div>
           <label htmlFor="bk-pesan" className="block text-xs font-bold text-primary mb-1">Catatan Tambahan</label>

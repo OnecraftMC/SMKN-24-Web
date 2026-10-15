@@ -27,6 +27,12 @@ import {
   buttonGhostClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 const STATUS_LIST: StatusPesanBK[] = ["Baru", "Diproses", "Selesai"];
 
@@ -429,31 +435,31 @@ export default function BKPage() {
             className={`${fieldClass} pl-9`}
           />
         </div>
-        <select
-          value={filterKesulitan}
-          onChange={(e) => setFilterKesulitan(e.target.value as TingkatKesulitanBK | "semua")}
-          aria-label="Filter tingkat kesulitan"
-          className={fieldClass}
-        >
-          {FILTER_KESULITAN.map((v) => (
-            <option key={v} value={v}>
-              {v === "semua" ? "Semua tingkat" : `Tingkat ${v}`}
-            </option>
-          ))}
-        </select>
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value as StatusPesanBK | "semua")}
-          aria-label="Filter status"
-          className={fieldClass}
-        >
-          <option value="semua">Semua status</option>
-          {STATUS_LIST.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <MorphSelect value={filterKesulitan} onValueChange={(v) => setFilterKesulitan(v as TingkatKesulitanBK | "semua")} className="min-w-[10rem]">
+          <MorphSelectTrigger className={fieldClass}>
+            <MorphSelectValue />
+          </MorphSelectTrigger>
+          <MorphSelectContent>
+            {FILTER_KESULITAN.map((v) => (
+              <MorphSelectItem key={v} value={v}>
+                {v === "semua" ? "Semua tingkat" : `Tingkat ${v}`}
+              </MorphSelectItem>
+            ))}
+          </MorphSelectContent>
+        </MorphSelect>
+        <MorphSelect value={filterStatus} onValueChange={(v) => setFilterStatus(v as StatusPesanBK | "semua")} className="min-w-[10rem]">
+          <MorphSelectTrigger className={fieldClass}>
+            <MorphSelectValue />
+          </MorphSelectTrigger>
+          <MorphSelectContent>
+            <MorphSelectItem value="semua">Semua status</MorphSelectItem>
+            {STATUS_LIST.map((s) => (
+              <MorphSelectItem key={s} value={s}>
+                {s}
+              </MorphSelectItem>
+            ))}
+          </MorphSelectContent>
+        </MorphSelect>
       </div>
 
       <ListState
@@ -517,19 +523,18 @@ export default function BKPage() {
             )}
 
             <div className="mt-space-sm flex flex-wrap items-center gap-space-sm">
-              <select
-                value={row.status}
-                disabled={busyId === row.id}
-                onChange={(e) => changeStatus(row, e.target.value as StatusPesanBK)}
-                aria-label={`Status untuk ${row.nama}`}
-                className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 font-body-sm text-body-sm"
-              >
-                {STATUS_LIST.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
+              <MorphSelect value={row.status} onValueChange={(v) => changeStatus(row, v as StatusPesanBK)} disabled={busyId === row.id}>
+                <MorphSelectTrigger className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2 font-body-sm text-body-sm">
+                  <MorphSelectValue />
+                </MorphSelectTrigger>
+                <MorphSelectContent>
+                  {STATUS_LIST.map((s) => (
+                    <MorphSelectItem key={s} value={s}>
+                      {s}
+                    </MorphSelectItem>
+                  ))}
+                </MorphSelectContent>
+              </MorphSelect>
 
               {busyId === row.id && (
                 <Loader2 aria-hidden className="h-4 w-4 animate-spin text-on-surface-variant" />

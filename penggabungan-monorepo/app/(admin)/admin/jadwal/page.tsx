@@ -13,6 +13,12 @@ import {
 } from "@/components/admin/ui/FormBits";
 import JadwalSlotDialog from "./JadwalSlotDialog";
 import KelasDialog from "./KelasDialog";
+import MorphSelect, {
+  MorphSelectContent,
+  MorphSelectItem,
+  MorphSelectTrigger,
+  MorphSelectValue,
+} from "@/components/ui/select-morph";
 
 const PROGRAMS: { key: JurusanKey; label: string }[] = [
   { key: "perhotelan", label: "Perhotelan" },
@@ -170,17 +176,17 @@ export default function JadwalPage() {
       <div className="flex flex-wrap items-end gap-space-md">
         <label className="flex min-w-56 flex-col gap-2 font-label-sm text-label-sm font-bold text-on-surface-variant">
           Pilih kelas
-          <select
-            value={selectedClass?.id ?? ""}
-            onChange={(event) => setClassId(Number(event.target.value) || null)}
-            className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface"
-            disabled={programClasses.length === 0}
-          >
-            {programClasses.length === 0 && <option value="">Belum ada kelas</option>}
-            {programClasses.map((item) => (
-              <option key={item.id} value={item.id}>{item.nama} · Kelas {item.tingkat}</option>
-            ))}
-          </select>
+          <MorphSelect value={selectedClass?.id != null ? String(selectedClass.id) : ""} onValueChange={(v) => setClassId(Number(v) || null)} disabled={programClasses.length === 0}>
+            <MorphSelectTrigger className="rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-2.5 text-sm text-on-surface">
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              {programClasses.length === 0 && <MorphSelectItem value="">Belum ada kelas</MorphSelectItem>}
+              {programClasses.map((item) => (
+                <MorphSelectItem key={item.id} value={String(item.id)}>{item.nama} · Kelas {item.tingkat}</MorphSelectItem>
+              ))}
+            </MorphSelectContent>
+          </MorphSelect>
         </label>
         {selectedClass && (
           <button

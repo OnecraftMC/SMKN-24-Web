@@ -14,6 +14,12 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import GuruDialog from "./GuruDialog";
+import MorphSelect, {
+  MorphSelectContent,
+  MorphSelectItem,
+  MorphSelectTrigger,
+  MorphSelectValue,
+} from "@/components/ui/select-morph";
 
 export default function GuruPage() {
   const { logout } = useAuth();
@@ -145,19 +151,17 @@ export default function GuruPage() {
           <label htmlFor="guru-filter-kategori" className="sr-only">
             Filter kategori
           </label>
-          <select
-            id="guru-filter-kategori"
-            className={fieldClass}
-            value={kategoriFilter}
-            onChange={(e) => setKategoriFilter(e.target.value)}
-          >
-            <option value="semua">Semua kategori</option>
-            {kategoriOptions.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
+          <MorphSelect value={kategoriFilter} onValueChange={setKategoriFilter}>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="semua">Semua kategori</MorphSelectItem>
+              {kategoriOptions.map((value) => (
+                <MorphSelectItem key={value} value={value}>{value}</MorphSelectItem>
+              ))}
+            </MorphSelectContent>
+          </MorphSelect>
         </div>
       </div>
 

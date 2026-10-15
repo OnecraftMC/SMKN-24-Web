@@ -3,6 +3,12 @@
 import { useMemo, useState } from "react";
 import type { JadwalDataDTO } from "@/lib/shared/mappers";
 import type { JurusanKey } from "@/lib/shared/types";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 const PROGRAMS: { key: JurusanKey; label: string }[] = [
   { key: "perhotelan", label: "Perhotelan" },
@@ -67,31 +73,36 @@ export default function JadwalMatriks({
             <div className="grid gap-space-md sm:grid-cols-2">
               <label className="flex flex-col gap-2 font-label-md text-label-md font-bold text-primary">
                 Program keahlian
-                <select
+                <MorphSelect
                   value={program}
-                  onChange={(event) => {
-                    const nextProgram = event.target.value as JurusanKey;
+                  onValueChange={(value) => {
+                    const nextProgram = value as JurusanKey;
                     setProgram(nextProgram);
                     setClassId(String(jadwal.classes.find((item) => item.jurusan === nextProgram)?.id ?? ""));
                   }}
-                  className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
                 >
-                  {PROGRAMS.filter(({ key }) => jadwal.classes.some((item) => item.jurusan === key)).map(({ key, label }) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
+                  <MorphSelectTrigger className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md">
+                    <MorphSelectValue />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent>
+                    {PROGRAMS.filter(({ key }) => jadwal.classes.some((item) => item.jurusan === key)).map(({ key, label }) => (
+                      <MorphSelectItem key={key} value={key}>{label}</MorphSelectItem>
+                    ))}
+                  </MorphSelectContent>
+                </MorphSelect>
               </label>
               <label className="flex flex-col gap-2 font-label-md text-label-md font-bold text-primary">
                 Kelas
-                <select
-                  value={classId}
-                  onChange={(event) => setClassId(event.target.value)}
-                  className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md"
-                >
-                  {programClasses.map((item) => (
-                    <option key={item.id} value={item.id}>{item.nama}</option>
-                  ))}
-                </select>
+                <MorphSelect value={classId} onValueChange={setClassId}>
+                  <MorphSelectTrigger className="rounded-lg border border-surface-container bg-surface-container-lowest px-4 py-3 font-body-md text-body-md">
+                    <MorphSelectValue />
+                  </MorphSelectTrigger>
+                  <MorphSelectContent>
+                    {programClasses.map((item) => (
+                      <MorphSelectItem key={item.id} value={String(item.id)}>{item.nama}</MorphSelectItem>
+                    ))}
+                  </MorphSelectContent>
+                </MorphSelect>
               </label>
             </div>
 

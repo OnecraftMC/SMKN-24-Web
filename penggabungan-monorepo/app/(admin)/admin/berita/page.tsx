@@ -18,6 +18,13 @@ import {
 
 type StatusFilter = "semua" | "draft" | "terbit";
 
+import MorphSelect, {
+  MorphSelectContent,
+  MorphSelectItem,
+  MorphSelectTrigger,
+  MorphSelectValue,
+} from "@/components/ui/select-morph";
+
 export default function BeritaPage() {
   const { logout } = useAuth();
   const [rows, setRows] = useState<BeritaDTO[]>([]);
@@ -164,16 +171,16 @@ export default function BeritaPage() {
           <label htmlFor="berita-status-filter" className="sr-only">
             Filter status
           </label>
-          <select
-            id="berita-status-filter"
-            className={fieldClass}
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          >
-            <option value="semua">Semua status</option>
-            <option value="terbit">Terbit</option>
-            <option value="draft">Draft</option>
-          </select>
+          <MorphSelect value={statusFilter} onValueChange={(v) => setStatusFilter(v as StatusFilter)}>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="semua">Semua status</MorphSelectItem>
+              <MorphSelectItem value="terbit">Terbit</MorphSelectItem>
+              <MorphSelectItem value="draft">Draft</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
         </div>
       </div>
 

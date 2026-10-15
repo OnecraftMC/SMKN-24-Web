@@ -4,6 +4,12 @@ import { useEffect, useId, useState } from "react";
 import { Check, Plus, X } from "lucide-react";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import { fieldClass, labelClass } from "@/components/admin/ui/FormBits";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 export type CategoryModule =
   | "agenda"
@@ -105,20 +111,22 @@ export default function CategoryField({
         {label}
         {required ? <span aria-hidden="true"> *</span> : null}
       </label>
-      <select
-        id={id}
-        className={fieldClass}
+      <MorphSelect
         value={value ?? ""}
-        onChange={(event) => onChange(event.target.value || null)}
-        required={required}
+        onValueChange={(v) => onChange(v || null)}
         disabled={loadingCategories || Boolean(error)}
       >
-        <option value="">{loadingCategories ? "Memuat kategori…" : required ? "Pilih kategori" : "Tanpa kategori"}</option>
-        {value && !categories.includes(value) && <option value={value}>{value}</option>}
-        {categories.map((category) => (
-          <option key={category} value={category}>{category}</option>
-        ))}
-      </select>
+        <MorphSelectTrigger className={fieldClass}>
+          <MorphSelectValue placeholder={loadingCategories ? "Memuat kategori…" : required ? "Pilih kategori" : "Tanpa kategori"} />
+        </MorphSelectTrigger>
+        <MorphSelectContent>
+          {!(required) && <MorphSelectItem value="">Tanpa kategori</MorphSelectItem>}
+          {value && !categories.includes(value) && <MorphSelectItem value={value}>{value}</MorphSelectItem>}
+          {categories.map((category) => (
+            <MorphSelectItem key={category} value={category}>{category}</MorphSelectItem>
+          ))}
+        </MorphSelectContent>
+      </MorphSelect>
 
       {error ? (
         <div className="space-y-1">
