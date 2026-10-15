@@ -20,7 +20,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-[26px] bg-surface-container-lowest px-2 py-2 ring-1 ring-surface-container transition focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
+    <form onSubmit={handleSubmit} className="flex items-center gap-2 rounded-[26px] bg-surface-container-lowest px-2 py-2 ring-1 ring-surface-container transition-[box-shadow] duration-200 focus-within:ring-2 focus-within:ring-primary/25">
       <input
         type="text"
         value={input}
@@ -30,7 +30,7 @@ export default function ChatInput({ onSend, disabled = false }: ChatInputProps) 
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
         placeholder="Tanyakan sesuatu..."
         aria-label="Tulis pertanyaan untuk Asisten AI"
-        className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/70 disabled:cursor-not-allowed"
+        className="chatbot-text-input min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-on-surface outline-none placeholder:text-on-surface-variant/70 disabled:cursor-not-allowed"
       />
       <button
         type="submit"

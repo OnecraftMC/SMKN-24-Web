@@ -35,6 +35,37 @@ body {
   }
 }
 
+@keyframes brandLogoSpin {
+  0% { transform: rotate(0) scale(1); }
+  28% { transform: rotate(115deg) scale(1.12); }
+  72% { transform: rotate(300deg) scale(1.08); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes buttonHoverMicro {
+  0% { scale: 1; }
+  62% { scale: 1.04; }
+  100% { scale: 1.015; }
+}
+
+button:not(:disabled):hover {
+  animation: buttonHoverMicro 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+button:not(:disabled):active {
+  animation: none;
+  scale: 0.98;
+}
+
+.navbar-brand-logo {
+  transform-origin: center;
+}
+
+.group:hover .navbar-brand-logo,
+.group:focus-visible .navbar-brand-logo {
+  animation: brandLogoSpin 780ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 @media (min-width: 768px) and (min-height: 600px) {
   body {
     zoom: 0.75;
@@ -76,6 +107,24 @@ body {
 /* Parent composer supplies its own focus ring; avoid a second square outline. */
 .bk-chat-textarea:focus-visible {
   outline: none;
+}
+
+/* The chatbot composer draws its own focus ring around the whole input. */
+.chatbot-text-input:focus-visible {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .navbar-brand-logo,
+  .group:focus-visible .navbar-brand-logo {
+    animation: none;
+  }
+
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    animation: none;
+    scale: 1;
+  }
 }
 
 /* Angka statistik dashboard lebih mudah dibaca dengan tabular figures. */

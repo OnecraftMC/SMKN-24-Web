@@ -90,7 +90,7 @@ export default function Navbar() {
             alt="Logo SMK Negeri 24 Jakarta"
             width={36}
             height={36}
-            className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0 transition-transform duration-700 ease-out group-hover:rotate-[360deg] group-focus-visible:rotate-[360deg] motion-reduce:transition-none"
+            className="navbar-brand-logo h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
           />
           <span className="flex flex-col min-w-0">
             <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
@@ -136,8 +136,16 @@ export default function Navbar() {
             onClick={() => setIsMobileOpen(!isMobileOpen)}
             type="button"
           >
-            <span className="material-symbols-outlined text-[24px]">
-              {isMobileOpen ? "close" : "menu"}
+            <span className="relative block h-6 w-6" aria-hidden="true">
+              <span
+                className={`absolute left-1/2 top-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-current transition-all duration-300 ease-out motion-reduce:transition-none ${isMobileOpen ? "translate-y-0 rotate-45" : "-translate-y-[6px]"}`}
+              />
+              <span
+                className={`absolute left-1/2 top-1/2 h-0.5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-current transition-all duration-200 ease-out motion-reduce:transition-none ${isMobileOpen ? "scale-x-0 opacity-0" : "scale-x-100 opacity-100"}`}
+              />
+              <span
+                className={`absolute left-1/2 top-1/2 h-0.5 w-5 -translate-x-1/2 rounded-full bg-current transition-all duration-300 ease-out motion-reduce:transition-none ${isMobileOpen ? "translate-y-0 -rotate-45" : "translate-y-[6px]"}`}
+              />
             </span>
           </button>
         </div>
