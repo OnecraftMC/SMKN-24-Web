@@ -706,7 +706,7 @@ export default function BKChatModal({
                           }
                         }}
                         placeholder="Tulis pesanmu dengan nyaman…"
-                        className="max-h-28 min-h-10 flex-1 resize-none bg-transparent px-1 py-2 text-xs leading-relaxed outline-none placeholder:text-on-surface-variant/70"
+                        className="bk-chat-textarea max-h-28 min-h-10 flex-1 resize-none bg-transparent px-1 py-2 text-xs leading-relaxed outline-none placeholder:text-on-surface-variant/70"
                         onInput={(event) => {
                           event.currentTarget.style.height = "auto";
                           event.currentTarget.style.height = `${Math.min(event.currentTarget.scrollHeight, 112)}px`;
@@ -717,9 +717,9 @@ export default function BKChatModal({
                         onClick={() => void sendDraft()}
                         disabled={!draft.trim() || isSending}
                         aria-label="Kirim pesan ke konselor AI"
-                        className="mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary text-surface shadow-sm transition hover:scale-105 hover:bg-primary/90 active:scale-95 disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none"
+                        className="group mb-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary text-surface shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-primary/90 active:scale-95 disabled:translate-y-0 disabled:bg-surface-container-high disabled:text-on-surface-variant disabled:shadow-none motion-reduce:transition-none"
                       >
-                        <ArrowUp aria-hidden className="h-4 w-4" />
+                        <ArrowUp aria-hidden className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 motion-reduce:transition-none" />
                       </button>
                       </div>
                       <div className="flex items-center justify-between gap-2 px-2 pb-0.5 pt-1.5">

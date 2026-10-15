@@ -90,7 +90,7 @@ export default function Navbar() {
             alt="Logo SMK Negeri 24 Jakarta"
             width={36}
             height={36}
-            className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
+            className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0 transition-transform duration-700 ease-out group-hover:rotate-[360deg] group-focus-visible:rotate-[360deg] motion-reduce:transition-none"
           />
           <span className="flex flex-col min-w-0">
             <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
