@@ -100,7 +100,7 @@ CREATE TABLE IF NOT EXISTS canteen_payment_events (
 
 INSERT INTO canteen_stands (slug, name, description, image_url)
 VALUES ('kang-asep', 'Stand Kang Asep', 'Menu makanan dan minuman pilihan untuk warga sekolah.', '/images/kantin-sekolah.svg')
-ON DUPLICATE KEY UPDATE name = VALUES(name), description = VALUES(description);
+ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id);
 
 INSERT INTO canteen_menu_items (stand_id, name, description, category, price, sort_order)
 SELECT s.id, seed.name, seed.description, seed.category, seed.price, seed.sort_order

@@ -71,10 +71,20 @@ Backend PHP butuh `backend/.env` (salinan `backend/.env.example`). Isi
 
 ## 4. Setup database
 
-1. Buat database lalu import: `mysql -u root -p <db> < backend/database.sql`
-2. Jalankan migrasi kantin: `mysql -u root -p <db> < backend/migrations/20261015_add_canteen.sql`
-3. Isi `backend/.env` (DB_HOST/DB_NAME/DB_USER/DB_PASS sesuai lingkungan).
-4. Akun admin **tidak** di-seed skema (keamanan). Buat satu akun:
+**Pemasangan baru:** buat database lalu import `backend/database.sql` satu kali,
+kemudian jalankan migrasi kantin:
+
+```bash
+mysql -u root -p <db> < backend/migrations/20261015_add_canteen.sql
+```
+
+**Database yang sudah berisi data sekolah:** jangan impor ulang
+`backend/database.sql`. Cadangkan database, lalu jalankan hanya migrasi kantin di
+atas; migrasi ini menambah tabel kantin dan tidak menghapus tabel atau data lama.
+
+Setelah skema siap, isi `backend/.env` (DB_HOST/DB_NAME/DB_USER/DB_PASS sesuai
+lingkungan). Untuk pemasangan baru, akun admin **tidak** di-seed skema
+(keamanan); buat akun pertama:
 
 ```bash
 cd backend
