@@ -33,9 +33,9 @@ export default function AgendaKegiatan({
           {agenda.map((item) => (
             <div
               key={item.id}
-              className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:shadow-md transition-all flex items-start gap-space-md border border-surface-container"
+              className="group bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex items-start gap-space-md border border-surface-container motion-reduce:transform-none motion-reduce:transition-none"
             >
-              <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-primary text-surface flex flex-col items-center justify-center text-center">
+              <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-primary text-surface flex flex-col items-center justify-center text-center transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none">
                 <span className="font-headline-md text-headline-md font-extrabold text-secondary-container leading-none">
                   {item.day}
                 </span>

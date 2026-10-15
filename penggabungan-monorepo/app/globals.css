@@ -20,6 +20,21 @@ body {
   min-height: 100%;
 }
 
+@keyframes badgeBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+.hero-badge-icon {
+  animation: badgeBob 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-badge-icon {
+    animation: none;
+  }
+}
+
 @media (min-width: 768px) and (min-height: 600px) {
   body {
     zoom: 0.75;

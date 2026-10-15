@@ -33,10 +33,10 @@ export default function QuickHighlights() {
           {highlights.map((item) => (
             <div
               key={item.label}
-              className="p-space-md flex flex-col justify-center rounded-xl bg-surface-container-low transition-all hover:bg-surface-container"
+              className="group p-space-md flex flex-col justify-center rounded-xl bg-surface-container-low transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none"
             >
               <div className="flex items-center gap-2 text-secondary font-bold mb-1">
-                <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+                <span className="material-symbols-outlined text-[22px] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transform-none motion-reduce:transition-none">{item.icon}</span>
                 <span className="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">
                   {item.label}
                 </span>

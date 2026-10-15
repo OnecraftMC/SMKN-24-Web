@@ -27,7 +27,7 @@ export default function Hero() {
           <div className="lg:col-span-7 space-y-space-lg">
             <div className="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-surface-container-highest/20 backdrop-blur-md text-secondary-fixed">
               <span
-                className="material-symbols-outlined text-[18px] text-secondary-container"
+                className="hero-badge-icon material-symbols-outlined text-[18px] text-secondary-container"
                 style={{ fontVariationSettings: "'FILL' 1" }}
               >
                 verified
