@@ -14,6 +14,7 @@ export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isBKOpen, setIsBKOpen] = useState(false);
   const [indonesiaTime, setIndonesiaTime] = useState("--:--:--");
+  const [logoAnimationKey, setLogoAnimationKey] = useState(0);
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
@@ -84,14 +85,23 @@ export default function Navbar() {
       {/* Main nav */}
       <div className="h-16 md:h-20 max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop flex items-center justify-between gap-space-md">
         {/* Brand / Logo */}
-        <Link href="/" className="flex items-center gap-2 md:gap-space-sm text-left group min-w-0 shrink">
-          <Image
-            src="/logo-smkn24.png"
-            alt="Logo SMK Negeri 24 Jakarta"
-            width={36}
-            height={36}
-            className="navbar-brand-logo h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
-          />
+        <Link
+          href="/"
+          onClick={() => setLogoAnimationKey((current) => current + 1)}
+          className="flex items-center gap-2 md:gap-space-sm text-left group min-w-0 shrink"
+        >
+          <span
+            key={logoAnimationKey}
+            className={logoAnimationKey > 0 ? "navbar-logo-3d-click inline-flex shrink-0" : "inline-flex shrink-0"}
+          >
+            <Image
+              src="/logo-smkn24.png"
+              alt="Logo SMK Negeri 24 Jakarta"
+              width={36}
+              height={36}
+              className="h-8 md:h-9 w-auto object-contain rounded-md shadow-sm shrink-0"
+            />
+          </span>
           <span className="flex flex-col min-w-0">
             <span className="font-headline-sm text-[15px] md:text-headline-sm text-primary tracking-tight font-bold leading-tight group-hover:text-secondary transition-colors whitespace-nowrap">
               SMKN 24 Jakarta

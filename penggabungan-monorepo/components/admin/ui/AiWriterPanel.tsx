@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, Sparkles, TriangleAlert, Wand2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Loader2, Mic, MicOff, Sparkles, TriangleAlert, Volume2, VolumeX, Wand2 } from "lucide-react";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import { buttonGhostClass, fieldClass, labelClass } from "./FormBits";
 
@@ -73,6 +73,32 @@ export type AiDraft =
 type AiResponse<D> = {
   draf: D;
   aiAvailable: boolean;
+};
+
+type SpeechRecognitionResultEvent = {
+  resultIndex: number;
+  results: ArrayLike<ArrayLike<{ transcript: string }> & { isFinal: boolean }>;
+};
+
+type SpeechRecognitionErrorEvent = { error: string };
+
+type SpeechRecognitionController = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionResultEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionController;
+
+type WindowWithSpeechRecognition = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
 };
 
 const COPY: Record<AiDraftModule, { title: string; placeholder: string; hint: string }> = {
@@ -149,10 +175,117 @@ export default function AiWriterPanel<D extends AiDraft>({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sukses, setSukses] = useState<string | null>(null);
+  const [listening, setListening] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<string | null>(null);
+  const [draftSpeechText, setDraftSpeechText] = useState("");
+  const [speaking, setSpeaking] = useState(false);
+  const recognitionRef = useRef<SpeechRecognitionController | null>(null);
 
   const copy = COPY[module];
   const catatanId = `ai-catatan-${module}`;
   const statusId = `ai-status-${module}`;
+
+  useEffect(() => () => {
+    recognitionRef.current?.abort();
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+  }, []);
+
+  function startDictation() {
+    if (typeof window === "undefined") return;
+    const speechWindow = window as WindowWithSpeechRecognition;
+    const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setError("Browser ini belum mendukung pengenalan suara. Gunakan Chrome atau masukkan catatan dengan mengetik.");
+      setVoiceStatus(null);
+      return;
+    }
+
+    setError(null);
+    setSukses(null);
+    setVoiceStatus("Meminta akses mikrofon…");
+    const recognition = new SpeechRecognition();
+    recognition.lang = "id-ID";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognitionRef.current = recognition;
+    recognition.onresult = (event) => {
+      const spokenText = Array.from(event.results)
+        .slice(event.resultIndex)
+        .filter((result) => result.isFinal)
+        .map((result) => result[0]?.transcript ?? "")
+        .join(" ")
+        .trim();
+
+      if (spokenText) {
+        setCatatan((current) => `${current.trim()}${current.trim() ? " " : ""}${spokenText}`.slice(0, 2000));
+        setVoiceStatus("Ucapan sudah ditambahkan ke catatan. Periksa teksnya, lalu jalankan AI.");
+      }
+    };
+    recognition.onerror = (event) => {
+      const message = event.error === "not-allowed" || event.error === "service-not-allowed"
+        ? "Akses mikrofon ditolak. Izinkan mikrofon di pengaturan browser, lalu coba lagi."
+        : event.error === "audio-capture"
+          ? "Mikrofon tidak ditemukan atau sedang tidak tersedia."
+          : event.error === "network"
+            ? "Layanan pengenalan suara browser tidak dapat dihubungi."
+            : "Ucapan belum dapat dikenali. Silakan coba lagi atau ketik catatan.";
+      setError(message);
+      setVoiceStatus(null);
+    };
+    recognition.onend = () => {
+      setListening(false);
+      recognitionRef.current = null;
+      setVoiceStatus((current) =>
+        current === "Meminta akses mikrofon…" || current === "Mendengarkan… ucapkan catatan untuk AI."
+          ? null
+          : current,
+      );
+    };
+
+    try {
+      recognition.start();
+      setListening(true);
+      setVoiceStatus("Mendengarkan… ucapkan catatan untuk AI.");
+    } catch {
+      recognitionRef.current = null;
+      setListening(false);
+      setError("Mikrofon belum siap. Coba lagi dan pastikan izin mikrofon tersedia.");
+      setVoiceStatus(null);
+    }
+  }
+
+  function stopDictation() {
+    recognitionRef.current?.stop();
+    setListening(false);
+  }
+
+  function toggleDraftSpeech() {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setError("Fitur suara keluaran tidak tersedia di browser ini.");
+      return;
+    }
+    const speech = window.speechSynthesis;
+    if (speaking) {
+      speech.cancel();
+      setSpeaking(false);
+      return;
+    }
+    if (!draftSpeechText) return;
+
+    speech.cancel();
+    const utterance = new SpeechSynthesisUtterance(draftSpeechText);
+    utterance.lang = "id-ID";
+    utterance.rate = 0.95;
+    const indonesianVoice = speech.getVoices().find((voice) => voice.lang.toLowerCase().startsWith("id"));
+    if (indonesianVoice) utterance.voice = indonesianVoice;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => {
+      setSpeaking(false);
+      setError("Draf tidak dapat dibacakan. Coba lagi atau gunakan fitur suara browser.");
+    };
+    speech.speak(utterance);
+  }
 
   async function generate() {
     if (catatan.trim() === "" || busy) {
@@ -161,6 +294,9 @@ export default function AiWriterPanel<D extends AiDraft>({
 
     setError(null);
     setSukses(null);
+    setDraftSpeechText("");
+    if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    setSpeaking(false);
     setBusy(true);
 
     try {
@@ -177,6 +313,11 @@ export default function AiWriterPanel<D extends AiDraft>({
       }
 
       onApply(result.draf);
+      const readableDraft = Object.values(result.draf as Record<string, unknown>)
+        .filter((value): value is string => typeof value === "string" && value.trim() !== "")
+        .join(". ");
+      setDraftSpeechText(readableDraft);
+      setSpeaking(false);
       setSukses(`Draf ${label} terisi. Periksa dan perbaiki sebelum menyimpan.`);
     } catch (err) {
       if (isUnauthorized(err)) {
@@ -218,9 +359,22 @@ export default function AiWriterPanel<D extends AiDraft>({
           disabled={disabled || busy}
           onChange={(e) => setCatatan(e.target.value)}
         />
+        <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+          Dikte memakai layanan suara browser/perangkat. Browser akan meminta izin mikrofon; pemrosesan audio mengikuti kebijakan browser/perangkat.
+        </p>
       </div>
 
       <div className="mt-space-sm flex flex-wrap items-center gap-space-sm">
+        <button
+          type="button"
+          onClick={listening ? stopDictation : startDictation}
+          disabled={disabled || busy}
+          aria-pressed={listening}
+          className={buttonGhostClass}
+        >
+          {listening ? <MicOff aria-hidden className="h-4 w-4" /> : <Mic aria-hidden className="h-4 w-4" />}
+          {listening ? "Hentikan mikrofon" : "Perintah dengan suara"}
+        </button>
         <button
           type="button"
           onClick={() => void generate()}
@@ -234,12 +388,25 @@ export default function AiWriterPanel<D extends AiDraft>({
           )}
           {busy ? "Menyusun draf…" : "Buat draf dengan AI"}
         </button>
+        {draftSpeechText && (
+          <button
+            type="button"
+            onClick={toggleDraftSpeech}
+            disabled={disabled || busy}
+            aria-pressed={speaking}
+            className={buttonGhostClass}
+          >
+            {speaking ? <VolumeX aria-hidden className="h-4 w-4" /> : <Volume2 aria-hidden className="h-4 w-4" />}
+            {speaking ? "Hentikan suara" : "Dengarkan draf"}
+          </button>
+        )}
         <span className="font-body-sm text-body-sm text-on-surface-variant">
           Draf hanya mengisi form. Tidak tersimpan otomatis.
         </span>
       </div>
 
       <div id={statusId} aria-live="polite" className="mt-space-sm space-y-space-xs">
+        {voiceStatus && <p className="font-body-sm text-body-sm text-on-surface-variant">{voiceStatus}</p>}
         {error && (
           <p
             role="alert"

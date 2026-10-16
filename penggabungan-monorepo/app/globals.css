@@ -35,11 +35,11 @@ body {
   }
 }
 
-@keyframes brandLogoSpin {
-  0% { transform: rotate(0) scale(1); }
-  28% { transform: rotate(115deg) scale(1.12); }
-  72% { transform: rotate(300deg) scale(1.08); }
-  100% { transform: rotate(360deg) scale(1); }
+@keyframes brandLogo3DClick {
+  0% { transform: perspective(700px) rotateX(0) rotateY(0) translateZ(0) scale(1); }
+  38% { transform: perspective(700px) rotateX(18deg) rotateY(180deg) translateZ(28px) scale(1.16); }
+  72% { transform: perspective(700px) rotateX(-10deg) rotateY(300deg) translateZ(12px) scale(1.08); }
+  100% { transform: perspective(700px) rotateX(0) rotateY(360deg) translateZ(0) scale(1); }
 }
 
 @keyframes buttonHoverMicro {
@@ -57,13 +57,10 @@ button:not(:disabled):active {
   scale: 0.98;
 }
 
-.navbar-brand-logo {
+.navbar-logo-3d-click {
   transform-origin: center;
-}
-
-.group:hover .navbar-brand-logo,
-.group:focus-visible .navbar-brand-logo {
-  animation: brandLogoSpin 780ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+  animation: brandLogo3DClick 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 @media (min-width: 768px) and (min-height: 600px) {
@@ -115,8 +112,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .group:hover .navbar-brand-logo,
-  .group:focus-visible .navbar-brand-logo {
+  .navbar-logo-3d-click {
     animation: none;
   }
 
