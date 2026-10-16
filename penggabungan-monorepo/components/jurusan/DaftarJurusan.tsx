@@ -20,6 +20,13 @@ const TATA_LETAK: Record<
   pariwisata: { kolom: "lg:col-span-2", sizes: GAMBAR_LEBAR },
 };
 
+const HALAMAN_JURUSAN: Partial<Record<JurusanKey, string>> = {
+  perhotelan: "perhotelan.html",
+  boga: "boga.html",
+  pplg: "pplg.html",
+  pariwisata: "pariwisata.html",
+};
+
 // Latar kartu: foto kegiatan resmi bila tersedia (slot
 // public/images/jurusan/<key>.jpg — lihat komentar `gambar` di lib/types.ts),
 // jika belum: fallback token berupa gradien surface + ikon watermark besar.
@@ -74,6 +81,7 @@ export default function DaftarJurusan({
         <ul id="daftar-jurusan" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[16rem] md:auto-rows-[18rem] gap-gutter-md">
           {jurusanData.map((item) => {
             const tata = TATA_LETAK[item.key];
+            const halamanJurusan = HALAMAN_JURUSAN[item.key];
             const kelas = kelasByJurusan[item.key] ?? [];
             const chipKelas = tata.unggulan ? kelas : kelas.slice(0, 3);
             return (
@@ -131,16 +139,22 @@ export default function DaftarJurusan({
                       )}
                     </ul>
 
-                    <Link
-                      href={`/jurusan/${item.key}.html`}
-                      title={`Lihat informasi jurusan ${item.nama}`}
-                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                    >
-                      <span>Informasi Jurusan</span>
-                      <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
-                        arrow_forward
+                    {halamanJurusan ? (
+                      <Link
+                        href={`/jurusan/${halamanJurusan}`}
+                        title={`Buka website jurusan ${item.nama}`}
+                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      >
+                        <span>Kunjungi Website Jurusan</span>
+                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
+                          arrow_forward
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className="inline-flex min-h-11 items-center rounded-lg bg-surface-container-high px-space-md py-2 font-label-sm text-label-sm font-bold text-on-surface-variant">
+                        Website jurusan segera tersedia
                       </span>
-                    </Link>
+                    )}
                   </div>
                 </article>
               </li>
