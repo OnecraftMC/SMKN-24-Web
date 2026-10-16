@@ -48,10 +48,10 @@ export default function SambutanKepsek() {
               <p>
                 Melalui tema ini, kita diajak untuk berpikir kritis: Bagaimana AI dapat diintegrasikan ke dalam profil sekolah kita? Bukan sekadar sebagai teknologi, tetapi sebagai sarana untuk:
               </p>
-              <ul className="space-y-2 pl-6 marker:text-secondary">
-                <li>Memperkuat karakter dan integritas warga sekolah,</li>
-                <li>Meningkatkan kualitas pembelajaran yang berpihak pada murid,</li>
-                <li>Dan menyiapkan lulusan SMK yang siap bersaing di dunia kerja digital.</li>
+              <ul className="list-none space-y-2 pl-0">
+                <li>- Memperkuat karakter dan integritas warga sekolah,</li>
+                <li>- Meningkatkan kualitas pembelajaran yang berpihak pada murid,</li>
+                <li>- Dan menyiapkan lulusan SMK yang siap bersaing di dunia kerja digital.</li>
               </ul>
               <p>
                 Tunjukkan kreativitas, kolaborasi, dan integritas kalian. Ingatlah, juara bukanlah satu-satunya tujuan. Yang lebih penting adalah proses belajar, keberanian berinovasi, dan semangat sportifitas. Selamat berlomba
