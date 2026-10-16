@@ -156,6 +156,7 @@ export const jurusanData: Jurusan[] = [
     deskripsi:
       "Front office, housekeeping, dan F&B service dengan praktik di kamar simulasi standar hotel bintang.",
     ikon: "hotel",
+    gambar: "/images/jurusan/perhotelan.jpg",
   },
   {
     key: "boga",
@@ -163,6 +164,7 @@ export const jurusanData: Jurusan[] = [
     deskripsi:
       "Pengolahan makanan Indonesia dan kontinental, pastry, serta sanitasi hygiene di dapur produksi.",
     ikon: "restaurant",
+    gambar: "/images/jurusan/boga.jpg",
   },
   {
     key: "busana",
@@ -170,6 +172,7 @@ export const jurusanData: Jurusan[] = [
     deskripsi:
       "Dasar pola, desain busana, sampai produksi garmen di ruang busana dan sanggar jahit.",
     ikon: "checkroom",
+    gambar: "/images/jurusan/busana.jpg",
   },
   {
     key: "pplg",
@@ -177,6 +180,7 @@ export const jurusanData: Jurusan[] = [
     deskripsi:
       "Pemrograman web, basis data, dan pengembangan gim di laboratorium komputer yang terhubung jaringan.",
     ikon: "code",
+    gambar: "/images/jurusan/pplg.jpg",
   },
   {
     key: "pariwisata",
@@ -184,5 +188,6 @@ export const jurusanData: Jurusan[] = [
     deskripsi:
       "Pemanduan wisata, ticketing & reservasi, serta pengelolaan biro perjalanan.",
     ikon: "travel_explore",
+    gambar: "/images/jurusan/pariwisata.jpg",
   },
 ];

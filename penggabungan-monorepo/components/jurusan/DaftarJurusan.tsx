@@ -27,8 +27,8 @@ const HALAMAN_JURUSAN: Partial<Record<JurusanKey, string>> = {
   pariwisata: "pariwisata.html",
 };
 
-// Latar kartu: foto kegiatan resmi bila tersedia (slot
-// public/images/jurusan/<key>.jpg — lihat komentar `gambar` di lib/types.ts),
+// Latar kartu: foto jurusan dari public/images/jurusan/<key>.jpg (lihat komentar
+// `gambar` di lib/types.ts),
 // jika belum: fallback token berupa gradien surface + ikon watermark besar.
 export function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
   if (item.gambar) {

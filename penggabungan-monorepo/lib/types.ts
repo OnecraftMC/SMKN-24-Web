@@ -215,6 +215,6 @@ export interface Jurusan {
   deskripsi: string;
   /** Nama ikon Material Symbols (font sudah dimuat di app/layout.tsx). */
   ikon: string;
-  /** Kosong sampai foto kegiatan resmi ada di public/images/jurusan/<key>.jpg. */
+  /** Path foto jurusan di public/images/jurusan/<key>.jpg. */
   gambar?: string;
 }
