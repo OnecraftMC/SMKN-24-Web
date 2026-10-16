@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Loader2, Save, TriangleAlert } from "lucide-react";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type { JadwalKelasDTO, JurusanKey } from "@/lib/admin/types";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 import {
   Field,
   Modal,
@@ -93,16 +99,28 @@ export default function KelasDialog({
         {!editing && (
           <div className="grid gap-space-md sm:grid-cols-2">
             <Field htmlFor="jadwal-class-program" label="Program keahlian">
-              <select id="jadwal-class-program" className={fieldClass} value={program} onChange={(event) => setProgram(event.target.value as JurusanKey)}>
-                {PROGRAMS.map(({ key, label }) => <option key={key} value={key}>{label}</option>)}
-              </select>
+              <MorphSelect value={program} onValueChange={(value) => setProgram(value as JurusanKey)} className="w-full">
+                <MorphSelectTrigger className={fieldClass}>
+                  <MorphSelectValue />
+                </MorphSelectTrigger>
+                <MorphSelectContent>
+                  {PROGRAMS.map(({ key, label }) => (
+                    <MorphSelectItem key={key} value={key}>{label}</MorphSelectItem>
+                  ))}
+                </MorphSelectContent>
+              </MorphSelect>
             </Field>
             <Field htmlFor="jadwal-class-grade" label="Tingkat">
-              <select id="jadwal-class-grade" className={fieldClass} value={grade} onChange={(event) => setGrade(event.target.value)}>
-                <option value="10">X</option>
-                <option value="11">XI</option>
-                <option value="12">XII</option>
-              </select>
+              <MorphSelect value={grade} onValueChange={(value) => setGrade(value)} className="w-full">
+                <MorphSelectTrigger className={fieldClass}>
+                  <MorphSelectValue />
+                </MorphSelectTrigger>
+                <MorphSelectContent>
+                  <MorphSelectItem value="10">X</MorphSelectItem>
+                  <MorphSelectItem value="11">XI</MorphSelectItem>
+                  <MorphSelectItem value="12">XII</MorphSelectItem>
+                </MorphSelectContent>
+              </MorphSelect>
             </Field>
           </div>
         )}

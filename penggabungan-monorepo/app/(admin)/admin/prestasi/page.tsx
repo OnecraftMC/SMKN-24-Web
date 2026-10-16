@@ -12,6 +12,12 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import CategoryField from "@/components/admin/ui/CategoryField";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 const statuses: StatusPrestasi[] = ["Baru", "Ditinjau", "Disetujui", "Ditolak"];
 type StatusFilter = "semua" | StatusPrestasi;
@@ -179,19 +185,23 @@ export default function PrestasiAdminPage() {
         </label>
         <label className="block">
           <span className="mb-1 block font-label-sm font-bold text-on-surface-variant">Status</span>
-          <select
+          <MorphSelect
             value={statusFilter}
-            onChange={(event) => {
+            onValueChange={(v) => {
               setPage(1);
-              setStatusFilter(event.target.value as StatusFilter);
+              setStatusFilter(v as StatusFilter);
             }}
-            className={fieldClass}
           >
-            <option value="semua">Semua</option>
-            {statuses.map((status) => (
-              <option key={status} value={status}>{status}</option>
-            ))}
-          </select>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="semua">Semua</MorphSelectItem>
+              {statuses.map((status) => (
+                <MorphSelectItem key={status} value={status}>{status}</MorphSelectItem>
+              ))}
+            </MorphSelectContent>
+          </MorphSelect>
         </label>
       </div>
 
@@ -234,14 +244,20 @@ export default function PrestasiAdminPage() {
                   <td className="px-space-md py-space-md">
                     <label className="block">
                       <span className="sr-only">Status pengajuan {row.namaSiswa}</span>
-                      <select
+                      <MorphSelect
                         value={row.status}
                         disabled={statusBusyId !== null}
-                        onChange={(event) => void updateStatus(row, event.target.value as StatusPrestasi)}
-                        className={fieldClass}
+                        onValueChange={(v) => void updateStatus(row, v as StatusPrestasi)}
                       >
-                        {statuses.map((status) => <option key={status}>{status}</option>)}
-                      </select>
+                        <MorphSelectTrigger className={fieldClass}>
+                          <MorphSelectValue />
+                        </MorphSelectTrigger>
+                        <MorphSelectContent>
+                          {statuses.map((status) => (
+                            <MorphSelectItem key={status} value={status}>{status}</MorphSelectItem>
+                          ))}
+                        </MorphSelectContent>
+                      </MorphSelect>
                       {statusBusyId === row.id && <span className="sr-only">Menyimpan status…</span>}
                     </label>
                   </td>

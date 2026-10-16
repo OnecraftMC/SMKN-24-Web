@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
 import type { FasilitasView } from "@/lib/shared/mappers";
@@ -11,6 +15,22 @@ export default function FasilitasKampus({
   error: string | null;
   variant?: "all" | "featured";
 }) {
+  const [selected, setSelected] = useState<FasilitasView | null>(null);
+
+  useEffect(() => {
+    if (!selected) return;
+    const previousOverflow = document.body.style.overflow;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelected(null);
+    };
+    window.addEventListener("keydown", handleEscape);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selected]);
+
   if (variant === "featured") {
     const unggulan = fasilitas.filter((item) => item.unggulan);
 
@@ -57,9 +77,11 @@ export default function FasilitasKampus({
           ) : (
             <div className="grid grid-cols-1 gap-space-sm md:grid-cols-2 xl:grid-cols-3">
               {unggulan.map((item) => (
-                <article
+                <button
                   key={item.id}
-                  className="flex min-w-0 items-center gap-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-sm"
+                  type="button"
+                  onClick={() => setSelected(item)}
+                  className="flex w-full min-w-0 items-center gap-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-sm text-left transition hover:border-primary/40 hover:shadow-sm"
                 >
                   <div className="h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-surface-container-high sm:h-24 sm:w-28">
                     {item.image ? (
@@ -90,7 +112,7 @@ export default function FasilitasKampus({
                       </p>
                     )}
                   </div>
-                </article>
+                </button>
               ))}
             </div>
           )}
@@ -111,7 +133,12 @@ export default function FasilitasKampus({
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
           {fasilitas.map((item) => (
-            <div key={item.id} className="rounded-2xl overflow-hidden border border-surface-container bg-surface-container-lowest shadow-sm group">
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => setSelected(item)}
+              className="block w-full rounded-2xl overflow-hidden border border-surface-container bg-surface-container-lowest shadow-sm group text-left transition hover:border-primary/40 hover:shadow-md"
+            >
               <div className="h-52 overflow-hidden">
                 {item.image ? (
                   <Image src={item.image} alt={item.title} width={640} height={420} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -128,12 +155,66 @@ export default function FasilitasKampus({
                 </div>
                 <p className="text-body-sm text-on-surface-variant">{item.desc}</p>
               </div>
-            </div>
+            </button>
           ))}
           {fasilitas.length === 0 && (
             <p className="md:col-span-3 rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
               {error ? `Fasilitas belum dapat dimuat: ${error}` : "Belum ada fasilitas yang dipublikasikan."}
             </p>
+          )}
+
+          {selected && createPortal(
+            <div
+              role="presentation"
+              onClick={() => setSelected(null)}
+              className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-black/50 p-4"
+            >
+              <div
+                onClick={(event) => event.stopPropagation()}
+                className="relative max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-surface-container-lowest shadow-xl"
+              >
+                <button
+                  type="button"
+                  onClick={() => setSelected(null)}
+                  aria-label="Tutup"
+                  className="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-high text-on-surface"
+                >
+                  <span className="material-symbols-outlined">close</span>
+                </button>
+                <div className="h-64 w-full bg-surface-container-high">
+                  {selected.image ? (
+                    <Image
+                      src={selected.image}
+                      alt={selected.title}
+                      width={1280}
+                      height={720}
+                      sizes="(max-width: 768px) 100vw, 768px"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-primary" aria-hidden="true">
+                      <span className="material-symbols-outlined text-6xl">apartment</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-space-md p-space-lg">
+                  <div className="space-y-space-xs">
+                    {selected.unggulan && (
+                      <span className="inline-flex rounded-full bg-secondary-container px-2 py-0.5 font-label-sm text-[11px] font-bold text-on-secondary-container">
+                        Unggulan
+                      </span>
+                    )}
+                    <h2 className="font-headline-md text-headline-md font-bold text-primary">
+                      {selected.title}
+                    </h2>
+                  </div>
+                  {selected.desc && (
+                    <p className="font-body-md text-on-surface-variant">{selected.desc}</p>
+                  )}
+                </div>
+              </div>
+            </div>,
+            document.body,
           )}
         </div>
       </div>

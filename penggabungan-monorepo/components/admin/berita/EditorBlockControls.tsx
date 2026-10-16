@@ -9,6 +9,12 @@ import {
   Heading5,
   Heading6,
 } from "lucide-react";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 import { toolBtn, Divider } from "./editorToolbarBits";
 
 export type EditorLevel = 1 | 2 | 3 | 4 | 5 | 6;
@@ -30,51 +36,57 @@ export function BlockControls({ editor, disabled }: { editor: Editor; disabled: 
   );
   return (
     <>
-      <select
-        aria-label="Jenis blok teks"
-        className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 font-label-sm text-label-sm font-bold text-on-surface"
+      <MorphSelect
         disabled={disabled}
-        value={activeLevel ?? (editor.isActive("paragraph") ? "p" : "")}
-        onChange={(e) => {
-          const v = e.target.value;
+        value={String(activeLevel ?? (editor.isActive("paragraph") ? "p" : ""))}
+        onValueChange={(v) => {
           if (v === "p" || v === "") {
             editor.chain().focus().setParagraph().run();
           } else {
             editor.chain().focus().toggleHeading({ level: Number(v) as EditorLevel }).run();
           }
         }}
+        className="w-auto"
       >
-        <option value="p">Paragraf</option>
-        {([1, 2, 3, 4, 5, 6] as EditorLevel[]).map((l) => (
-          <option key={l} value={l}>
-            Heading {l}
-          </option>
-        ))}
-      </select>
+        <MorphSelectTrigger className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 font-label-sm text-label-sm font-bold text-on-surface">
+          <MorphSelectValue />
+        </MorphSelectTrigger>
+        <MorphSelectContent>
+          <MorphSelectItem value="p">Paragraf</MorphSelectItem>
+          {([1, 2, 3, 4, 5, 6] as EditorLevel[]).map((l) => (
+            <MorphSelectItem key={l} value={String(l)}>
+              Heading {l}
+            </MorphSelectItem>
+          ))}
+        </MorphSelectContent>
+      </MorphSelect>
 
-      <select
-        aria-label="Ukuran teks"
-        className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 font-label-sm text-label-sm font-bold text-on-surface"
+      <MorphSelect
         disabled={disabled}
         value={
           FONT_SIZES.find((s) => s.value !== "" && editor.isActive("textStyle", { fontSize: s.value }))
             ?.value ?? ""
         }
-        onChange={(e) => {
-          const v = e.target.value;
+        onValueChange={(v) => {
           if (v === "") {
             editor.chain().focus().unsetFontSize().run();
           } else {
             editor.chain().focus().setFontSize(v).run();
           }
         }}
+        className="w-auto"
       >
-        {FONT_SIZES.map((s) => (
-          <option key={s.label} value={s.value}>
-            {s.label}
-          </option>
-        ))}
-      </select>
+        <MorphSelectTrigger className="h-9 rounded-md border border-outline-variant bg-surface-container-lowest px-2 font-label-sm text-label-sm font-bold text-on-surface">
+          <MorphSelectValue />
+        </MorphSelectTrigger>
+        <MorphSelectContent>
+          {FONT_SIZES.map((s) => (
+            <MorphSelectItem key={s.label} value={s.value}>
+              {s.label}
+            </MorphSelectItem>
+          ))}
+        </MorphSelectContent>
+      </MorphSelect>
 
       <Divider />
 

@@ -4,6 +4,12 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Download, FileText, Search } from "lucide-react";
 import type { ArsipPublicDTO } from "@/lib/api";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -82,15 +88,16 @@ export default function DirektoriArsip({
             </label>
             <label className="block md:w-64">
               <span className="sr-only">Pilih kategori arsip</span>
-              <select
-                value={kategoriAktif}
-                onChange={(event) => setKategoriAktif(event.target.value)}
-                className="min-h-12 w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-base text-on-surface outline-none focus-visible:ring-2 focus-visible:ring-primary"
-              >
-                {kategori.map((item) => (
-                  <option key={item} value={item}>{item}</option>
-                ))}
-              </select>
+              <MorphSelect value={kategoriAktif} onValueChange={setKategoriAktif}>
+                <MorphSelectTrigger className="min-h-12 w-full rounded-xl border border-outline-variant bg-surface-container-lowest px-4 py-3 text-base text-on-surface outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                  <MorphSelectValue />
+                </MorphSelectTrigger>
+                <MorphSelectContent>
+                  {kategori.map((item) => (
+                    <MorphSelectItem key={item} value={item}>{item}</MorphSelectItem>
+                  ))}
+                </MorphSelectContent>
+              </MorphSelect>
             </label>
           </div>
 

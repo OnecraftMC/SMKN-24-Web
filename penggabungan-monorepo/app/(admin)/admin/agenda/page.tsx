@@ -14,6 +14,12 @@ import {
   fieldClass,
 } from "@/components/admin/ui/FormBits";
 import AgendaDialog from "./AgendaDialog";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 type TimingFilter = "semua" | "mendatang" | "terlewat";
 
@@ -183,16 +189,20 @@ export default function AgendaPage() {
           <label htmlFor="agenda-timing" className="sr-only">
             Filter waktu
           </label>
-          <select
-            id="agenda-timing"
-            className={fieldClass}
+          <MorphSelect
             value={timingFilter}
-            onChange={(e) => setTimingFilter(e.target.value as TimingFilter)}
+            onValueChange={(value) => setTimingFilter(value as TimingFilter)}
+            className="w-full"
           >
-            <option value="semua">Semua agenda</option>
-            <option value="mendatang">Mendatang &amp; hari ini</option>
-            <option value="terlewat">Terlewat</option>
-          </select>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="semua">Semua agenda</MorphSelectItem>
+              <MorphSelectItem value="mendatang">Mendatang & hari ini</MorphSelectItem>
+              <MorphSelectItem value="terlewat">Terlewat</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
         </div>
       </div>
 

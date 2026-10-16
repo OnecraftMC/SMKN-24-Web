@@ -61,6 +61,12 @@ function handleCreate(PDO $db): void
     validate($body, $db);
     $body['kategori'] = validateCategorySelection($db, 'pengumuman', $body['kategori']);
 
+    // Hanya satu kartu pengumuman utama yang tampil di beranda.
+    // Saat item baru dipilih tampil, kartu lama otomatis tidak tampil.
+    if (!empty($body['tampilBeranda'])) {
+        $db->exec('UPDATE pengumuman SET tampil_beranda = 0');
+    }
+
     $stmt = $db->prepare(
         'INSERT INTO pengumuman (judul, isi, tanggal, kategori, penting, gambar, badge, status, link_label, link_href, icon, action_icon, variant, tampil_beranda)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
@@ -91,6 +97,13 @@ function handleUpdate(PDO $db): void
     $exists = $db->prepare('SELECT id FROM pengumuman WHERE id = ?');
     $exists->execute([$id]);
     if (!$exists->fetch()) jsonError('Pengumuman tidak ditemukan', 404);
+
+    // Toggle eksklusif: hanya satu pengumuman yang boleh tampil di beranda.
+    // Data lama yang tampil otomatis dinonaktifkan sebelum baris ini diperbarui.
+    if (!empty($body['tampilBeranda'])) {
+        $clear = $db->prepare('UPDATE pengumuman SET tampil_beranda = 0 WHERE id <> ?');
+        $clear->execute([$id]);
+    }
 
     $stmt = $db->prepare(
         'UPDATE pengumuman SET judul=?, isi=?, tanggal=?, kategori=?, penting=?, gambar=?, badge=?, status=?, link_label=?, link_href=?, icon=?, action_icon=?, variant=?, tampil_beranda=?

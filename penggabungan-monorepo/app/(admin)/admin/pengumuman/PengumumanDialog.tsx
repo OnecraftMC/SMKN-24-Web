@@ -15,6 +15,12 @@ import {
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
 import AiWriterPanel, { type PengumumanDraft } from "@/components/admin/ui/AiWriterPanel";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 
 export type PengumumanFormValues = {
   judul: string;
@@ -72,6 +78,8 @@ function formFromRow(row: PengumumanDTO): PengumumanFormValues {
 }
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+const ICON_OPTIONS = ["campaign", "notifications", "event", "info", "school", "calendar_today", "groups", "menu_book", "arrow_forward", "arrow_outward", "open_in_new", "chevron_right"];
 
 export default function PengumumanDialog({
   editing,
@@ -195,6 +203,65 @@ export default function PengumumanDialog({
           </p>
         )}
 
+        <section className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
+          <h2 className="mb-space-sm font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant">
+            Pratinjau kartu beranda
+          </h2>
+          <div
+            className={`max-w-xl rounded-2xl border p-space-md ${
+              form.variant === "secondary"
+                ? "border-secondary-container/20 bg-secondary-container/15"
+                : "border-surface-container bg-surface-container-low"
+            }`}
+          >
+            <div className="mb-2 flex items-center justify-between">
+              <span
+                className={`rounded-full px-2.5 py-0.5 font-label-sm text-label-sm font-bold uppercase tracking-wide text-surface ${
+                  form.variant === "secondary" ? "bg-secondary" : "bg-primary"
+                }`}
+              >
+                {form.badge.trim() || form.kategori || "Pengumuman"}
+              </span>
+              <span className="flex items-center gap-2">
+                {form.status.trim() && (
+                  <span className="font-label-sm text-label-sm font-bold text-secondary">
+                    {form.status}
+                  </span>
+                )}
+                {form.penting && (
+                  <span className="font-label-sm text-label-sm font-bold text-error">
+                    Penting (perlu tindak lanjut)
+                  </span>
+                )}
+                {form.tanggal < todayIso() && (
+                  <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-xs font-bold text-on-surface-variant">
+                    Sudah lewat
+                  </span>
+                )}
+              </span>
+            </div>
+            <p className="font-title-md text-title-md font-bold text-primary">
+              {form.judul.trim() || "Judul pengumuman"}
+            </p>
+            {form.isi.trim() && (
+              <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+                {form.isi}
+              </p>
+            )}
+            {form.linkLabel.trim() && form.linkHref.trim() && (
+              <p className="mt-space-sm flex items-center gap-1 font-label-sm text-label-sm font-bold text-secondary">
+                {form.linkLabel}
+                {form.icon && (
+                  <span className="material-symbols-outlined text-base leading-none">{form.icon}</span>
+                )}
+                {form.actionIcon && (
+                  <span className="material-symbols-outlined text-base leading-none">{form.actionIcon}</span>
+                )}
+              </p>
+            )}
+          </div>
+        </section>
+
         <AiWriterPanel<PengumumanDraft>
           module="pengumuman"
           label="pengumuman"
@@ -273,39 +340,60 @@ export default function PengumumanDialog({
           </Field>
         </div>
 
-        <div className="grid gap-space-md sm:grid-cols-3">
-          <Field htmlFor="peng-variant" label="Varian kartu" hint='"secondary" = warna emas.'>
-            <select
-              id="peng-variant"
-              className={fieldClass}
-              value={form.variant}
-              onChange={(e) => update("variant", e.target.value)}
-            >
-              <option value="default">default</option>
-              <option value="secondary">secondary</option>
-            </select>
-          </Field>
-          <Field htmlFor="peng-icon" label="Ikon" hint="Nama Material Symbols.">
-            <input
-              id="peng-icon"
-              className={fieldClass}
-              value={form.icon}
-              onChange={(e) => update("icon", e.target.value)}
-              placeholder="campaign"
-              maxLength={100}
-            />
-          </Field>
-          <Field htmlFor="peng-action-icon" label="Ikon aksi">
-            <input
-              id="peng-action-icon"
-              className={fieldClass}
-              value={form.actionIcon}
-              onChange={(e) => update("actionIcon", e.target.value)}
-              placeholder="arrow_forward"
-              maxLength={100}
-            />
-          </Field>
-        </div>
+        <Field htmlFor="peng-variant" label="Varian kartu" hint='"secondary" = warna emas.'>
+          <MorphSelect
+            value={form.variant}
+            onValueChange={(value) => update("variant", value)}
+            className="w-full"
+          >
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue placeholder="Varian kartu" />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="default">default</MorphSelectItem>
+              <MorphSelectItem value="secondary">secondary</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
+        </Field>
+
+        <Field htmlFor="peng-icon" label="Ikon">
+          <MorphSelect
+            value={form.icon}
+            onValueChange={(value) => update("icon", value)}
+            className="w-full"
+          >
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue placeholder="Ikon" />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="">Tanpa ikon</MorphSelectItem>
+              {ICON_OPTIONS.map((icon) => (
+                <MorphSelectItem key={icon} value={icon}>
+                  {icon}
+                </MorphSelectItem>
+              ))}
+            </MorphSelectContent>
+          </MorphSelect>
+        </Field>
+        <Field htmlFor="peng-action-icon" label="Ikon aksi">
+          <MorphSelect
+            value={form.actionIcon}
+            onValueChange={(value) => update("actionIcon", value)}
+            className="w-full"
+          >
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue placeholder="Ikon aksi" />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="">Tanpa ikon</MorphSelectItem>
+              {ICON_OPTIONS.map((icon) => (
+                <MorphSelectItem key={icon} value={icon}>
+                  {icon}
+                </MorphSelectItem>
+              ))}
+            </MorphSelectContent>
+          </MorphSelect>
+        </Field>
 
         <div className="grid gap-space-md sm:grid-cols-2">
           <Field htmlFor="peng-link-label" label="Label tautan">
@@ -343,7 +431,7 @@ export default function PengumumanDialog({
               checked={form.penting}
               onChange={(e) => update("penting", e.target.checked)}
             />
-            Tandai penting
+            Tandai penting (perlu tindak lanjut)
           </label>
           <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
             <input

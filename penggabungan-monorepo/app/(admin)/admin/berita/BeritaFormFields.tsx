@@ -12,6 +12,12 @@ import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
 import AiWriterPanel, { type BeritaDraft } from "@/components/admin/ui/AiWriterPanel";
 import RichTextEditor from "@/components/admin/berita/RichTextEditor";
+import MorphSelect, {
+  MorphSelectTrigger,
+  MorphSelectValue,
+  MorphSelectContent,
+  MorphSelectItem,
+} from "@/components/ui/select-morph";
 import type { BeritaFormValues } from "./useBeritaForm";
 
 export type BeritaUpdate = <K extends keyof BeritaFormValues>(
@@ -81,15 +87,19 @@ export function BeritaFormFields({
 
       <div className="grid gap-space-md sm:grid-cols-2">
         <Field htmlFor="berita-status" label="Status">
-          <select
-            id="berita-status"
-            className={fieldClass}
+          <MorphSelect
             value={form.status}
-            onChange={(e) => onUpdate("status", e.target.value as BeritaStatus)}
+            onValueChange={(value) => onUpdate("status", value as BeritaStatus)}
+            className="w-full"
           >
-            <option value="draft">Draft</option>
-            <option value="terbit">Terbit</option>
-          </select>
+            <MorphSelectTrigger className={fieldClass}>
+              <MorphSelectValue />
+            </MorphSelectTrigger>
+            <MorphSelectContent>
+              <MorphSelectItem value="draft">Draft</MorphSelectItem>
+              <MorphSelectItem value="terbit">Terbit</MorphSelectItem>
+            </MorphSelectContent>
+          </MorphSelect>
         </Field>
 
         <div className="flex items-end pb-2">
