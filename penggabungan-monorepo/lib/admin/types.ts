@@ -206,6 +206,8 @@ export interface PesanBKDTO {
   butuhPerhatian: boolean;
   /** Transkrip percakapan siswa dengan counseller AI (JSON string). */
   transkrip: string | null;
+  /** true bila pesan terhubung ke riwayat perangkat siswa untuk balasan portal. */
+  canReply: boolean;
   /** Lampiran bukti privat; file hanya dapat dibaca admin terautentikasi. */
   media: BKEvidenceDTO[];
 }

@@ -1,19 +1,39 @@
+import { ArrowDown, Newspaper } from "lucide-react";
+
 export default function BeritaBanner() {
   return (
-    <div className="bg-primary text-on-primary py-space-2xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop relative overflow-hidden">
-      <div className="max-w-container-max mx-auto space-y-3 relative z-10">
-        <div className="inline-flex items-center gap-2 text-secondary-container font-label-sm font-bold uppercase tracking-wider">
-          <span className="material-symbols-outlined text-[18px]" aria-hidden="true">article</span>
-          <span>Warta Sekolah</span>
+    <section className="relative isolate overflow-hidden bg-gradient-to-br from-primary via-primary to-primary/85 px-margin-mobile py-space-3xl text-surface md:px-margin-tablet lg:px-margin-desktop lg:py-20">
+      <div aria-hidden className="absolute -right-20 -top-28 -z-10 h-96 w-96 rounded-full border border-white/10" />
+      <div aria-hidden className="absolute -right-4 top-8 -z-10 h-64 w-64 rounded-full border border-white/10" />
+      <div aria-hidden className="absolute bottom-0 right-[20%] -z-10 h-40 w-40 rounded-full bg-secondary/10 blur-3xl" />
+      <div className="mx-auto grid max-w-container-max items-end gap-space-xl lg:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="max-w-4xl space-y-space-md">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-label-sm text-label-sm font-bold uppercase tracking-wider text-secondary-container">
+            <Newspaper aria-hidden className="h-4 w-4" />
+            <span>Warta Sekolah</span>
+          </div>
+          <h1 className="font-headline-lg text-headline-lg font-bold tracking-tight text-surface lg:text-[2.75rem]">
+            Cerita, prestasi, dan kabar dari SMKN 24 Jakarta
+          </h1>
+          <p className="max-w-3xl font-body-lg text-primary-fixed">
+            Ikuti kegiatan, pencapaian, dan perkembangan terbaru dari siswa-siswi serta warga sekolah.
+          </p>
+          <div className="flex flex-wrap gap-2 pt-1">
+            {["Kegiatan sekolah", "Prestasi", "Informasi"].map((topic) => (
+              <span key={topic} className="rounded-full bg-white/10 px-3 py-1.5 font-label-sm text-label-sm text-surface">
+                {topic}
+              </span>
+            ))}
+          </div>
         </div>
-        <h1 className="font-headline-lg text-headline-lg lg:text-[2.75rem] font-bold text-surface tracking-tight">
-          Berita &amp; Kabar Terkini SMKN 24 Jakarta
-        </h1>
-        <p className="font-body-lg text-primary-fixed max-w-3xl">
-          Ikuti perkembangan terbaru kegiatan, prestasi, dan capaian siswa-siswi
-          serta dewan guru SMK Negeri 24 Jakarta.
-        </p>
+        <a
+          href="#daftar-berita"
+          className="inline-flex min-h-11 items-center justify-center gap-2 justify-self-start rounded-full bg-secondary-container px-5 font-label-md text-label-md font-bold text-on-secondary-container transition hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-secondary-container lg:justify-self-end"
+        >
+          Jelajahi berita
+          <ArrowDown aria-hidden className="h-4 w-4" />
+        </a>
       </div>
-    </div>
+    </section>
   );
 }

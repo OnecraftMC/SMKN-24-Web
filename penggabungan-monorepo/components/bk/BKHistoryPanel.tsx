@@ -192,7 +192,9 @@ export default function BKHistoryPanel({
                 {isOpen && item.messages && (
                   <div className="mt-2 space-y-1.5 rounded-xl bg-surface-container/70 p-2.5">
                     {item.messages.map((m, i) => {
-                      const isUser = (m.sender ?? m.role) === "user";
+                      const sender = m.sender ?? m.role;
+                      const isUser = sender === "user";
+                      const isCounselor = sender === "counselor";
                       const text = m.text ?? "";
                       if (!text) return null;
                       return (
@@ -204,6 +206,11 @@ export default function BKHistoryPanel({
                               : "bg-surface-container-highest text-on-surface"
                           }`}
                         >
+                          {isCounselor && (
+                            <span className="mb-1 block text-[10px] font-bold uppercase tracking-wide text-primary">
+                              Balasan Guru BK
+                            </span>
+                          )}
                           {text}
                         </p>
                       );

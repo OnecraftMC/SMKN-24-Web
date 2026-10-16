@@ -49,7 +49,7 @@ export function MediaControls({
 }) {
   return (
     <>
-      <button type="button" title="Sisipkan gambar" aria-label="Sisipkan gambar" disabled={disabled || uploading} className={toolBtn(false)} onClick={() => fileRef.current?.click()}>
+      <button type="button" title="Sisipkan satu atau beberapa foto" aria-label="Sisipkan satu atau beberapa foto" disabled={disabled || uploading} className={toolBtn(false)} onClick={() => fileRef.current?.click()}>
         {uploading ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : <ImagePlus aria-hidden className="h-4 w-4" />}
       </button>
       <button type="button" title="Sisipkan tabel 3x3" aria-label="Sisipkan tabel 3 kolom 3 baris" disabled={disabled} className={toolBtn(false)} onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}>

@@ -95,15 +95,39 @@ export default function RichTextEditor({
     editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
   }, [editor]);
 
-  async function handleImageFile(file: File | undefined) {
-    if (!file || !editor) return;
+  async function handleImageFiles(fileList: FileList | null) {
+    const files = Array.from(fileList ?? []);
+    if (files.length === 0 || !editor) return;
+
     setUploadError(null);
     setUploading(true);
+    const uploaded: Array<{ src: string; alt: string }> = [];
+    const issues: string[] = [];
+    const selectedFiles = files.slice(0, 10);
+
+    if (files.length > selectedFiles.length) {
+      issues.push("Pilih maksimal 10 foto untuk setiap proses unggah.");
+    }
+
     try {
-      const path = await uploadImage(file);
-      editor.chain().focus().setImage({ src: path }).run();
-    } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "Gagal mengunggah gambar.");
+      for (const file of selectedFiles) {
+        try {
+          uploaded.push({ src: await uploadImage(file), alt: file.name });
+        } catch (err) {
+          const message = err instanceof Error ? err.message : "Gagal mengunggah gambar.";
+          issues.push(file.name + ": " + message);
+        }
+      }
+
+      if (uploaded.length > 0) {
+        editor.chain().focus().insertContent(
+          uploaded.map((image) => ({
+            type: "image" as const,
+            attrs: { src: image.src, alt: image.alt },
+          })),
+        ).run();
+      }
+      if (issues.length > 0) setUploadError(issues.join(" "));
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -137,12 +161,16 @@ export default function RichTextEditor({
         ref={fileRef}
         type="file"
         accept="image/jpeg,image/png,image/webp,image/gif"
+        multiple
         className="hidden"
         aria-hidden
         tabIndex={-1}
-        onChange={(e) => void handleImageFile(e.target.files?.[0])}
+        onChange={(e) => void handleImageFiles(e.currentTarget.files)}
       />
       <EditorContent editor={editor} id={toolbarId} />
+      <p className="border-t border-surface-container px-3 py-2 font-body-sm text-body-sm text-on-surface-variant">
+        Pilih beberapa foto sekaligus untuk menyisipkan lebih dari satu gambar ke artikel.
+      </p>
       {uploadError && (
         <p role="alert" className="border-t border-surface-container px-3 py-2 font-body-sm text-body-sm text-error">
           {uploadError}

@@ -8,6 +8,7 @@ import {
   Loader2,
   MessageSquareText,
   Search,
+  Send,
   ShieldAlert,
   Sparkles,
   Trash2,
@@ -187,6 +188,10 @@ export default function BKPage() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [replyBusy, setReplyBusy] = useState(false);
+  const [replyError, setReplyError] = useState<string | null>(null);
+  const [replySuccess, setReplySuccess] = useState<string | null>(null);
 
   const selectedRow = useMemo(
     () => rows.find((row) => row.id === selectedId) ?? rows[0] ?? null,
@@ -306,6 +311,48 @@ export default function BKPage() {
     }
   };
 
+  const sendReply = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!selectedRow) return;
+    const reply = replyText.trim();
+    if (!reply) {
+      setReplyError("Tulis balasan sebelum mengirim.");
+      return;
+    }
+    if (!selectedRow.canReply) {
+      setReplyError("Pesan ini tidak memiliki tautan riwayat perangkat siswa.");
+      return;
+    }
+
+    setReplyBusy(true);
+    setReplyError(null);
+    setReplySuccess(null);
+    try {
+      const result = await apiRequest<{ message: string; status: StatusPesanBK }>(
+        "/api/bk/index.php?id=" + selectedRow.id,
+        { method: "PUT", body: { reply } },
+      );
+      const transcript = [...parseTranskrip(selectedRow.transkrip), { sender: "counselor", text: reply }];
+      setRows((previous) =>
+        previous.map((row) =>
+          row.id === selectedRow.id
+            ? { ...row, transkrip: JSON.stringify(transcript), status: result.status }
+            : row,
+        ),
+      );
+      setReplyText("");
+      setReplySuccess("Balasan tersimpan. Siswa dapat membacanya di tab Riwayat BK.");
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setReplyError(err instanceof Error ? err.message : "Balasan belum berhasil dikirim.");
+    } finally {
+      setReplyBusy(false);
+    }
+  };
+
   return (
     <div className="space-y-space-lg">
       <header className="space-y-space-xs">
@@ -394,6 +441,49 @@ export default function BKPage() {
           </div>
 
           <BKEvidence files={selectedRow.media ?? []} />
+
+          <form
+            onSubmit={(event) => void sendReply(event)}
+            className="mt-space-md rounded-xl border border-primary/15 bg-surface-container-lowest p-space-md"
+          >
+            <label htmlFor="bk-reply" className="font-label-md text-label-md font-bold text-on-surface">
+              Balasan Guru BK
+            </label>
+            <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
+              Balasan akan tampil di tab Riwayat BK milik perangkat siswa yang mengirim cerita ini.
+            </p>
+            {selectedRow.canReply ? (
+              <>
+                <textarea
+                  id="bk-reply"
+                  value={replyText}
+                  onChange={(event) => {
+                    setReplyText(event.target.value);
+                    setReplyError(null);
+                    setReplySuccess(null);
+                  }}
+                  rows={4}
+                  maxLength={5000}
+                  disabled={replyBusy}
+                  className={fieldClass + " mt-space-sm"}
+                  placeholder="Tulis respons yang empatik dan langkah tindak lanjut untuk siswa…"
+                />
+                <div className="mt-space-sm flex flex-wrap items-center justify-between gap-space-sm">
+                  <span className="font-body-sm text-body-sm text-on-surface-variant">{replyText.length}/5000</span>
+                  <button type="submit" disabled={replyBusy || replyText.trim() === ""} className={buttonGhostClass}>
+                    {replyBusy ? <Loader2 aria-hidden className="h-4 w-4 animate-spin" /> : <Send aria-hidden className="h-4 w-4" />}
+                    {replyBusy ? "Mengirim…" : "Kirim balasan ke siswa"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="mt-space-sm rounded-lg bg-surface-container-high px-3 py-2 font-body-sm text-body-sm text-on-surface-variant" role="status">
+                Pesan ini tidak terhubung ke riwayat perangkat siswa, jadi balasan dari portal tidak dapat ditampilkan secara privat.
+              </p>
+            )}
+            {replyError && <p className="mt-space-sm font-body-sm text-body-sm text-error" role="alert">{replyError}</p>}
+            {replySuccess && <p className="mt-space-sm font-body-sm text-body-sm text-primary" role="status">{replySuccess}</p>}
+          </form>
 
           <div className="mt-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
             <p className="flex items-center gap-2 font-label-md text-label-md font-bold text-on-surface">
@@ -540,6 +630,9 @@ export default function BKPage() {
                 onClick={() => {
                   setSelectedId(row.id);
                   setExpanded(row.id);
+                  setReplyText("");
+                  setReplyError(null);
+                  setReplySuccess(null);
                 }}
                 className={buttonGhostClass}
               >

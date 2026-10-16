@@ -2,7 +2,7 @@
 /**
  * POST   /api/bk/index.php            -> kirim pesan BK (publik, dari FormBK.tsx)
  * GET    /api/bk/index.php            -> daftar pesan BK (admin)
- * PUT    /api/bk/index.php?id=1       -> update status (admin)
+ * PUT    /api/bk/index.php?id=1       -> update status/kategori atau balas siswa (admin)
  * DELETE /api/bk/index.php?id=1       -> hapus (admin)
  */
 
@@ -81,6 +81,9 @@ function handleGet(PDO $db): void
             'butuhPerhatian' => (bool)($r['butuh_perhatian'] ?? 0),
             'transkrip' => $r['transkrip'] ?? null,
             'media' => json_decode((string)($r['media_json'] ?? '[]'), true) ?: [],
+            // Jangan kirim device_id ke admin UI; cukup beri tahu apakah
+            // balasan web dapat dikirim ke riwayat milik perangkat siswa.
+            'canReply' => !empty($r['device_id']),
         ];
     }, $stmt->fetchAll());
 
@@ -93,6 +96,11 @@ function handleUpdate(PDO $db): void
     if (!$id) jsonError('Parameter id wajib diisi', 400);
 
     $body = getJsonBody();
+    if (array_key_exists('reply', $body)) {
+        handleReply($db, $id, $body['reply']);
+        return;
+    }
+
     $hasStatus = array_key_exists('status', $body);
     $hasCategory = array_key_exists('kategori', $body);
     if (!$hasStatus && !$hasCategory) {
@@ -121,6 +129,56 @@ function handleUpdate(PDO $db): void
     $stmt->execute($values);
 
     jsonResponse(['message' => 'Pesan BK berhasil diperbarui.']);
+}
+
+/**
+ * Tambahkan balasan guru ke transkrip yang sudah dibatasi per-deviceId.
+ * Siswa membacanya kembali melalui endpoint history milik perangkatnya.
+ */
+function handleReply(PDO $db, int $id, $value): void
+{
+    if (!is_string($value)) jsonError('Balasan harus berupa teks.', 400);
+    $reply = trim($value);
+    $length = function_exists('mb_strlen') ? mb_strlen($reply, 'UTF-8') : strlen($reply);
+    if ($reply === '') jsonError('Balasan tidak boleh kosong.', 400);
+    if ($length > 5000) jsonError('Balasan maksimal 5.000 karakter.', 400);
+
+    $db->beginTransaction();
+    try {
+        $stmt = $db->prepare('SELECT device_id, transkrip FROM pesan_bk WHERE id = ? FOR UPDATE');
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        if (!$row) {
+            $db->rollBack();
+            jsonError('Pesan tidak ditemukan.', 404);
+        }
+        if (empty($row['device_id'])) {
+            $db->rollBack();
+            jsonError('Pesan ini tidak terhubung dengan riwayat perangkat siswa, jadi balasan web tidak dapat dikirim.', 409);
+        }
+
+        $messages = json_decode((string)($row['transkrip'] ?? ''), true);
+        if (!is_array($messages)) $messages = [];
+        $messages[] = [
+            'sender' => 'counselor',
+            'text' => $reply,
+            'sentAt' => date(DATE_ATOM),
+        ];
+        $transcript = json_encode($messages, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($transcript === false) {
+            $db->rollBack();
+            jsonError('Balasan tidak dapat disimpan.', 500);
+        }
+
+        $update = $db->prepare("UPDATE pesan_bk SET transkrip = ?, status = 'Diproses' WHERE id = ?");
+        $update->execute([$transcript, $id]);
+        $db->commit();
+    } catch (Throwable $e) {
+        if ($db->inTransaction()) $db->rollBack();
+        throw $e;
+    }
+
+    jsonResponse(['message' => 'Balasan Guru BK berhasil dikirim.', 'status' => 'Diproses']);
 }
 
 function handleDelete(PDO $db): void
