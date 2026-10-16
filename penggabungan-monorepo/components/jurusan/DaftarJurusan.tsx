@@ -86,18 +86,18 @@ export default function DaftarJurusan({
             const chipKelas = tata.unggulan ? kelas : kelas.slice(0, 3);
             return (
               <li key={item.key} className={tata.kolom}>
-                <article className="group relative flex h-full flex-col justify-end overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                  {/* Lapis 1 — latar penuh kartu (foto/fallback) + scrim bawah */}
-                  <div className="absolute inset-0">
+                <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                  {/* Foto hanya mengisi area atas; panel informasi tetap terpisah di bawah. */}
+                  <div className="relative min-h-0 flex-1 overflow-hidden">
                     <LatarKartu item={item} sizes={tata.sizes} />
                     <div
                       aria-hidden="true"
-                      className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"
+                      className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent"
                     />
                   </div>
 
-                  {/* Lapis 2 — panel informasi; teks selalu terbaca di latar apa pun */}
-                  <div className="relative z-10 m-space-sm space-y-space-xs rounded-xl border border-surface-container bg-surface-container-lowest/95 p-space-md backdrop-blur-sm">
+                  {/* Panel informasi berada di bawah foto dan tidak tertimpa gambar. */}
+                  <div className="relative z-10 m-space-sm shrink-0 space-y-space-xs rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
                     <div className="flex items-center gap-2">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary transition-colors duration-300 group-hover:bg-secondary group-hover:text-on-secondary">
                         <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
