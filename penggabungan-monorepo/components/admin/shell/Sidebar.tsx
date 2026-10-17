@@ -119,11 +119,11 @@ function NavList({
       {NAV_GROUPS.map((group, groupIndex) => (
         <div key={group.heading ?? groupIndex} className={groupIndex > 0 ? "mt-space-md" : ""}>
           {group.heading && !collapsed && (
-            <p className="mb-1 px-3 font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface-variant/70">
+            <p className="mb-1 px-3 font-label-sm text-label-sm font-bold uppercase tracking-wider text-primary-fixed-dim">
               {group.heading}
             </p>
           )}
-          {group.heading && collapsed && <div className="mx-3 my-2 border-t border-surface-container" />}
+          {group.heading && collapsed && <div className="mx-3 my-2 border-t border-primary-container" />}
           <ul className="space-y-1">
             {group.items.map((item) => {
               const Icon = item.icon;
@@ -135,7 +135,7 @@ function NavList({
                     <span
                       aria-disabled="true"
                       title="Modul segera tersedia"
-                      className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md text-on-surface-variant/50"
+                      className="flex cursor-not-allowed items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md text-primary-fixed/50"
                     >
                       <Icon aria-hidden className="h-5 w-5 shrink-0" />
                       {!collapsed && <span className="truncate">{item.label}</span>}
@@ -153,8 +153,8 @@ function NavList({
                     title={collapsed ? item.label : undefined}
                     className={`flex items-center gap-3 rounded-lg px-3 py-2 font-label-md text-label-md transition-colors ${
                       active
-                        ? "bg-primary font-bold text-surface"
-                        : "text-on-surface-variant hover:bg-surface-container hover:text-primary"
+                        ? "bg-secondary-container font-bold text-on-secondary-fixed"
+                        : "text-primary-fixed hover:bg-primary-container hover:text-on-primary"
                     }`}
                   >
                     <Icon aria-hidden className="h-5 w-5 shrink-0" />
@@ -198,10 +198,10 @@ function Brand({ collapsed }: { collapsed: boolean }) {
         <span className="sr-only">SMKN 24 Jakarta — Dashboard Admin</span>
       ) : (
         <span className="min-w-0 flex-1">
-          <span className="block font-headline-sm text-headline-sm font-bold leading-tight text-primary">
+          <span className="block font-headline-sm text-headline-sm font-bold leading-tight text-on-primary">
             SMKN 24 Jakarta
           </span>
-          <span className="block truncate font-label-sm text-label-sm text-on-surface-variant">
+          <span className="block truncate font-label-sm text-label-sm text-primary-fixed-dim">
             Dashboard Admin
           </span>
         </span>
@@ -256,7 +256,7 @@ export default function Sidebar({
     <>
       {/* Desktop: lebar dianimasikan saat collapse/expand. */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-surface-container bg-surface-container-lowest transition-[width] duration-300 ease-in-out motion-reduce:transition-none md:flex ${
+        className={`fixed inset-y-0 left-0 z-40 hidden flex-col overflow-hidden border-r border-primary-container bg-primary transition-[width] duration-300 ease-in-out motion-reduce:transition-none md:flex ${
           collapsed ? "w-[4.5rem]" : "w-64"
         }`}
       >
@@ -268,7 +268,7 @@ export default function Sidebar({
               onClick={onToggleCollapse}
               aria-label={collapsed ? "Perlebar sidebar" : "Persempit sidebar"}
               title={collapsed ? "Perlebar sidebar" : "Persempit sidebar"}
-              className="shrink-0 rounded-md p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+              className="shrink-0 rounded-md p-1.5 text-primary-fixed transition-colors hover:bg-primary-container hover:text-on-primary"
             >
               {collapsed ? (
                 <PanelLeftOpen aria-hidden className="h-4 w-4" />
@@ -313,7 +313,7 @@ export default function Sidebar({
                   duration: shouldReduceMotion ? 0 : 0.28,
                   ease: "easeOut",
                 }}
-                className="absolute inset-y-0 left-0 flex w-72 flex-col bg-surface-container-lowest shadow-xl"
+                className="absolute inset-y-0 left-0 flex w-72 flex-col bg-primary shadow-xl"
               >
                 <SidebarHeader
                   collapsed={false}
@@ -322,7 +322,7 @@ export default function Sidebar({
                       type="button"
                       onClick={onCloseMobile}
                       aria-label="Tutup menu"
-                      className="shrink-0 rounded-md p-1.5 text-on-surface-variant transition-colors hover:bg-surface-container hover:text-primary"
+                      className="shrink-0 rounded-md p-1.5 text-primary-fixed transition-colors hover:bg-primary-container hover:text-on-primary"
                     >
                       <X aria-hidden className="h-5 w-5" />
                     </button>
@@ -339,4 +339,3 @@ export default function Sidebar({
     </>
   );
 }
-
