@@ -1,20 +1,22 @@
 # SMKN 24 Jakarta — Aplikasi Tunggal (Website Publik + Dashboard Admin)
 
 Salinan **mandiri** dari monorepo: satu aplikasi Next.js yang melayani website
-publik dan dashboard admin pada **origin yang sama**, plus backend PHP sebagai
-REST API. Salinan ini tidak bergantung pada struktur monorepo sumber; seluruh
-import berada di dalam folder ini.
+publik dan dashboard admin pada **origin yang sama**, dengan backend Laravel
+sebagai target migrasi API dan PHP tetap tersedia selama cutover bertahap.
+Salinan ini tidak bergantung pada struktur monorepo sumber; seluruh import
+berada di dalam folder ini.
 
 | Bagian | Isi |
 |---|---|
 | `app/(public)/` | Website publik (beranda, profil, akademik, kabar, fasilitas, berita, jurusan) |
 | `app/(admin)/login/` | Halaman login admin — `/login` (satu origin, bukan redirect) |
 | `app/(admin)/admin/` | Dashboard admin — `/admin/...` |
-| `app/api/` | Route Next.js (BFF/proxy ke backend PHP untuk publik dan upload pengajuan) |
+| `app/api/` | Route Next.js (BFF/proxy ke API untuk publik dan upload pengajuan) |
 | `components/` | Komponen publik; `components/admin/` komponen shell/dialog admin |
 | `lib/` | Client publik (`lib/api.ts`), `lib/admin/`, `lib/shared/` (token data gabungan) |
 | `styles/tokens.css` | Design token visual — SATU sumber untuk publik & admin |
-| `backend/` | REST API PHP + PDO/MySQL + JWT + upload |
+| `backend-laravel/` | REST API Laravel untuk migrasi backend bertahap |
+| `backend/` | REST API PHP legacy, termasuk aset lama dan rollback |
 
 Baca `MIGRATION_MATRIX.md` untuk daftar paritas sumber → target dan gap yang
 masih terbuka.
@@ -54,16 +56,20 @@ Catatan:
 
 | Variabel | Jenis | Siapa yang pakai |
 |---|---|---|
-| `BACKEND_URL` | **server-only** | Server Next → backend PHP (render + proxy `/api/*`) |
-| `NEXT_PUBLIC_API_URL` | public (ditanam saat **build**) | Browser dashboard admin (CRUD + upload) |
+| `LARAVEL_API_URL` | **server-only** | Server Next → Laravel; jika kosong, server memakai `BACKEND_URL` |
+| `BACKEND_URL` | **server-only** | Server Next → PHP legacy/fallback dan URL aset lama |
+| `NEXT_PUBLIC_API_URL` | public (ditanam saat **build**) | Browser dashboard admin → API (CRUD + upload) |
+| `NEXT_PUBLIC_ASSET_URL` | public (ditanam saat **build**) | Origin website untuk aset lama `/backend/uploads/...` |
 | `NEXT_PUBLIC_MAIN_WEB_URL` | public | Tautan "Kembali ke situs utama" di halaman login |
 | `NEXT_PUBLIC_ADMIN_URL` | public | Opsional; default tautan Login sudah `/login` |
 | `ADMIN_ORIGIN` | public | Hanya bila admin dipisah lintas-origin; **kosongkan untuk same-origin** |
 | `backend/.env` | **server-only** | Backend PHP: `APP_ENV`, `JWT_SECRET`, DB, provider AI |
 
-Backend PHP butuh `backend/.env` (salinan `backend/.env.example`). Isi
-`APP_ENV=production` **dan** `JWT_SECRET` acak sebelum rilis — kalau tidak,
-`bootstrap.php` menolak semua request.
+Backend PHP butuh PHP legacy membutuhkan `backend/.env` (salinan `backend/.env.example`). Laravel
+membutuhkan `backend-laravel/.env` (salinan `backend-laravel/.env.example`).
+Jangan arahkan Laravel ke database produksi atau alihkan trafik sebelum backup
+teruji, staging lulus, dan rollback siap. Untuk rilis PHP, isi `APP_ENV=production`
+dan `JWT_SECRET` acak — kalau tidak, `bootstrap.php` menolak semua request.
 
 **Tidak ada secret di `.env.example`.** Jangan pernah commit `.env`, `.env.local`,
 `JWT_SECRET`, kunci AI, atau kredensial database.
@@ -169,39 +175,68 @@ curl -X POST http://localhost:8000/backend/api/auth/login.php \
 # diharapkan 401 {"error":"Username atau password salah."}
 ```
 
-## 8. Deploy ke Hostinger (belum diuji — lakukan manual)
+## 8. Deploy ke Hostinger
 
-Deployment **belum pernah dijalankan** oleh agen; langkah di bawah adalah
-rencana yang harus dieksekusi dan diverifikasi sendiri.
+Laravel cutover needs an API subdomain whose document root points directly to
+`backend-laravel/public` (not the Laravel project root). Keep the PHP backend
+at `public_html/backend` during rollout for static legacy uploads and rollback.
+Deployment and production cutover must be performed and verified in hPanel;
+changing repository files alone does not change live routing.
 
-1. **Node di hPanel.** aktifkan "Node.js" (versi 20/22), lalu `npm install` dan
-   `npm run build` **di server** (Hostinger menjalankan Next.js lewat Passenger/
-   "Setup Node.js App"). Isi environment variable di hPanel, bukan di file:
-   `BACKEND_URL=https://domain-anda.id/backend`,
-   `NEXT_PUBLIC_API_URL=/backend`, `NEXT_PUBLIC_MAIN_WEB_URL=/`,
-   `NEXT_PUBLIC_ADMIN_URL=/login`, `ADMIN_ORIGIN=` (kosong).
-   `NEXT_PUBLIC_*` di-compile saat build — isi **sebelum** `npm run build`.
-2. **Backend PHP.** upload folder `backend/` ke `public_html/backend/`. Salin
-   `backend/.env.example` menjadi `backend/.env`, isi `APP_ENV=production` dan
-   `JWT_SECRET` acak. **Jangan** pernah menaruh `.env` di path yang bisa diunduh.
-3. **Document root.** pastikan `public_html/backend/` berada di dalam
-   document root agar `.htaccess` ikut diproses.
-4. **Database.** import `backend/database.sql` lewat phpMyAdmin (hapus
-   `CREATE DATABASE`/`USE` bila shared hosting), lalu buat akun admin:
-   `php tools/create-admin.php <username> "<password>" "<nama>"`.
-5. **Verifikasi pasca-deploy (wajib):**
+1. Back up the production database and verify the backup can be restored.
+   Configure Laravel with the same production database as PHP so existing
+   content/admin accounts remain visible. The Laravel migration is additive;
+   review it with `php artisan migrate --pretend --force` before applying it.
+   Do not import `backend/database.sql` into the populated production database:
+   it includes example content. Never point the Laravel app at the empty
+   `laraveltest` database for cutover.
+   Local/staging API writes and Artisan commands block database mutations
+   against remote SQL hosts by default. Use `ALLOW_REMOTE_DB_MUTATIONS=true`
+   only temporarily for a verified staging target; production uses
+   `APP_ENV=production` and Laravel's production confirmation (`--force` only
+   for approved deployments).
+   Destructive remote commands (fresh/reset/rollback/wipe/seeding) also require
+   the separate `ALLOW_DESTRUCTIVE_REMOTE_DB_COMMANDS=true` override.
+2. Deploy the Laravel project outside the public document root, install
+   production Composer dependencies, and set its `public` directory as the
+   API subdomain document root. Keep `.env`, `vendor`, storage, and source
+   files outside the document root. Set `APP_ENV=production`,
+   `APP_DEBUG=false`, `APP_URL=https://api.domain-anda.id`, production DB
+   settings, and the same `JWT_SECRET` currently used by PHP. Set
+   `CORS_ALLOWED_ORIGINS=https://domain-anda.id`. Reuse legacy public uploads
+   (`PUBLIC_UPLOAD_DIR` and `UPLOAD_URL_BASE=/backend/uploads/`) and private
+   uploads (`PRIVATE_UPLOAD_DIR`) with absolute paths outside the document
+   root. Keep AI on sandbox credentials until those flows pass.
+3. Before deploying the frontend build, set these hPanel variables:
 
-```bash
-curl -I https://domain-anda.id/backend/.env          # harus 403
-curl -I https://domain-anda.id/backend/database.sql  # harus 403
-curl -I https://domain-anda.id/backend/uploads/      # harus 403/tidak ada
-curl -X POST https://domain-anda.id/backend/api/auth/login.php \
-  -H "Content-Type: application/json" \
-  -d '{"username":"<user>","password":"<salah>"}'      # harus 401
-```
+   ```text
+   BACKEND_URL=https://domain-anda.id/backend
+   LARAVEL_API_URL=https://api.domain-anda.id
+   NEXT_PUBLIC_API_URL=https://api.domain-anda.id
+   NEXT_PUBLIC_ASSET_URL=https://domain-anda.id
+   NEXT_PUBLIC_MAIN_WEB_URL=/
+   NEXT_PUBLIC_ADMIN_URL=/login
+   ADMIN_ORIGIN=
+   ```
 
-Lalu buka `https://domain-anda.id/login`, masuk dengan akun admin, pastikan
-mengarah ke `/admin`, dan coba CRUD satu modul.
+   `NEXT_PUBLIC_*` values are embedded during `npm run build`; changing them
+   afterwards requires rebuilding and restarting the Next.js app. The old
+   PHP `/backend/uploads` URL remains the asset origin while API requests use
+   the Laravel subdomain.
+4. On Laravel's deployment host, run `php artisan migrate --pretend --force`,
+   verify its DB name is the production DB and the backup exists, then run
+   `php artisan migrate --force`. Check `https://api.domain-anda.id/up`,
+   public API reads, admin login, CRUD, BK uploads, and AI.
+   Run parity checks against a staging copy before sending production traffic.
+5. Deploy/build Next.js with the variables above. Keep the old PHP backend
+   online as rollback. Rollback: restore `NEXT_PUBLIC_API_URL=/backend`,
+   remove `LARAVEL_API_URL` (so server requests fall back to PHP
+   `BACKEND_URL`), rebuild, and restart Next.js. Do not send writes to both
+   backends.
+
+Do not expose production `JWT_SECRET` on a public staging server. Use a
+separate staging secret unless verifying token interoperability in a controlled
+environment.
 
 Hasil validasi lokal dan gap yang masih terbuka: `MIGRATION_MATRIX.md` §8.
 

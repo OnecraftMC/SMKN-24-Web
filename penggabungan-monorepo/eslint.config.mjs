@@ -6,7 +6,13 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   // Abaikan artefak build/output; berkas sumber tetap diperiksa semuanya.
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "backend-laravel/**",
+    "next-env.d.ts",
+  ]),
 ]);
 
 export default eslintConfig;

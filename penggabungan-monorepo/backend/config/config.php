@@ -92,7 +92,7 @@ define('AI_UNAVAILABLE_MESSAGE', "Maaf, asisten AI sedang tidak dapat diakses sa
 // Semua variabel opsional; bila kosong/nonaktif, tool hanya melaporkan
 // halaman tidak tersedia (chatbot tetap jalan dengan tool database).
 // -----------------------------------------------------------------------------
-define('WEBSITE_FETCH_ENABLED', env('WEBSITE_FETCH_ENABLED', 'true') === 'true');
+define('WEBSITE_FETCH_ENABLED', in_array(env('WEBSITE_FETCH_ENABLED', 'true'), [true, 'true'], true));
 define('WEBSITE_URL', rtrim(env('WEBSITE_URL', 'https://macdeep.my.id'), '/'));
 // Path halaman publik yang diambil sebagai konteks (KECUALI galeri).
 // Isi 'path1,path2,...' untuk menimpa default.

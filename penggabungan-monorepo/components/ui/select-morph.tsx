@@ -192,10 +192,11 @@ export function MorphSelectValue({
   className,
 }: MorphSelectValueProps) {
   const ctx = useMorphContext("MorphSelectValue");
+  const { setPlaceholder } = ctx;
   // surface the placeholder so the morph header (rendered by content) matches
   useEffect(() => {
-    if (placeholder) ctx.setPlaceholder(placeholder);
-  }, [placeholder, ctx.setPlaceholder]);
+    if (placeholder) setPlaceholder(placeholder);
+  }, [placeholder, setPlaceholder]);
   const label = ctx.labelFor(ctx.value);
   return (
     <span
@@ -356,13 +357,14 @@ export function MorphSelectItem({
   children,
 }: MorphSelectItemProps) {
   const ctx = useMorphContext("MorphSelectItem");
+  const { register, unregister } = ctx;
   const selected = ctx.value === value;
   const label = typeof children === "string" ? children : value;
 
   useLayoutEffect(() => {
-    ctx.register(value, label);
-    return () => ctx.unregister(value);
-  }, [ctx.register, ctx.unregister, value, label]);
+    register(value, label);
+    return () => unregister(value);
+  }, [register, unregister, value, label]);
 
   return (
     <motion.li variants={ctx.reduce ? undefined : ITEM}>

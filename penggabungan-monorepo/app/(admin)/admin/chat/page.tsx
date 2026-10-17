@@ -99,7 +99,7 @@ export default function ChatAnalyticsPage() {
 
   const { dari, sampai } = useMemo(
     () => rentang(periode, customDari, customSampai),
-    [periode, customDari, customSampai, reloadKey],
+    [periode, customDari, customSampai],
   );
 
   const muat = useCallback(() => {
@@ -431,7 +431,6 @@ export default function ChatAnalyticsPage() {
     </div>
   );
 }
-
 
 
 

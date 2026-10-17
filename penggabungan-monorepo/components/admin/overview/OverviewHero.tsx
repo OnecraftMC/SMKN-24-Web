@@ -40,9 +40,15 @@ export default function OverviewHero({
   // pertama sengaja "null" lalu diisi oleh effect.
   const [kini, setKini] = useState<Date | null>(null);
   useEffect(() => {
-    setKini(new Date());
-    const id = window.setInterval(() => setKini(new Date()), 30_000);
-    return () => window.clearInterval(id);
+    let intervalId: number | undefined;
+    const timeoutId = window.setTimeout(() => {
+      setKini(new Date());
+      intervalId = window.setInterval(() => setKini(new Date()), 30_000);
+    }, 0);
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
   }, []);
 
   const tanggal = kini

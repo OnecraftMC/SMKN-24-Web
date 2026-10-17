@@ -40,7 +40,7 @@ const CHAT_TIMEOUT_MS = 60000;
 const PORT_DATABASE = new Set([3306, 5432]);
 
 export function backendBaseUrl(): { url: string | null; error: string | null } {
-  const value = process.env.BACKEND_URL?.trim();
+  const value = (process.env.LARAVEL_API_URL ?? process.env.BACKEND_URL)?.trim();
   if (!value) return { url: null, error: null };
   let url: URL;
   try {
@@ -108,10 +108,20 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
 }
 
 function backendUrl(): string {
-  const { url, error } = backendBaseUrl();
-  if (error) throw new Error(error);
-  if (!url) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
-  return url;
+  const value = process.env.BACKEND_URL?.trim();
+  if (!value) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      throw new Error("BACKEND_URL harus diawali http:// atau https://.");
+    }
+    return value.replace(/\/+$/, "");
+  } catch (error) {
+    if (error instanceof TypeError) {
+      throw new Error("BACKEND_URL bukan URL yang valid. Contoh nilai: http://localhost:8000");
+    }
+    throw error;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -442,7 +452,8 @@ export async function proxyPublicMultipartPost(
 
 /**
  * Proxy GET same-origin ke backend PHP untuk route baca publik
- * (`/api/berita`, `/api/pengumuman`, `/api/agenda`, `/api/jadwal`).
+ * (`/api/berita`, `/api/pengumuman`, `/api/agenda`, `/api/jadwal`, `/api/guru`,
+ * `/api/galeri`).
  *
  * Sebelumnya keempat route ini menyajikan data contoh dari `lib/data.ts` seolah
  * data server. Sekarang route-nya meneruskan permintaan ke backend PHP nyata dan
@@ -453,7 +464,7 @@ export async function proxyPublicMultipartPost(
  * tidak ikut terekspos lewat proxy publik.
  */
 export async function proxyPublicGet(
-  endpoint: "berita" | "pengumuman" | "agenda" | "jadwal",
+  endpoint: "berita" | "pengumuman" | "agenda" | "jadwal" | "guru" | "galeri",
   params: Record<string, string> = {},
 ): Promise<Response> {
   const { url: baseUrl, error: configError } = backendBaseUrl();

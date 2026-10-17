@@ -25,6 +25,9 @@ export const API_ORIGIN = (() => {
   }
 })();
 
+const configuredAssetUrl = process.env.NEXT_PUBLIC_ASSET_URL?.trim();
+const ASSET_ORIGIN = configuredAssetUrl ? new URL(configuredAssetUrl).origin : API_ORIGIN;
+
 /**
  * URL gambar yang disimpan backend berbentuk path relatif
  * (`/backend/uploads/xxx.jpg`). Saat backend dibuka pada origin yang sama
@@ -39,10 +42,10 @@ export function assetUrl(path: string | null | undefined): string | null {
   if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("/logo")) {
     return path;
   }
-  if (API_ORIGIN === "") {
+  if (ASSET_ORIGIN === "") {
     return path;
   }
-  return `${API_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
+  return `${ASSET_ORIGIN}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 
 export const TOKEN_STORAGE_KEY = "smkn24-admin-token";

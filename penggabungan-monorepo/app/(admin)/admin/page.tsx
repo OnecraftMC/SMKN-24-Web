@@ -213,7 +213,9 @@ export default function OverviewPage() {
   // kartu konten. Query dari/sampai ikut dikirim ke /api/chat/analytics.php.
   useEffect(() => {
     let cancelled = false;
-    setChatStats({ kind: "loading" });
+    const loadingTimer = window.setTimeout(() => {
+      if (!cancelled) setChatStats({ kind: "loading" });
+    }, 0);
 
     const akhir = new Date();
     const mulai = new Date();
@@ -225,6 +227,7 @@ export default function OverviewPage() {
       ),
       apiRequest<ChatInsightsResponse>("/api/chat/insights.php"),
     ]).then(([chat, insight]) => {
+      window.clearTimeout(loadingTimer);
       if (cancelled) return;
 
       if (chat.status === "rejected" && isUnauthorized(chat.reason)) {
@@ -260,6 +263,7 @@ export default function OverviewPage() {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(loadingTimer);
     };
   }, [attempt, periode, logout]);
 
@@ -464,4 +468,3 @@ export default function OverviewPage() {
     </div>
   );
 }
-
