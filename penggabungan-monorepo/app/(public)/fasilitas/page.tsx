@@ -1,5 +1,4 @@
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
-import KantinFacilitySection from '@/components/kantin/KantinFacilitySection';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
 import { getBerita, getFasilitas } from '@/lib/api';
@@ -37,7 +36,6 @@ export default async function FasilitasPage() {
           error={utamaRes.error}
         />
       </Reveal>
-      <Reveal><KantinFacilitySection /></Reveal>
       <Reveal>
         <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} variant="all" />
       </Reveal>
