@@ -15,6 +15,7 @@ import {
   buttonPrimaryClass,
   fieldClass,
 } from "@/components/admin/ui/FormBits";
+import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
 
 type PeriodeKey = "hari" | "7" | "30" | "custom";
 
@@ -274,12 +275,29 @@ export default function ChatAnalyticsPage() {
           </button>
         ))}
         {periode === "custom" && (
-          <>
-            <input type="date" aria-label="Dari tanggal" value={customDari} max={isoHariIni()}
-              onChange={(e) => setCustomDari(e.target.value)} className={fieldClass} />
-            <input type="date" aria-label="Sampai tanggal" value={customSampai} max={isoHariIni()}
-              onChange={(e) => setCustomSampai(e.target.value)} className={fieldClass} />
-          </>
+          <div className="flex flex-wrap items-center gap-2">
+            <UniversalDatePicker
+              defaultMode="range"
+              rangeValue={{ from: customDari, to: customSampai }}
+              onRangeChange={(range) => {
+                if (range?.from) {
+                  const y = range.from.getFullYear();
+                  const m = String(range.from.getMonth() + 1).padStart(2, "0");
+                  const d = String(range.from.getDate()).padStart(2, "0");
+                  setCustomDari(`${y}-${m}-${d}`);
+                }
+                if (range?.to) {
+                  const y = range.to.getFullYear();
+                  const m = String(range.to.getMonth() + 1).padStart(2, "0");
+                  const d = String(range.to.getDate()).padStart(2, "0");
+                  setCustomSampai(`${y}-${m}-${d}`);
+                }
+              }}
+              max={isoHariIni()}
+              placeholder="Pilih rentang tanggal kustom"
+              triggerClassName="h-10 rounded-full border-outline-variant bg-surface text-xs font-semibold px-4"
+            />
+          </div>
         )}
       </section>
 

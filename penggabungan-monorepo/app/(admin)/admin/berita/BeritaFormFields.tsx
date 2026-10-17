@@ -18,6 +18,7 @@ import MorphSelect, {
   MorphSelectContent,
   MorphSelectItem,
 } from "@/components/ui/select-morph";
+import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
 import type { BeritaFormValues } from "./useBeritaForm";
 
 export type BeritaUpdate = <K extends keyof BeritaFormValues>(
@@ -75,12 +76,12 @@ export function BeritaFormFields({
         />
 
         <Field htmlFor="berita-tanggal" label="Tanggal">
-          <input
+          <UniversalDatePicker
             id="berita-tanggal"
-            type="date"
-            className={fieldClass}
             value={form.tanggal.slice(0, 10)}
-            onChange={(e) => onUpdate("tanggal", e.target.value)}
+            onChange={(val) => onUpdate("tanggal", val)}
+            placeholder="Pilih tanggal rilis"
+            triggerClassName="rounded-xl border-outline-variant bg-surface"
           />
         </Field>
       </div>

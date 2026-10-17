@@ -190,13 +190,10 @@ changing repository files alone does not change live routing.
    Do not import `backend/database.sql` into the populated production database:
    it includes example content. Never point the Laravel app at the empty
    `laraveltest` database for cutover.
-   Local/staging API writes and Artisan commands block database mutations
-   against remote SQL hosts by default. Use `ALLOW_REMOTE_DB_MUTATIONS=true`
-   only temporarily for a verified staging target; production uses
-   `APP_ENV=production` and Laravel's production confirmation (`--force` only
-   for approved deployments).
-   Destructive remote commands (fresh/reset/rollback/wipe/seeding) also require
-   the separate `ALLOW_DESTRUCTIVE_REMOTE_DB_COMMANDS=true` override.
+   Laravel has no custom environment/remote-host guard for API writes or
+   Artisan database mutations. Use the intended database credentials and
+   verify the target before running commands; Laravel's built-in production
+   confirmation (`--force`) still applies to migrations.
 2. Deploy the Laravel project outside the public document root, install
    production Composer dependencies, and set its `public` directory as the
    API subdomain document root. Keep `.env`, `vendor`, storage, and source

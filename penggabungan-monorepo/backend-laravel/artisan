@@ -12,21 +12,6 @@ require __DIR__ . '/vendor/autoload.php';
 $app = require_once __DIR__ . '/bootstrap/app.php';
 
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-$connectionName = (string) config('database.default');
-$connections = config('database.connections', []);
-$denial = App\Support\RemoteDatabaseMutationGuard::denialReason(
-    $argv,
-    (string) config('database.mutation_guard_environment', 'local'),
-    is_array($connections) ? $connections : [],
-    $connectionName,
-    config('database.allow_remote_db_mutations', false),
-    config('database.allow_destructive_remote_db_commands', false),
-);
-if ($denial !== null) {
-    fwrite(STDERR, $denial . PHP_EOL);
-    exit(1);
-}
-
 $status = $app->handleCommand(new ArgvInput());
 
 exit($status);

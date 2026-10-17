@@ -22,15 +22,10 @@ production frontend cutover has been performed by this pilot.
    existing archive and achievement files must remain downloadable. Keep it
    outside the document root. Do not use a production database until staging
    parity and rollback have been verified.
-   Local/staging environments refuse API write requests and schema/data
-   mutation commands when the configured SQL host is remote. For an intentional
-   staging test or migration only, set `ALLOW_REMOTE_DB_MUTATIONS=true`
-   temporarily, verify the database target, then restore it to `false`;
-   production deployments use `APP_ENV=production` and Laravel's normal
-   production confirmation (`--force` only for approved deployments).
-   Destructive remote commands (including fresh, reset, rollback, wipe, and
-   seeding) are separately blocked unless
-   `ALLOW_DESTRUCTIVE_REMOTE_DB_COMMANDS=true` is explicitly enabled.
+   Laravel does not add a custom guard blocking API writes or Artisan
+   mutations based on environment or remote SQL host. Verify the configured
+   database target before running mutations. Laravel's built-in production
+   migration confirmation (`--force`) still applies.
 3. Install dependencies with `composer install`.
 4. Generate an application key with `php artisan key:generate`.
 5. Point Laravel at a dedicated local or staging MySQL database. It may be

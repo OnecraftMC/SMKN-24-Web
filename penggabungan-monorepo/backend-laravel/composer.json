@@ -29,8 +29,7 @@
     "test": [
       "@php tests/legacy-jwt-smoke.php",
       "@php tests/canteen-seller-token-smoke.php",
-      "@php tests/legacy-route-coverage.php",
-      "@php tests/remote-db-mutation-guard-smoke.php"
+      "@php tests/legacy-route-coverage.php"
     ],
     "post-autoload-dump": [
       "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

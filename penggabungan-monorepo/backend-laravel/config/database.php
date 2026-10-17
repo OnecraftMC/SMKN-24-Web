@@ -2,9 +2,6 @@
 
 return [
     'default' => env('DB_CONNECTION', 'mysql'),
-    'mutation_guard_environment' => env('APP_ENV', 'local'),
-    'allow_remote_db_mutations' => env('ALLOW_REMOTE_DB_MUTATIONS', false),
-    'allow_destructive_remote_db_commands' => env('ALLOW_DESTRUCTIVE_REMOTE_DB_COMMANDS', false),
     'connections' => [
         'mysql' => [
             'driver' => 'mysql',

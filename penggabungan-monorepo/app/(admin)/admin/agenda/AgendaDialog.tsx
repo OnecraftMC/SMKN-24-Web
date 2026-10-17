@@ -15,6 +15,7 @@ import {
 import ImageField from "@/components/admin/ui/ImageField";
 import CategoryField from "@/components/admin/ui/CategoryField";
 import AiWriterPanel, { type AgendaDraft } from "@/components/admin/ui/AiWriterPanel";
+import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
 
 export type AgendaFormValues = {
   judul: string;
@@ -202,22 +203,22 @@ export default function AgendaDialog({
 
         <div className="grid gap-space-md sm:grid-cols-2">
           <Field htmlFor="agenda-mulai" label="Tanggal mulai">
-            <input
+            <UniversalDatePicker
               id="agenda-mulai"
-              type="date"
-              className={fieldClass}
               value={form.tglMulai}
-              onChange={(e) => update("tglMulai", e.target.value)}
+              onChange={(val) => update("tglMulai", val)}
+              placeholder="Pilih tanggal mulai"
+              triggerClassName="rounded-xl border-outline-variant bg-surface"
             />
           </Field>
           <Field htmlFor="agenda-selesai" label="Tanggal selesai (opsional)">
-            <input
+            <UniversalDatePicker
               id="agenda-selesai"
-              type="date"
-              className={fieldClass}
               value={form.tglSelesai}
               min={form.tglMulai}
-              onChange={(e) => update("tglSelesai", e.target.value)}
+              onChange={(val) => update("tglSelesai", val)}
+              placeholder="Pilih tanggal selesai"
+              triggerClassName="rounded-xl border-outline-variant bg-surface"
             />
           </Field>
         </div>

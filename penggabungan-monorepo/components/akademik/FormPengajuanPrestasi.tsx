@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Loader2, Send } from "lucide-react";
 import { fieldClass, labelClass } from "@/components/admin/ui/FormBits";
+import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
 
 const initialForm = {
   nisn: "",
@@ -107,7 +108,17 @@ export default function FormPengajuanPrestasi() {
         <Field label="Jurusan" name="jurusan" required maxLength={100} value={form.jurusan} onChange={updateField} />
         <Field label="Nama perlombaan" name="perlombaan" required maxLength={255} value={form.perlombaan} onChange={updateField} />
         <Field label="Tingkat perlombaan" name="tingkat" required maxLength={100} value={form.tingkat} onChange={updateField} />
-        <Field label="Tanggal perlombaan" name="tanggalLomba" required type="date" value={form.tanggalLomba} onChange={updateField} />
+        <div>
+          <span className={labelClass}>
+            Tanggal perlombaan <span aria-hidden="true">*</span>
+          </span>
+          <UniversalDatePicker
+            value={form.tanggalLomba}
+            onChange={(val) => updateField("tanggalLomba", val)}
+            placeholder="Pilih tanggal perlombaan"
+            triggerClassName="rounded-xl border-outline-variant bg-surface"
+          />
+        </div>
         <Field label="Penyelenggara" name="penyelenggara" required maxLength={200} value={form.penyelenggara} onChange={updateField} />
         <Field label="Prestasi / peringkat" name="prestasi" required maxLength={150} value={form.prestasi} onChange={updateField} />
         <label className="block md:col-span-2">

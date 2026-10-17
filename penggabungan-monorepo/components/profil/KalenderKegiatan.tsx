@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, X } from "lucide-react";
 import type { AgendaDTO } from "@/lib/shared/mappers";
+import { MonthPicker } from "@/components/ui/month-picker";
 
 const WEEKDAYS = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 const MONTH_FORMATTER = new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" });
@@ -104,22 +105,19 @@ export default function KalenderKegiatan({
                 <h3 className="font-title-lg font-bold capitalize text-on-surface">
                   {MONTH_FORMATTER.format(visibleMonth)}
                 </h3>
-                <label className="mt-1 inline-flex items-center gap-2 text-xs font-semibold text-on-surface-variant">
-                  <span>Pilih bulan</span>
-                  <input
-                    type="month"
-                    aria-label="Pilih bulan dan tahun kalender"
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-xs font-semibold text-on-surface-variant">Pilih bulan:</span>
+                  <MonthPicker
                     value={isoMonth(visibleMonth)}
-                    onChange={(event) => {
-                      const [year, month] = event.target.value.split("-").map(Number);
+                    onChange={(val) => {
+                      const [year, month] = val.split("-").map(Number);
                       if (year && month) {
                         setVisibleMonth(new Date(year, month - 1, 1));
                         setSelectedDate(null);
                       }
                     }}
-                    className="rounded-lg border border-outline-variant bg-surface-container-lowest px-2 py-1 text-on-surface"
                   />
-                </label>
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <button

@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "react-day-picker/src/style.css";
 
 /* =============================================================================
  * app/globals.css — aplikasi gabungan (website publik + dashboard admin).

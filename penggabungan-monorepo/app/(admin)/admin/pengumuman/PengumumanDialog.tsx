@@ -21,6 +21,7 @@ import MorphSelect, {
   MorphSelectContent,
   MorphSelectItem,
 } from "@/components/ui/select-morph";
+import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
 
 export type PengumumanFormValues = {
   judul: string;
@@ -299,12 +300,12 @@ export default function PengumumanDialog({
             required
           />
           <Field htmlFor="peng-tanggal" label="Tanggal">
-            <input
+            <UniversalDatePicker
               id="peng-tanggal"
-              type="date"
-              className={fieldClass}
               value={form.tanggal.slice(0, 10)}
-              onChange={(e) => update("tanggal", e.target.value)}
+              onChange={(val) => update("tanggal", val)}
+              placeholder="Pilih tanggal rilis"
+              triggerClassName="rounded-xl border-outline-variant bg-surface"
             />
           </Field>
         </div>
