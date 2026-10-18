@@ -18,7 +18,17 @@ export default async function Home() {
   ]);
   const berita = beritaRes.data ?? [];
   const pengumuman = pengumumanRes.data ?? [];
-  const agenda = agendaRes.data ?? [];
+  const allAgenda = agendaRes.data ?? [];
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+  const agenda = allAgenda.filter((item) => (item.tglSelesai || item.tglMulai) >= today);
+  const pastAgenda = allAgenda
+    .filter((item) => (item.tglSelesai || item.tglMulai) < today)
+    .sort((a, b) => b.tglMulai.localeCompare(a.tglMulai));
 
   return (
     <>
@@ -40,7 +50,7 @@ export default async function Home() {
         </section>
       </Reveal>
       <Reveal>
-        <AgendaKegiatan agenda={agenda} error={agendaRes.error} />
+        <AgendaKegiatan agenda={agenda} pastAgenda={pastAgenda} error={agendaRes.error} />
       </Reveal>
       <Reveal>
         <LokasiSekolahBanner />
