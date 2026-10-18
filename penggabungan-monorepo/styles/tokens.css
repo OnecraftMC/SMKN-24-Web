@@ -65,6 +65,12 @@
   --color-primary-container: #0f294a;
   --color-primary-fixed-dim: #b0c8f1;
 
+  /* Seri diagram (garis tren & area). Nilai ini sebelumnya di-hardcode di
+     ChatStatsSection sebagai #2563eb di luar token. */
+  --color-chart-series: #2563eb;
+  /* Jalur poros waktu pada halaman Overview admin. */
+  --color-chart-spine: #0f294a;
+
   --radius: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;

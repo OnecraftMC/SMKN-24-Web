@@ -41,6 +41,7 @@ Desktop.ini
 !.vscode/tasks.json
 !.vscode/launch.json
 .idea/
+.impeccable/
 
 # Temporary files
 *.tmp

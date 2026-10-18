@@ -24,6 +24,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { useModul, type ModulContextValue, type ModulKey, type SumberState } from "@/lib/admin/moduleCounts";
 
 export type NavItem = {
   href: string;
@@ -31,6 +32,11 @@ export type NavItem = {
   icon: LucideIcon;
   /** false = modul belum dibangun (Slice 2+), dirender nonaktif. */
   ready: boolean;
+  /**
+   * Sumber jumlah pada ModulProvider untuk lencana rail. Jumlah berasal
+   * dari backend, bukan dekorasi: "—" berarti sumbernya gagal dimuat.
+   */
+  jumlah?: ModulKey;
 };
 
 export type NavGroup = {
@@ -49,12 +55,12 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     heading: "Konten Website",
     items: [
-      { href: `${ADMIN_BASE}/berita`, label: "Berita & Highlight", icon: Newspaper, ready: true },
-      { href: `${ADMIN_BASE}/pengumuman`, label: "Pengumuman & Papan", icon: Megaphone, ready: true },
-      { href: `${ADMIN_BASE}/agenda`, label: "Agenda Kegiatan", icon: CalendarDays, ready: true },
-      { href: `${ADMIN_BASE}/galeri`, label: "Galeri Kegiatan", icon: Images, ready: true },
-      { href: `${ADMIN_BASE}/fasilitas`, label: "Fasilitas Sekolah", icon: Building2, ready: true },
-      { href: `${ADMIN_BASE}/guru`, label: "Direktori Guru", icon: GraduationCap, ready: true },
+      { href: `${ADMIN_BASE}/berita`, label: "Berita & Highlight", icon: Newspaper, ready: true, jumlah: "berita" },
+      { href: `${ADMIN_BASE}/pengumuman`, label: "Pengumuman & Papan", icon: Megaphone, ready: true, jumlah: "pengumuman" },
+      { href: `${ADMIN_BASE}/agenda`, label: "Agenda Kegiatan", icon: CalendarDays, ready: true, jumlah: "agenda" },
+      { href: `${ADMIN_BASE}/galeri`, label: "Galeri Kegiatan", icon: Images, ready: true, jumlah: "galeri" },
+      { href: `${ADMIN_BASE}/fasilitas`, label: "Fasilitas Sekolah", icon: Building2, ready: true, jumlah: "fasilitas" },
+      { href: `${ADMIN_BASE}/guru`, label: "Direktori Guru", icon: GraduationCap, ready: true, jumlah: "guru" },
     ],
   },
   {
@@ -67,8 +73,8 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     heading: "Inbox & Moderasi",
     items: [
-      { href: `${ADMIN_BASE}/bk`, label: "Pesan BK", icon: MessageSquareHeart, ready: true },
-      { href: `${ADMIN_BASE}/prestasi`, label: "Pengajuan Prestasi", icon: Trophy, ready: true },
+      { href: `${ADMIN_BASE}/bk`, label: "Pesan BK", icon: MessageSquareHeart, ready: true, jumlah: "bk" },
+      { href: `${ADMIN_BASE}/prestasi`, label: "Pengajuan Prestasi", icon: Trophy, ready: true, jumlah: "prestasi" },
     ],
   },
   {
@@ -103,6 +109,96 @@ type SidebarProps = {
   onCloseMobile: () => void;
 };
 
+/* ---------------------------------------------------------------------------
+ * Lencana jumlah per modul
+ *
+ * Angka berasal dari backend dan pindah ke sini bersama penghapusan kartu
+ * modul di Overview. state "error" sengaja tampil sebagai "—" berpermalinkan
+ * error, bukan 0: jumlah yang gagal dimuat bukan jumlah nol.
+ * ------------------------------------------------------------------------- */
+
+type Lencana = { status: "loading" | "error" | "ok"; value: number | null };
+
+function dariSumber<T>(sumber: SumberState<T>, angka: (nilai: T) => number): Lencana {
+  if (sumber.kind === "loading") return { status: "loading", value: null };
+  if (sumber.kind === "error") return { status: "error", value: null };
+  return { status: "ok", value: angka(sumber.value) };
+}
+
+function hitungLencana(modul: ModulContextValue, key?: ModulKey): Lencana | null {
+  switch (key) {
+    case "berita":
+      return dariSumber(modul.berita, (n) => n);
+    case "guru":
+      return dariSumber(modul.guru, (n) => n);
+    case "fasilitas":
+      return dariSumber(modul.fasilitas, (n) => n);
+    case "galeri":
+      return dariSumber(modul.galeri, (n) => n);
+    case "pengumuman":
+      return dariSumber(modul.pengumuman, (n) => n.total);
+    case "agenda":
+      return dariSumber(modul.agenda, (n) => n.length);
+    case "bk":
+      return dariSumber(modul.bk, (n) => n.filter((p) => p.status === "Baru").length);
+    case "prestasi":
+      return dariSumber(modul.prestasi, (n) => n.baru);
+    default:
+      return null;
+  }
+}
+
+/** Angka lencana memakai pemisah ribuan gaya Indonesia. */
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat("id-ID").format(value);
+}
+
+function LencanaJumlah({
+  lencana,
+  item,
+  aktif,
+}: {
+  lencana: Lencana;
+  item: NavItem;
+  aktif: boolean;
+}) {
+  if (lencana.status === "loading") {
+    return (
+      <span
+        aria-hidden
+        className="h-4 w-6 shrink-0 animate-pulse rounded bg-primary-fixed/25"
+      />
+    );
+  }
+
+  if (lencana.status === "error") {
+    return (
+      <span
+        title={`Jumlah ${item.label} gagal dimuat`}
+        className="shrink-0 tabular-nums font-label-sm text-label-sm text-error"
+      >
+        <span aria-hidden>—</span>
+        <span className="sr-only">
+          Jumlah {item.label} gagal dimuat. Muat ulang halaman untuk mencoba lagi.
+        </span>
+      </span>
+    );
+  }
+
+  const nilai = lencana.value ?? 0;
+  return (
+    <span
+      title={`${formatNumber(nilai)} di ${item.label}`}
+      className={`shrink-0 tabular-nums font-label-sm text-label-sm font-bold ${
+        aktif ? "text-on-secondary-fixed" : "text-primary-fixed-dim"
+      }`}
+    >
+      {formatNumber(nilai)}
+      <span className="sr-only"> di {item.label}</span>
+    </span>
+  );
+}
+
 function NavList({
   collapsed,
   pathname,
@@ -112,6 +208,7 @@ function NavList({
   pathname: string;
   onNavigate?: () => void;
 }) {
+  const modul = useModul();
   return (
     <>
       {NAV_GROUPS.map((group, groupIndex) => (
@@ -157,6 +254,15 @@ function NavList({
                   >
                     <Icon aria-hidden className="h-5 w-5 shrink-0" />
                     {!collapsed && <span className="truncate">{item.label}</span>}
+                    {!collapsed && item.jumlah && (
+                      <span className="ml-auto">
+                        <LencanaJumlah
+                          lencana={hitungLencana(modul, item.jumlah)!}
+                          item={item}
+                          aktif={active}
+                        />
+                      </span>
+                    )}
                   </Link>
                 </li>
               );

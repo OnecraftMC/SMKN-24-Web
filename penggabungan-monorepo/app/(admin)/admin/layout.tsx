@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
+import { ModulProvider } from "@/lib/admin/moduleCounts";
 import Sidebar from "@/components/admin/shell/Sidebar";
 import Topbar from "@/components/admin/shell/Topbar";
 
@@ -39,23 +40,25 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-surface">
-      <Sidebar
-        collapsed={collapsed}
-        onToggleCollapse={() => setCollapsed((v) => !v)}
-        mobileOpen={mobileOpen}
-        onCloseMobile={() => setMobileOpen(false)}
-      />
-      <div
-        className={`flex min-h-screen flex-col transition-[padding] duration-300 ease-in-out motion-reduce:transition-none ${
-          collapsed ? "md:pl-[4.5rem]" : "md:pl-64"
-        }`}
-      >
-        <Topbar onOpenMobile={() => setMobileOpen(true)} />
-        <main className="flex-1 px-margin-mobile py-space-lg md:px-margin-tablet lg:px-margin-desktop">
-          {children}
-        </main>
+    <ModulProvider>
+      <div className="min-h-screen bg-surface">
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed((v) => !v)}
+          mobileOpen={mobileOpen}
+          onCloseMobile={() => setMobileOpen(false)}
+        />
+        <div
+          className={`flex min-h-screen flex-col transition-[padding] duration-300 ease-in-out motion-reduce:transition-none ${
+            collapsed ? "md:pl-[4.5rem]" : "md:pl-64"
+          }`}
+        >
+          <Topbar onOpenMobile={() => setMobileOpen(true)} />
+          <main className="flex-1 px-margin-mobile py-space-lg md:px-margin-tablet lg:px-margin-desktop">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </ModulProvider>
   );
 }
