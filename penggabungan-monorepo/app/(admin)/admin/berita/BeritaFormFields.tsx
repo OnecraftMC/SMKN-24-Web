@@ -3,6 +3,7 @@
 import { Loader2, Save } from "lucide-react";
 import type { BeritaStatus } from "@/lib/admin/types";
 import {
+  CheckField,
   Field,
   buttonGhostClass,
   buttonPrimaryClass,
@@ -56,7 +57,7 @@ export function BeritaFormFields({
         onApply={onApplyDraft}
       />
 
-      <Field htmlFor="berita-judul" label="Judul">
+      <Field htmlFor="berita-judul" label="Judul" required>
         <input
           id="berita-judul"
           className={fieldClass}
@@ -75,7 +76,7 @@ export function BeritaFormFields({
           required
         />
 
-        <Field htmlFor="berita-tanggal" label="Tanggal">
+        <Field htmlFor="berita-tanggal" label="Tanggal" required>
           <UniversalDatePicker
             id="berita-tanggal"
             value={form.tanggal.slice(0, 10)}
@@ -104,14 +105,13 @@ export function BeritaFormFields({
         </Field>
 
         <div className="flex items-end pb-2">
-          <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-            <input
-              type="checkbox"
-              checked={form.utama}
-              onChange={(e) => onUpdate("utama", e.target.checked)}
-            />
+          <CheckField
+            id="berita-utama"
+            checked={form.utama}
+            onChange={(checked) => onUpdate("utama", checked)}
+          >
             Jadikan berita utama (highlight)
-          </label>
+          </CheckField>
         </div>
       </div>
 

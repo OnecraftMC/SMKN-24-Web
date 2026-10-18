@@ -1,10 +1,10 @@
-"use client";
-
 /**
  * Helper murni halaman Pesan BK (`/admin/bk`).
  *
- * Dipisah dari `page.tsx` agar komponen antrean (`BKQueueList`) dan panel
- * detail (`BKDetailPanel`) dapat memakai ulang tanpa duplikasi.
+ * Tanpa "use client": hanya fungsi/konstanta murni agar aman diimpor
+ * komponen server bila kelak dibutuhkan. Dipisah dari `page.tsx` agar
+ * komponen antrean (`BKQueueList`) dan panel detail (`BKDetailPanel`)
+ * dapat memakai ulang tanpa duplikasi.
  */
 
 import {
@@ -14,8 +14,6 @@ import {
 } from "@/lib/admin/types";
 
 export const STATUS_LIST = ["Baru", "Diproses", "Selesai"] as const;
-
-export type StatusPesanBKFallback = (typeof STATUS_LIST)[number];
 
 /**
  * Samarkan nomor HP siswa: tampilkan 4 digit terakhir saja.

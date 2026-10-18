@@ -149,7 +149,7 @@ export default function GuruDialog({
           </p>
         )}
 
-        <Field htmlFor="guru-nama" label="Nama">
+        <Field htmlFor="guru-nama" label="Nama" required>
           <input
             id="guru-nama"
             className={fieldClass}
@@ -175,7 +175,7 @@ export default function GuruDialog({
           }}
         />
 
-        <Field htmlFor="guru-jabatan" label="Jabatan">
+        <Field htmlFor="guru-jabatan" label="Jabatan" required>
           <input
             id="guru-jabatan"
             className={fieldClass}

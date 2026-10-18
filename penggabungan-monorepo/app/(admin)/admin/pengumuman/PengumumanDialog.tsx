@@ -6,6 +6,7 @@ import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type { PengumumanDTO } from "@/lib/admin/types";
 import { todayIso } from "@/lib/admin/format";
 import {
+  CheckField,
   Field,
   Modal,
   buttonGhostClass,
@@ -281,7 +282,7 @@ export default function PengumumanDialog({
           }}
         />
 
-        <Field htmlFor="peng-judul" label="Judul">
+        <Field htmlFor="peng-judul" label="Judul" required>
           <input
             id="peng-judul"
             className={fieldClass}
@@ -299,7 +300,7 @@ export default function PengumumanDialog({
             onUnauthorized={onUnauthorized}
             required
           />
-          <Field htmlFor="peng-tanggal" label="Tanggal">
+          <Field htmlFor="peng-tanggal" label="Tanggal" required>
             <UniversalDatePicker
               id="peng-tanggal"
               value={form.tanggal.slice(0, 10)}
@@ -425,23 +426,21 @@ export default function PengumumanDialog({
           label="Gambar pendukung (opsional)"
         />
 
-        <div className="flex flex-wrap gap-space-lg">
-          <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-            <input
-              type="checkbox"
-              checked={form.penting}
-              onChange={(e) => update("penting", e.target.checked)}
-            />
+        <div className="grid gap-space-md sm:grid-cols-2">
+          <CheckField
+            id="peng-penting"
+            checked={form.penting}
+            onChange={(checked) => update("penting", checked)}
+          >
             Tandai penting (perlu tindak lanjut)
-          </label>
-          <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-            <input
-              type="checkbox"
-              checked={form.tampilBeranda}
-              onChange={(e) => update("tampilBeranda", e.target.checked)}
-            />
+          </CheckField>
+          <CheckField
+            id="peng-tampil-beranda"
+            checked={form.tampilBeranda}
+            onChange={(checked) => update("tampilBeranda", checked)}
+          >
             Tampilkan di papan informasi beranda
-          </label>
+          </CheckField>
         </div>
       </form>
     </Modal>

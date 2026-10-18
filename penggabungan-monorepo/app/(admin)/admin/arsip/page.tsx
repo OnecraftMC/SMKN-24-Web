@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/admin/auth";
 import { apiDownload, apiRequest, apiUpload, isUnauthorized } from "@/lib/admin/api";
 import type { ArsipDTO } from "@/lib/admin/types";
 import {
+  CheckField,
   ConfirmDialog,
   Field,
   ListState,
@@ -257,7 +258,7 @@ export default function ArsipAdminPage() {
           }
         >
           <form id="archive-form" onSubmit={saveArchive} className="space-y-space-md">
-            <Field htmlFor="archive-title" label="Judul">
+            <Field htmlFor="archive-title" label="Judul" required>
               <input
                 id="archive-title"
                 value={draft.judul}
@@ -306,15 +307,13 @@ export default function ArsipAdminPage() {
                 />
               </Field>
             )}
-            <label className="flex items-start gap-3 rounded-lg bg-surface-container-low p-space-md">
-              <input
-                type="checkbox"
-                checked={draft.aktif}
-                onChange={(event) => setDraft((value) => ({ ...value, aktif: event.target.checked }))}
-                className="mt-1 h-4 w-4 accent-primary"
-              />
-              <span className="text-sm">Tampilkan dan izinkan unduhan publik.</span>
-            </label>
+            <CheckField
+              id="archive-aktif"
+              checked={draft.aktif}
+              onChange={(checked) => setDraft((value) => ({ ...value, aktif: checked }))}
+            >
+              Tampilkan dan izinkan unduhan publik.
+            </CheckField>
             {error && (
               <p role="alert" className="rounded-lg bg-error-container p-space-sm text-on-error-container">
                 {error}

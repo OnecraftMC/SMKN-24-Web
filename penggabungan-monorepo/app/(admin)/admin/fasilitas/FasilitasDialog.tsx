@@ -5,6 +5,7 @@ import { Loader2, Save, TriangleAlert } from "lucide-react";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type { FasilitasDTO } from "@/lib/admin/types";
 import {
+  CheckField,
   Field,
   Modal,
   buttonGhostClass,
@@ -147,7 +148,7 @@ export default function FasilitasDialog({
           }}
         />
 
-        <Field htmlFor="fasilitas-judul" label="Judul">
+        <Field htmlFor="fasilitas-judul" label="Judul" required>
           <input
             id="fasilitas-judul"
             className={fieldClass}
@@ -174,19 +175,13 @@ export default function FasilitasDialog({
           />
         </Field>
 
-        <label
-          htmlFor="fasilitas-unggulan"
-          className="flex min-h-11 items-center gap-space-sm rounded-lg border border-surface-container px-space-md font-body-sm text-body-sm text-on-surface"
+        <CheckField
+          id="fasilitas-unggulan"
+          checked={form.unggulan}
+          onChange={(checked) => update("unggulan", checked)}
         >
-          <input
-            id="fasilitas-unggulan"
-            type="checkbox"
-            checked={form.unggulan}
-            onChange={(event) => update("unggulan", event.target.checked)}
-            className="h-4 w-4 accent-secondary"
-          />
           <span>Tampilkan sebagai fasilitas unggulan di halaman profil</span>
-        </label>
+        </CheckField>
 
         <ImageField
           label="Gambar fasilitas"

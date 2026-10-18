@@ -23,23 +23,62 @@ export function Field({
   htmlFor,
   label,
   hint,
+  required,
   children,
 }: {
   htmlFor: string;
   label: string;
   hint?: string;
+  required?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <div>
       <label htmlFor={htmlFor} className={labelClass}>
         {label}
+        {required ? <span aria-hidden="true"> *</span> : null}
       </label>
       {children}
       {hint && (
         <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">{hint}</p>
       )}
     </div>
+  );
+}
+
+/**
+ * Checkbox opsi bentuk kartu: target sentuh min-h-11, border konsisten,
+ * dipakai semua dialog tambah/edit (ganti label checkbox polos yang kecil
+ * dan beda-beda gaya di tiap dialog).
+ */
+export function CheckField({
+  id,
+  checked,
+  onChange,
+  disabled,
+  children,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label
+      htmlFor={id}
+      className="flex min-h-11 cursor-pointer items-center gap-space-sm rounded-lg border border-surface-container px-space-md font-body-sm text-body-sm text-on-surface transition-colors has-checked:border-primary/40 has-checked:bg-primary/5"
+    >
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        disabled={disabled}
+        className="h-4 w-4 shrink-0 accent-primary"
+      />
+      <span>{children}</span>
+    </label>
   );
 }
 

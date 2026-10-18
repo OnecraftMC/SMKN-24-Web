@@ -141,7 +141,7 @@ export default function JadwalSlotDialog({
             />
           </Field>
         </div>
-        <Field htmlFor="jadwal-mapel" label="Mata pelajaran">
+        <Field htmlFor="jadwal-mapel" label="Mata pelajaran" required>
           <input
             id="jadwal-mapel"
             className={fieldClass}

@@ -142,7 +142,7 @@ export default function GaleriDialog({
           }}
         />
 
-        <Field htmlFor="galeri-judul" label="Judul">
+        <Field htmlFor="galeri-judul" label="Judul" required>
           <input
             id="galeri-judul"
             className={fieldClass}

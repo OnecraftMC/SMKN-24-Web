@@ -6,6 +6,7 @@ import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type { AgendaDTO } from "@/lib/admin/types";
 import { todayIso } from "@/lib/admin/format";
 import {
+  CheckField,
   Field,
   Modal,
   buttonGhostClass,
@@ -191,7 +192,7 @@ export default function AgendaDialog({
           }}
         />
 
-        <Field htmlFor="agenda-judul" label="Judul kegiatan">
+        <Field htmlFor="agenda-judul" label="Judul kegiatan" required>
           <input
             id="agenda-judul"
             className={fieldClass}
@@ -202,7 +203,7 @@ export default function AgendaDialog({
         </Field>
 
         <div className="grid gap-space-md sm:grid-cols-2">
-          <Field htmlFor="agenda-mulai" label="Tanggal mulai">
+          <Field htmlFor="agenda-mulai" label="Tanggal mulai" required>
             <UniversalDatePicker
               id="agenda-mulai"
               value={form.tglMulai}
@@ -277,14 +278,13 @@ export default function AgendaDialog({
           label="Gambar (opsional)"
         />
 
-        <label className="flex items-center gap-2 font-body-sm text-body-sm text-on-surface">
-          <input
-            type="checkbox"
-            checked={form.tampilBeranda}
-            onChange={(e) => update("tampilBeranda", e.target.checked)}
-          />
+        <CheckField
+          id="agenda-tampil-beranda"
+          checked={form.tampilBeranda}
+          onChange={(checked) => update("tampilBeranda", checked)}
+        >
           Tampilkan di agenda beranda
-        </label>
+        </CheckField>
       </form>
     </Modal>
   );

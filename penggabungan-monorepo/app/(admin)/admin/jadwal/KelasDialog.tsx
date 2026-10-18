@@ -124,7 +124,7 @@ export default function KelasDialog({
             </Field>
           </div>
         )}
-        <Field htmlFor="jadwal-class-name" label="Nama kelas">
+        <Field htmlFor="jadwal-class-name" label="Nama kelas" required>
           <input
             id="jadwal-class-name"
             className={fieldClass}
