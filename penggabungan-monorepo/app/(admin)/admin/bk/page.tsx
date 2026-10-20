@@ -1,15 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ShieldAlert } from "lucide-react";
+import { ShieldAlert, Send, Save, Phone, MessageCircle } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
-import { apiRequest, isUnauthorized } from "@/lib/admin/api";
+import {
+  apiRequest,
+  getBkWaConfig,
+  saveBkWaConfig,
+  testBkWa,
+  isUnauthorized,
+} from "@/lib/admin/api";
 import {
   type PesanBKDTO,
   type StatusPesanBK,
   type TingkatKesulitanBK,
+  type BkWaSetting,
+  type WaProvider,
 } from "@/lib/admin/types";
-import { ConfirmDialog } from "@/components/admin/ui/FormBits";
+import { ConfirmDialog, fieldClass, labelClass } from "@/components/admin/ui/FormBits";
 import BKDetailPanel from "@/components/admin/bk/BKDetailPanel";
 import BKQueueList from "@/components/admin/bk/BKQueueList";
 import {
@@ -17,6 +25,16 @@ import {
   pilihPrioritasTerbuka,
   sortAntrean,
 } from "@/components/admin/bk/bk-helpers";
+
+/**
+ * Link verifikasi WhatsApp Guru BK.
+ *
+ * Format: https://wa.me/<nomor tanpa "+">?text=<pesan prefilled>.
+ * Ganti NOMOR_VERIFIKASI_WA dengan nomor Guru BK yang sebenarnya.
+ */
+const NOMOR_VERIFIKASI_WA = "6289526417406";
+const PESAN_VERIFIKASI_WA = "bk-registery";
+const WA_VERIFIKASI_URL = `https://wa.me/${NOMOR_VERIFIKASI_WA}?text=${encodeURIComponent(PESAN_VERIFIKASI_WA)}`;
 
 /**
  * Halaman Pesan BK (`/admin/bk`) — layout master–detail (P9.1/E22).
@@ -48,6 +66,110 @@ export default function BKPage() {
   const [replyBusy, setReplyBusy] = useState(false);
   const [replyError, setReplyError] = useState<string | null>(null);
   const [replySuccess, setReplySuccess] = useState<string | null>(null);
+
+  // ---------- Konfigurasi WhatsApp Guru BK ----------
+  const [waConfig, setWaConfig] = useState<BkWaSetting | null>(null);
+  const [waLoading, setWaLoading] = useState(true);
+  const [waError, setWaError] = useState<string | null>(null);
+  const [waSaving, setWaSaving] = useState(false);
+  const [waTesting, setWaTesting] = useState(false);
+  const [waTestResult, setWaTestResult] = useState<{
+    ok: boolean;
+    status: string;
+    detail: string;
+  } | null>(null);
+
+  const muatWaConfig = useCallback(async () => {
+    try {
+      const cfg = await getBkWaConfig();
+      setWaConfig(cfg);
+      setWaError(null);
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setWaError(err instanceof Error ? err.message : "Gagal memuat konfigurasi WA.");
+    } finally {
+      setWaLoading(false);
+    }
+  }, [logout]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function muat() {
+      try {
+        const cfg = await getBkWaConfig();
+        if (cancelled) return;
+        setWaConfig(cfg);
+        setWaError(null);
+      } catch (err) {
+        if (cancelled) return;
+        if (isUnauthorized(err)) {
+          logout();
+          return;
+        }
+        setWaError(err instanceof Error ? err.message : "Gagal memuat konfigurasi WA.");
+      } finally {
+        if (!cancelled) setWaLoading(false);
+      }
+    }
+
+    void muat();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [logout]);
+
+  const simpanWaConfig = async () => {
+    if (!waConfig) return;
+    setWaSaving(true);
+    setWaError(null);
+    try {
+      const cfg = await saveBkWaConfig({
+        target: waConfig.target,
+        aktif: waConfig.aktif,
+        threshold: waConfig.threshold,
+        provider: waConfig.provider,
+      });
+      setWaConfig(cfg);
+      setWaTestResult(null);
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setWaError(err instanceof Error ? err.message : "Gagal menyimpan konfigurasi WA.");
+    } finally {
+      setWaSaving(false);
+    }
+  };
+
+  const ujiKirimWa = async () => {
+    setWaTesting(true);
+    setWaError(null);
+    setWaTestResult(null);
+    try {
+      const res = await testBkWa();
+      setWaTestResult({
+        ok: res.ok,
+        status: res.status,
+        detail: res.detail,
+      });
+      // Muat ulang config agar jumlah_laporan_terbuka terkini
+      await muatWaConfig();
+    } catch (err) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setWaError(err instanceof Error ? err.message : "Uji kirim WA gagal.");
+    } finally {
+      setWaTesting(false);
+    }
+  };
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -233,7 +355,200 @@ export default function BKPage() {
         </p>
       )}
 
-      <div className="grid items-start gap-space-lg lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+      {/* ---------- Notifikasi WhatsApp Guru BK (pindah ke atas) ---------- */}
+      <section
+        aria-label="Konfigurasi notifikasi WhatsApp Guru BK"
+        className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-space-lg"
+      >
+        <div className="mb-space-lg flex flex-wrap items-start justify-between gap-space-sm">
+          <div>
+            <h2 className="flex items-center gap-space-xs font-title-sm text-title-sm font-bold text-orange-700">
+              <MessageCircle className="h-5 w-5" aria-hidden />
+              Notifikasi WhatsApp Guru BK
+            </h2>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Eskalasi otomatis saat laporan berat terbuka mencapai ambang. Kirim ke nomor
+              Guru BK lewat Fonnte / Wablas.
+            </p>
+          </div>
+          <a
+            id="wa-verifikasi-btn"
+            href={WA_VERIFIKASI_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-space-xs rounded-lg bg-green-600 px-space-md py-2.5 font-label-md text-label-md font-bold text-white transition-colors hover:bg-green-700"
+          >
+            <Phone className="h-4 w-4" aria-hidden />
+            Verifikasi
+          </a>
+        </div>
+
+        {waLoading ? (
+          <p className="font-body-sm text-body-sm text-on-surface-variant">Memuat konfigurasi…</p>
+        ) : waError ? (
+          <div
+            className="rounded-lg border border-error-container bg-error-container/40 p-space-md font-body-sm text-body-sm text-on-error-container"
+          >
+            <p>{waError}</p>
+          </div>
+        ) : (
+          <>
+            <form onSubmit={(e) => { e.preventDefault(); simpanWaConfig(); }} className="grid gap-space-md">
+              <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
+                <label htmlFor="wa-target" className={labelClass}>
+                  Nomor tujuan Guru BK
+                </label>
+                <input
+                  id="wa-target"
+                  type="tel"
+                  className={`${fieldClass} border-orange-500/40 focus:border-orange-500 focus:ring-orange-500/30`}
+                  value={waConfig?.target ?? ""}
+                  onChange={(e) =>
+                    setWaConfig((prev) =>
+                      prev ? { ...prev, target: e.target.value.replace(/\D/g, "") } : prev,
+                    )}
+                  placeholder="62812xxxx"
+                  disabled={waSaving}
+                />
+                <p className="col-span-full sm:col-span-2 font-body-sm text-body-sm text-on-surface-variant">
+                  Format internasional tanpa &quot;+&quot;, contoh 628123456789.
+                </p>
+              </div>
+
+              <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
+                <label htmlFor="wa-aktif" className={labelClass}>
+                  Aktifkan notifikasi
+                </label>
+                <label
+                  htmlFor="wa-aktif"
+                  className="flex min-h-11 cursor-pointer items-center gap-space-sm rounded-lg border border-surface-container px-space-md font-body-sm text-body-sm text-on-surface transition-colors has-checked:border-orange-500/50 has-checked:bg-orange-500/10"
+                >
+                  <input
+                    id="wa-aktif"
+                    type="checkbox"
+                    checked={waConfig?.aktif ?? false}
+                    onChange={(e) =>
+                      setWaConfig((prev) =>
+                        prev ? { ...prev, aktif: e.target.checked } : prev,
+                      )}
+                    disabled={waSaving}
+                    className="h-4 w-4 shrink-0 accent-orange-500"
+                  />
+                  <span>Aktifkan saat ambang tercapai</span>
+                </label>
+              </div>
+
+              <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
+                <label htmlFor="wa-threshold" className={labelClass}>
+                  Ambang laporan berat terbuka
+                </label>
+                <input
+                  id="wa-threshold"
+                  type="number"
+                  min="1"
+                  className={`${fieldClass} border-orange-500/40 focus:border-orange-500 focus:ring-orange-500/30`}
+                  value={waConfig?.threshold ?? 10}
+                  onChange={(e) =>
+                    setWaConfig((prev) =>
+                      prev ? { ...prev, threshold: Math.max(1, parseInt(e.target.value) || 1) } : prev,
+                    )}
+                  disabled={waSaving}
+                />
+                <p className="col-span-full sm:col-span-2 font-body-sm text-body-sm text-on-surface-variant">
+                  Kirim notifikasi saat jumlah laporan berat belum selesai mencapai angka ini.
+                </p>
+              </div>
+
+              <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
+                <label htmlFor="wa-provider" className={labelClass}>
+                  Gateway provider
+                </label>
+                <select
+                  id="wa-provider"
+                  className={`${fieldClass} border-orange-500/40 focus:border-orange-500 focus:ring-orange-500/30`}
+                  value={waConfig?.provider ?? "fonnte"}
+                  onChange={(e) =>
+                    setWaConfig((prev) =>
+                      prev ? { ...prev, provider: e.target.value as WaProvider } : prev,
+                    )}
+                  disabled={waSaving}
+                >
+                  <option value="fonnte">Fonnte</option>
+                  <option value="wablas">Wablas</option>
+                </select>
+                <p className="col-span-full sm:col-span-2 font-body-sm text-body-sm text-on-surface-variant">
+                  Token dan URL gateway dibaca dari file `.env` backend (server-only).
+                </p>
+              </div>
+
+              <div className="flex flex-wrap justify-end gap-space-sm pt-space-sm border-t border-surface-container">
+                <button
+                  type="button"
+                  onClick={ujiKirimWa}
+                  disabled={waTesting || waSaving}
+                  className="inline-flex items-center justify-center gap-space-xs rounded-lg border border-orange-500/50 px-space-md py-2.5 font-label-md text-label-md font-bold text-orange-600 transition-colors hover:bg-orange-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {waTesting && <Send className="h-4 w-4 animate-spin" />}
+                  {!waTesting && <Send className="h-4 w-4" />}
+                  Uji kirim sekarang
+                </button>
+                <button
+                  type="submit"
+                  disabled={waSaving}
+                  className="inline-flex items-center justify-center gap-space-xs rounded-lg bg-orange-500 px-space-md py-2.5 font-label-md text-label-md font-bold text-white transition-colors hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {waSaving && <Save className="h-4 w-4 animate-spin" />}
+                  {!waSaving && <Save className="h-4 w-4" />}
+                  Simpan konfigurasi
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-space-lg pt-space-lg border-t border-surface-container grid gap-space-sm sm:grid-cols-2 sm:items-start">
+              <div>
+                <p className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant mb-1">
+                  Status
+                </p>
+                <p className={`font-body-sm text-body-sm ${waConfig?.aktif ? "text-orange-500" : "text-on-surface-variant"}`}>
+                  {waConfig?.aktif ? "Aktif" : "Nonaktif"}
+                </p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Sumber:{" "}
+                  {waConfig?.sumber === "database" ? "Database (dashboard)" : "Env (.env fallback)"}
+                </p>
+              </div>
+              <div className="text-right sm:text-left">
+                <p className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant mb-1">
+                  Laporan berat terbuka
+                </p>
+                <p className="font-body-md text-body-md font-bold text-on-surface">
+                  {waConfig?.jumlah_laporan_terbuka ?? 0}
+                </p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Ambang: {waConfig?.threshold ?? 10}
+                </p>
+              </div>
+            </div>
+
+            {waTestResult && (
+              <div
+                className={`rounded-lg p-space-md font-body-sm text-body-sm ${
+                  waTestResult.ok
+                    ? "border border-success-container bg-success-container/40 text-on-success-container"
+                    : "border border-error-container bg-error-container/40 text-on-error-container"
+                }`}
+              >
+                <p>
+                  {waTestResult.ok ? "✓ Berhasil" : "✗ Gagal"}:{" "}
+                  {waTestResult.detail}
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </section>
+
+        <div className="grid gap-space-lg lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <div className={showDetailMobile ? "hidden lg:block" : undefined}>
           <BKQueueList
             rows={visible}
@@ -285,8 +600,7 @@ export default function BKPage() {
             />
           )}
         </div>
-      </div>
-
+        </div>
       {deleting && (
         <ConfirmDialog
           title="Hapus pesan BK?"

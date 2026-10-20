@@ -292,6 +292,34 @@ define('AI_CONTENT_MODEL', env('AI_CONTENT_MODEL', ''));
 define('AI_CONTENT_BASE_URL', env('AI_CONTENT_BASE_URL', ''));
 
 // -----------------------------------------------------------------------------
+// NOTIFIKASI WHATSAPP GURU BK (eskalasi laporan berat)
+//
+// Credential gateway HANYA di .env backend (server-only). Tidak pernah masuk ke
+// bundle browser, respons API, log, maupun repository.
+//
+// Nilai di bawah adalah FALLBACK awal bila tabel `bk_wa_setting` masih kosong
+// (lihat migrations/20261020_add_bk_wa_alert.sql). Setelah admin menyimpan
+// konfigurasi lewat /admin/bk, nomor tujuan, toggle, ambang, dan provider
+// diambil dari database — env tidak perlu diubah lagi.
+// -----------------------------------------------------------------------------
+// Gateway: 'fonnte' (default) atau 'wablas'. Keduanya POST JSON + header
+// Authorization berisi token, jadi payload dirakit di helpers/whatsapp.php.
+define('WA_PROVIDER', env('WA_PROVIDER', 'fonnte'));
+define('WA_API_URL', rtrim((string) env('WA_API_URL', 'https://api.fonnte.com'), '/'));
+// Kosong = provider belum dikonfigurasi. Notifikasi dilewati dengan log
+// 'Dilewati' — bukan error, sama seperti OPENAI_API_KEY yang kosong.
+define('WA_API_TOKEN', env('WA_API_TOKEN', ''));
+// Fallback nomor tujuan bila database belum punya konfigurasi.
+define('BK_WA_TARGET', env('BK_WA_TARGET', ''));
+// Fallback ambang; default 10 laporan berat terbuka.
+define('BK_WA_ALERT_THRESHOLD', max(1, (int) env('BK_WA_ALERT_THRESHOLD', 10)));
+// Jeda minimum (menit) sebelum nomor yang sama menerima pesan berikutnya.
+// Menghindari spam bila laporan berdatangan beruntun.
+define('BK_WA_ALERT_COOLDOWN_MINUTES', max(0, (int) env('BK_WA_ALERT_COOLDOWN_MINUTES', 360)));
+// Jumlah kasus yang disebut satu per satu pada pesan; sisanya diringkas angka.
+define('BK_WA_ALERT_MAX_CASES', max(1, min(20, (int) env('BK_WA_ALERT_MAX_CASES', 8))));
+
+// -----------------------------------------------------------------------------
 // JWT / Session secret untuk auth admin
 // -----------------------------------------------------------------------------
 define('JWT_SECRET', env('JWT_SECRET', 'ganti-dengan-secret-key-yang-acak-dan-panjang'));

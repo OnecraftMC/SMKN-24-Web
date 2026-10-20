@@ -157,6 +157,10 @@ try {
     ]);
     $id = (int)$db->lastInsertId();
     $db->commit();
+
+    // Notifikasi WhatsApp Guru BK jika laporan berat terbuka mencapai ambang.
+    // Tidak pernah gagal respons ke siswa — waMaybeAlert tangkap sendiri error.
+    waMaybeAlert($db);
 } catch (Throwable $e) {
     if ($db instanceof PDO && $db->inTransaction()) {
         $db->rollBack();

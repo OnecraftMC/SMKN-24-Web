@@ -359,3 +359,27 @@ export interface ChatInsightsResponse {
   aktif: ChatInsight[];
   riwayat: ChatInsight[];
 }
+
+// -----------------------------------------------------------------------------
+// Notifikasi WhatsApp Guru BK (GET/POST /api/bk/wa-config.php)
+// -----------------------------------------------------------------------------
+
+export type WaProvider = "fonnte" | "wablas";
+
+export interface BkWaSetting {
+  target: string;
+  aktif: boolean;
+  threshold: number;
+  provider: WaProvider;
+  sumber: "database" | "env";
+  jumlah_laporan_terbuka: number;
+}
+
+export interface BkWaTestResult {
+  ok: boolean;
+  status: string;
+  detail: string;
+  jumlah: number;
+  target: string;
+  provider: WaProvider;
+}

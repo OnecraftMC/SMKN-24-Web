@@ -9,6 +9,12 @@
  *  - membedakan kegagalan jaringan (status 0) dari kegagalan HTTP.
  */
 
+import {
+  type BkWaSetting,
+  type WaProvider,
+  type BkWaTestResult,
+} from "./types";
+
 export const API_BASE_URL = (
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost/backend"
 ).replace(/\/+$/, "");
@@ -260,6 +266,31 @@ export async function apiDownload(path: string): Promise<Blob> {
   }
 
   return response.blob();
+}
+
+/** Baca konfigurasi WA Guru BK + jumlah laporan berat terbuka. */
+export async function getBkWaConfig(): Promise<BkWaSetting> {
+  return apiRequest<BkWaSetting>("/api/bk/wa-config.php");
+}
+
+/** Simpan konfigurasi WA Guru BK dari dashboard admin. */
+export async function saveBkWaConfig(input: {
+  target: string;
+  aktif: boolean;
+  threshold: number;
+  provider: WaProvider;
+}): Promise<BkWaSetting> {
+  return apiRequest<BkWaSetting>("/api/bk/wa-config.php", {
+    method: "POST",
+    body: input,
+  });
+}
+
+/** Uji kirim WhatsApp ke Guru BK (paksa, abaikan ambang & cooldown). */
+export async function testBkWa(): Promise<BkWaTestResult> {
+  return apiRequest<BkWaTestResult>("/api/bk/wa-config.php?aksi=test", {
+    method: "POST",
+  });
 }
 
 function readErrorMessage(parsed: unknown, status: number): string {

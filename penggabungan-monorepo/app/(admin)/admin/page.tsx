@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * Halaman Overview dashboard admin — "Linimasa Hari".
+ * Halaman Overview dashboard admin — ringkasan kondisi sekolah.
  *
- * Susunan: header hari (di shell) → strip konteks → area kerja dua kolom
- * (poros waktu | panel analisis chatbot). Enam kartu modul dihapus; jumlah
- * data modul pindah ke lencana rail.
+ * Susunan: header hari (di shell) → strip konteks → panel analisis chatbot
+ * + ringkasan notifikasi WA Guru BK. Tidak ada daftar tugas/pekerjaan bertanggal
+ * agar halaman tetap berupa monitoring, bukan ruang kerja/task manager.
  *
  * Semua angka dari backend. Kegagalan parsial dinyatakan eksplisit di baris
  * status dan per satuan di strip, tidak pernah diam-diam menjadi nol.
@@ -13,25 +13,20 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { RefreshCw, TriangleAlert } from "lucide-react";
+import { RefreshCw, TriangleAlert, Phone } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
-import { apiRequest, isUnauthorized } from "@/lib/admin/api";
+import { apiRequest, getBkWaConfig, isUnauthorized } from "@/lib/admin/api";
 import {
-  jamKeMenit,
-  parseWaktuMySQL,
   tanggalLocal,
   useModul,
   type ModulKey,
 } from "@/lib/admin/moduleCounts";
-import { useJam } from "@/lib/admin/useJam";
 import ContextStrip, { StatusBar, type StripUnit } from "@/components/admin/overview/ContextStrip";
-import TimeSpine, { type NadaTag, type WorkItem } from "@/components/admin/overview/TimeSpine";
 import ChatAnalyticsPanel, {
   type ChatStatsState,
   type PeriodeStatistik,
 } from "@/components/admin/overview/ChatAnalyticsPanel";
 import type {
-  AgendaDTO,
   ChatAnalyticsResponse,
   ChatInsightsResponse,
 } from "@/lib/admin/types";
@@ -51,37 +46,46 @@ function formatNumber(value: number): string {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
-/** Nada tag dari hasil triase Counsellor AI. */
-function nadaKesulitan(
-  tingkat: "Ringan" | "Sedang" | "Berat" | null,
-  butuhPerhatian: boolean,
-): { tag: { teks: string; nada: NadaTag } | null; detail: string } {
-  if (butuhPerhatian) {
-    return {
-      tag: { teks: "Perlu perhatian", nada: "mendesak" },
-      detail: "Sudah dibaca AI, belum dibaca guru BK",
-    };
-  }
-  if (tingkat === "Berat") {
-    return { tag: { teks: "Berat", nada: "mendesak" }, detail: "Tingkat kesulitan berat" };
-  }
-  if (tingkat === "Sedang") {
-    return { tag: { teks: "Sedang", nada: "perhatian" }, detail: "Tingkat kesulitan sedang" };
-  }
-  if (tingkat === "Ringan") {
-    return { tag: { teks: "Ringan", nada: "netral" }, detail: "Tingkat kesulitan ringan" };
-  }
-  return { tag: null, detail: "Belum ditriase" };
-}
-
 export default function OverviewPage() {
   const modul = useModul();
   const { logout } = useAuth();
   const [chatStats, setChatStats] = useState<ChatStatsState>({ kind: "loading" });
   const [periode, setPeriode] = useState<PeriodeStatistik>("7");
   const [chatAttempt, setChatAttempt] = useState(0);
-  // Jam lokal untuk garis "sekarang" dan label "sekarang" pada daftar ponsel.
-  const now = useJam();
+
+  // ---------- Mini ringkasan notifikasi WA Guru BK ----------
+  const [waSummary, setWaSummary] = useState<{
+    aktif: boolean;
+    jumlah: number;
+    threshold: number;
+    target: string;
+  } | null>(null);
+  const [waSummaryError, setWaSummaryError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getBkWaConfig()
+      .then((cfg) => {
+        if (cancelled) return;
+        setWaSummary({
+          aktif: cfg.aktif,
+          jumlah: cfg.jumlah_laporan_terbuka,
+          threshold: cfg.threshold,
+          target: cfg.target,
+        });
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        if (isUnauthorized(err)) {
+          logout();
+          return;
+        }
+        setWaSummaryError(err instanceof Error ? err.message : "Gagal memuat ringkasan WA.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [logout]);
 
   // Statistik chatbot dipisah dari data modul karena kontrol periode (7/30 hari)
   // hanya boleh memicu refetch analytics, bukan seluruh halaman.
@@ -152,104 +156,6 @@ export default function OverviewPage() {
     modul.reload();
     setChatAttempt((n) => n + 1);
   }, [modul]);
-
-  /* ---------------------------------------------------------------------
-   * Poros waktu: kumpulkan pekerjaan yang menunggu keputusan manusia.
-   * Kartu bersifat anonim untuk data siswa (lihat komentar TimeSpine).
-   * ------------------------------------------------------------------- */
-  const { items, agendaBerikutnya, porosState, porosPesan } = useMemo(() => {
-    const hariIni = tanggalLocal(new Date());
-    const list: WorkItem[] = [];
-    const berikutnya: AgendaDTO[] = [];
-
-    // Pesan BK yang masih terbuka (Baru + Diproses). Selesai bukan pekerjaan.
-    if (modul.bk.kind === "ok") {
-      for (const row of modul.bk.value) {
-        if (row.status === "Selesai") continue;
-        const waktu = parseWaktuMySQL(row.tanggal);
-        const { tag, detail } = nadaKesulitan(row.tingkatKesulitan, row.butuhPerhatian);
-        list.push({
-          id: `bk-${row.id}`,
-          jenis: "bk",
-          label: "Pesan konseling",
-          judul: `Pesan konseling #${row.id}`,
-          detail: row.kategori ? `${row.kategori} · ${detail}` : detail,
-          menit: waktu ? waktu.getHours() * 60 + waktu.getMinutes() : null,
-          tanggal: waktu,
-          tertunda: waktu ? tanggalLocal(waktu) < hariIni : false,
-          tag,
-          href: "/admin/bk",
-          aksi: "Tangani",
-          lampiran: row.media?.length ?? 0,
-        });
-      }
-    }
-
-    // Pengajuan prestasi yang menunggu moderasi.
-    if (modul.prestasi.kind === "ok") {
-      for (const row of modul.prestasi.value.items) {
-        const waktu = parseWaktuMySQL(row.createdAt);
-        list.push({
-          id: `prestasi-${row.id}`,
-          jenis: "prestasi",
-          label: "Prestasi",
-          judul: `Prestasi ${row.tingkat}`,
-          detail: row.perlombaan,
-          menit: waktu ? waktu.getHours() * 60 + waktu.getMinutes() : null,
-          tanggal: waktu,
-          tertunda: waktu ? tanggalLocal(waktu) < hariIni : false,
-          tag: row.adaBukti ? null : { teks: "Tanpa bukti", nada: "perhatian" },
-          href: "/admin/prestasi",
-          aksi: "Nilai",
-          lampiran: row.adaBukti ? 1 : 0,
-        });
-      }
-    }
-
-    // Agenda: hari ini bertumpu pada poros; agenda berikutnya jadi daftar.
-    if (modul.agenda.kind === "ok") {
-      for (const row of modul.agenda.value) {
-        const tanggal = row.tglMulai ?? "";
-        const menit = jamKeMenit(row.waktu);
-        if (tanggal === hariIni) {
-          list.push({
-            id: `agenda-${row.id}`,
-            jenis: "agenda",
-            label: "Agenda",
-            judul: row.judul,
-            detail: row.lokasi ?? row.badge,
-            menit,
-            tanggal: tanggal ? new Date(`${tanggal}T00:00:00`) : null,
-            tertunda: false,
-            tag: { teks: row.badge ?? "Hari ini", nada: "netral" },
-            href: "/admin/agenda",
-            aksi: "Terbitkan",
-            lampiran: 0,
-          });
-        } else if (tanggal > hariIni) {
-          berikutnya.push(row);
-        }
-      }
-    }
-
-    // Poros gagal kalau sumber utama antrean gagal, bukan kalau salah satu
-    // daftar kosong: daftar kosong adalah keadaan yang valid.
-    const gagal: string[] = [];
-    if (modul.bk.kind === "error") gagal.push(modul.bk.message);
-    if (modul.prestasi.kind === "error") gagal.push(modul.prestasi.message);
-    if (modul.agenda.kind === "error") gagal.push(modul.agenda.message);
-
-    const sedang = modul.bk.kind === "loading" || modul.prestasi.kind === "loading";
-
-    return {
-      items: list,
-      agendaBerikutnya: berikutnya
-        .sort((a, b) => (a.tglMulai ?? "").localeCompare(b.tglMulai ?? ""))
-        .slice(0, 5),
-      porosState: gagal.length > 0 ? ("error" as const) : sedang ? ("loading" as const) : ("ok" as const),
-      porosPesan: gagal.join(" "),
-    };
-  }, [modul.bk, modul.prestasi, modul.agenda]);
 
   /* ---------------------------- Strip konteks --------------------------- */
   const units: StripUnit[] = useMemo(() => {
@@ -349,60 +255,79 @@ export default function OverviewPage() {
 
       <ContextStrip units={units} />
 
-      <div className="grid gap-space-lg xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="space-y-space-lg">
-          <TimeSpine
-            items={items}
-            now={now}
-            state={porosState}
-            message={porosPesan}
-          />
+      <div className="xl:sticky xl:top-20 xl:self-start">
+        <ChatAnalyticsPanel
+          state={chatStats}
+          periode={periode}
+          onPeriodeChange={gantiPeriode}
+        />
 
-          {agendaBerikutnya.length > 0 && (
-            <section
-              aria-label="Agenda berikutnya"
-              className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md"
-            >
-              <div className="flex items-baseline justify-between gap-space-sm">
-                <h2 className="font-title-md text-title-md font-bold text-on-surface">
-                  Agenda Berikutnya
-                </h2>
-                <Link
-                  href="/admin/agenda"
-                  className="font-label-sm text-label-sm font-bold text-primary underline underline-offset-4 hover:text-secondary"
-                >
-                  Kelola agenda
-                </Link>
-              </div>
-              <ul className="mt-space-sm divide-y divide-surface-container">
-                {agendaBerikutnya.map((row) => (
-                  <li
-                    key={row.id}
-                    className="flex flex-wrap items-baseline justify-between gap-x-space-sm gap-y-1 py-2"
+          {/* Mini ringkasan notifikasi WA Guru BK */}
+          <section
+            aria-label="Ringkasan notifikasi WhatsApp Guru BK"
+            className="mt-space-lg rounded-xl border border-outline-variant bg-surface-container-lowest p-space-md"
+          >
+            <h2 className="font-title-sm text-title-sm font-bold text-on-surface mb-space-sm">
+              Notifikasi WA Guru BK
+            </h2>
+            {waSummaryError ? (
+              <p className="font-body-sm text-body-sm text-on-error-container">
+                {waSummaryError}
+              </p>
+            ) : waSummary === null ? (
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Memuat…
+              </p>
+            ) : (
+              <div className="space-y-space-sm">
+                <div className="flex items-baseline justify-between gap-space-sm">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    Status
+                  </span>
+                  <span className={`font-body-sm text-body-sm font-bold ${
+                    waSummary.aktif ? "text-primary" : "text-on-surface-variant"
+                  }`}>
+                    {waSummary.aktif ? "Aktif" : "Nonaktif"}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-space-sm">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    Laporan berat terbuka
+                  </span>
+                  <span
+                    className={`font-body-md text-body-md font-bold ${
+                      waSummary.jumlah >= waSummary.threshold
+                        ? "text-error"
+                        : "text-on-surface"
+                    }`}
                   >
-                    <p className="truncate font-label-md text-label-md font-bold text-on-surface">
-                      {row.judul}
-                    </p>
-                    <p className="font-label-sm text-label-sm tabular-nums text-on-surface-variant">
-                      {row.tglMulai}
-                      {row.waktu ? ` · ${row.waktu}` : ""}
-                      {row.lokasi ? ` · ${row.lokasi}` : ""}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+                    {waSummary.jumlah} / {waSummary.threshold}
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between gap-space-sm">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    Nomor tujuan
+                  </span>
+                  <span className="font-body-sm text-body-sm text-on-surface truncate">
+                    {waSummary.target || "—"}
+                  </span>
+                </div>
+                {waSummary.jumlah >= waSummary.threshold && waSummary.aktif && (
+                  <p className="font-body-sm text-body-sm text-error">
+                    ⚠ Ambang tercapai — notifikasi akan dikirim otomatis saat laporan baru masuk.
+                  </p>
+                )}
+              </div>
+            )}
+            <Link
+              href="/admin/bk"
+              className="mt-space-sm inline-flex items-center gap-1 font-label-sm text-label-sm font-bold text-primary underline underline-offset-4 hover:text-secondary"
+            >
+              <Phone className="h-3.5 w-3.5" />
+              Kelola konfigurasi
+            </Link>
+          </section>
         </div>
-
-        <div className="xl:sticky xl:top-20 xl:self-start">
-          <ChatAnalyticsPanel
-            state={chatStats}
-            periode={periode}
-            onPeriodeChange={gantiPeriode}
-          />
-        </div>
-      </div>
 
       <p className="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
         <RefreshCw aria-hidden className="h-3.5 w-3.5" />
