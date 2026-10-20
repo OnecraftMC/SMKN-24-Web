@@ -63,7 +63,7 @@ export function buildAssistantPlan(row: PesanBKDTO) {
   const stressLevel = row.butuhPerhatian ? "perlu penanganan segera" : row.tingkatKesulitan ?? "belum ditentukan";
   const priorityText =
     row.butuhPerhatian || row.tingkatKesulitan === "Berat"
-      ? "Jangan diproses secepatnya. Beri ruang aman dan tindak lanjut yang terstruktur."
+      ? "Prioritaskan peninjauan Guru BK. Pastikan siswa memiliki ruang aman dan susun tindak lanjut yang terstruktur."
       : "Tetap lakukan follow-up ringan dengan jadwal monitoring yang jelas.";
 
   const draft = [
@@ -92,11 +92,11 @@ export function sortAntrean(rows: PesanBKDTO[]): PesanBKDTO[] {
   return rows.slice().sort((a, b) => {
     const bukaA = a.status !== "Selesai";
     const bukaB = b.status !== "Selesai";
-    if (bukaA !== bukaB) return bukaA ? -1 : 1;
-    if (a.butuhPerhatian !== b.butuhPerhatian) return a.butuhPerhatian ? -1 : 1;
     const bobotA = a.tingkatKesulitan ? BOBOT_KESULITAN[a.tingkatKesulitan] : 0;
     const bobotB = b.tingkatKesulitan ? BOBOT_KESULITAN[b.tingkatKesulitan] : 0;
+    if (bukaA !== bukaB) return bukaA ? -1 : 1;
     if (bobotA !== bobotB) return bobotB - bobotA;
+    if (a.butuhPerhatian !== b.butuhPerhatian) return a.butuhPerhatian ? -1 : 1;
     return b.tanggal.localeCompare(a.tanggal);
   });
 }

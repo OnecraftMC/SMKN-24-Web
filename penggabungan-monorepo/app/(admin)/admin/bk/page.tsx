@@ -139,7 +139,11 @@ export default function BKPage() {
     return sortAntrean(cocok);
   }, [rows, query, filterKesulitan, filterStatus]);
 
-  const jumlahButuhPerhatian = rows.filter((r) => r.butuhPerhatian).length;
+  const jumlahPrioritasTerbuka = rows.filter(
+    (row) =>
+      row.status !== "Selesai" &&
+      (row.butuhPerhatian || row.tingkatKesulitan === "Berat"),
+  ).length;
 
   const selectedRow = useMemo(
     () => rows.find((row) => row.id === selectedId) ?? pilihPrioritasTerbuka(rows),
@@ -219,12 +223,12 @@ export default function BKPage() {
         </p>
       </header>
 
-      {jumlahButuhPerhatian > 0 && (
+      {jumlahPrioritasTerbuka > 0 && (
         <p className="flex items-start gap-2 rounded-2xl border border-error-container bg-error-container/40 p-space-md font-body-sm text-body-sm text-on-error-container">
           <ShieldAlert aria-hidden className="mt-0.5 h-5 w-5 shrink-0" />
           <span>
-            Ada <strong>{jumlahButuhPerhatian}</strong> laporan dengan indikasi risiko
-            keselamatan. Tangani lebih dahulu.
+            Ada <strong>{jumlahPrioritasTerbuka}</strong> laporan terbuka berprioritas tinggi.
+            Periksa antrean dan tindak lanjuti sesuai penilaian Guru BK.
           </span>
         </p>
       )}
@@ -259,6 +263,7 @@ export default function BKPage() {
           ) : (
             <BKDetailPanel
               row={selectedRow}
+              hasOpenCases={rows.some((row) => row.status !== "Selesai")}
               antreanGenting={antreanGenting}
               replyText={replyText}
               onReplyTextChange={(value) => {
