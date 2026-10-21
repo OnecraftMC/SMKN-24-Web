@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SMKN 24 Admin</string>
+    <string name="toolbar_subtitle">Dashboard Admin</string>
+    <string name="error_title">Tidak dapat terhubung</string>
+    <string name="error_message">Periksa koneksi internet atau alamat dashboard, lalu coba lagi.</string>
+    <string name="retry">Coba lagi</string>
+    <string name="server_settings">Pengaturan server</string>
+</resources>

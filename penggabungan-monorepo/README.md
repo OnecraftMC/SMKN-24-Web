@@ -289,3 +289,26 @@ File tersebut aman dijalankan berulang kali (semua blok di-check lewat
 > Catatan: bila AI gagal atau tidak mengembalikan JSON, cerita siswa **tetap
 > tersimpan** dengan ringkasan cadangan — data tidak hilang, hanya triase
 > otomatisnya yang kosong.
+
+## 9. APK Android Dashboard Admin
+
+APK khusus admin ada di `android-admin/`. Aplikasi ini adalah shell native
+(WebView) yang membuka dashboard web yang sama, sehingga login, CRUD, unggah
+foto, dan unduhan tetap diproses oleh web/API dan langsung tersimpan di
+database sekolah. APK tidak menyimpan kredensial MySQL.
+
+- Server default: `https://macdeep.my.id/login` (bisa diganti dari menu
+  **⋮ → Pengaturan server**).
+- Dukungan kamera/galeri untuk unggah gambar, unduhan blob ke
+  `Download/SMKN 24 Admin/`, pintasan launcher modul admin, dan logout sesi.
+- Tetap berjalan saat frontend/backend di-redeploy pada domain yang sama; redirect
+  apex/`www` dan rute login yang berubah ditangani otomatis, error 5xx menampilkan
+  tombol coba lagi. Pindah domain cukup lewat **Pengaturan server**.
+- Bangun ulang: `cd android-admin && ./build-apk.sh`.
+- Hasil build disalin ke `~/Downloads/SMKN24-Admin-1.1.apk` (tidak disimpan di
+  repository). Detail prasyarat, kunci penandatangan, dan bukti validasi ada di
+  `android-admin/README.md`.
+
+Konfigurasi database untuk backend lokal/deploy ditulis di `backend/.env` dan
+`backend-laravel/.env` (keduanya gitignored, mode 600). Jangan commit berkas
+tersebut atau menyalin password ke dokumentasi.
