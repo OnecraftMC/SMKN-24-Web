@@ -10,6 +10,7 @@ import {
   Building2,
   CalendarClock,
   CalendarDays,
+  Database,
   FolderOpen,
   GraduationCap,
   Images,
@@ -79,7 +80,12 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     heading: "Monitoring",
-    items: [{ href: `${ADMIN_BASE}/chat`, label: "Riwayat Chatbot", icon: Bot, ready: true }],
+    // Dataset dulu: findNavLabel memilih match pertama (startsWith), jadi
+    // /chat/dataset harus terdaftar sebelum /chat agar breadcrumb tepat.
+    items: [
+      { href: `${ADMIN_BASE}/chat/dataset`, label: "Memori Chatbot", icon: Database, ready: true },
+      { href: `${ADMIN_BASE}/chat`, label: "Riwayat Chatbot", icon: Bot, ready: true },
+    ],
   },
   {
     heading: "Pengaturan",

@@ -450,3 +450,56 @@ export interface BkWaTestResult {
   target: string;
   provider: WaProvider;
 }
+
+// -----------------------------------------------------------------------------
+// Memori Chatbot — dataset knowledge (GET/POST/PUT/DELETE /api/knowledge/index.php)
+// -----------------------------------------------------------------------------
+
+export type KnowledgeKategori = "PPDB" | "Jurusan" | "Jadwal" | "Fasilitas" | "Umum";
+
+/** Entri list: konten dipotong backend (kolom `potongan`). */
+export interface KnowledgeDTO {
+  id: number;
+  judul: string;
+  kategori: KnowledgeKategori;
+  tags: string;
+  sumber: string;
+  potongan: string;
+  updated_at: string | null;
+}
+
+/** Entri penuh dari GET ?id= — untuk dialog edit. */
+export interface KnowledgeEntri extends KnowledgeDTO {
+  konten: string;
+}
+
+/** Baris pratinjau hasil parse POST ?preview=1 (belum tersimpan). */
+export interface KnowledgePreviewRow {
+  judul: string;
+  kategori: KnowledgeKategori;
+  potongan: string;
+  tags: string;
+  sumber: string;
+}
+
+export interface KnowledgePreviewResponse {
+  dibaca: number;
+  valid: KnowledgePreviewRow[];
+  gagal: string[];
+}
+
+export interface KnowledgeImportResponse {
+  dibaca: number;
+  tersimpan: number;
+  baru: number;
+  diperbarui: number;
+  gagal: string[];
+  catatan: string[];
+  total: number;
+  file: string;
+}
+
+export interface KnowledgeListResponse {
+  entri: KnowledgeDTO[];
+  total: number;
+}

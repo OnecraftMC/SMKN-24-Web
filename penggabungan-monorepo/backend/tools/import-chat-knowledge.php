@@ -1,13 +1,15 @@
 <?php
 /**
- * Import dataset knowledge untuk chatbot: Markdown ATAU CSV.
+ * Import dataset knowledge untuk chatbot — jalur CLI.
  *
- * Tabel: knowledge (backend/database.sql). Import mengubah, bukan menambah
- * duplikat - judul dipakai kunci (INSERT ... ON DUPLICATE KEY UPDATE).
+ * Parser kini satu dengan jalur dashboard: MD, TXT, CSV, DOCX, XLSX — semua
+ * lewat backend/helpers/knowledge_parser.php. Endpoint admin
+ * (backend/api/knowledge/index.php) memakai modul sama, jadi aturan validasi
+ * tidak berbeda antar pintu.
  *
- * Pakai:
- *   php backend/tools/import-chat-knowledge.php <file.md|file.csv>
- *
+ * Tabel: knowledge (backend/migrations/20261006_add_chat_knowledge.sql).
+ * Import mengubah, bukan menambah duplikat — judul dipakai kunci
+ * (INSERT ... ON DUPLICATE KEY UPDATE; judul yang sudah ada diganti isinya).
  * Format Markdown - didukung dua pola, boleh dicampur dalam satu file.
  *
  * Pola A (heading sebagai judul, kategori ditebak dari judul/konten):
@@ -25,95 +27,44 @@
  *
  *   Isi pengetahuan.
  *
- * Format CSV - header wajib: judul,kategori,konten,tags,sumber
+ * Format CSV - header wajib: judul,kategori,konten,tags,sumber (delimiter ; atau ,).
  *
  * Kategori yang diterima (sesuai enum database):
  *   PPDB | Jurusan | Jadwal | Fasilitas | Umum
- *
- * Sengaja CLI dan offline: tidak ada endpoint publik yang mengubah knowledge
- * sehingga tidak ada jalur tulis baru yang perlu dijaga.
  */
 
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../helpers/knowledge_parser.php';
 
-const KATEGORI_DIIZINKAN = ['PPDB', 'Jurusan', 'Jadwal', 'Fasilitas', 'Umum'];
-const KATEGORI_TEBAKAN = [
-    'PPDB' => ['ppdb', 'spmb', 'pendaftaran', 'daftar siswa', 'registrasi'],
-    'Jurusan' => ['jurusan', 'kompetensi keahlian', 'keahlian', 'pplg', 'pariwisata', 'perhotelan', 'tata boga', 'tata busana'],
-    'Jadwal' => ['jadwal', 'jam masuk', 'jam pelajaran', 'jam sekolah'],
-    'Fasilitas' => ['fasilitas', 'lab', 'laboratorium', 'gedung', 'ruang kelas', 'lapangan', 'perpustakaan'],
-];
-
-// ---------------------------------------------------------------------------
-// 1. Baca file
-// ---------------------------------------------------------------------------
 $path = $argv[1] ?? '';
 if ($path === '') {
-    fwrite(STDERR, "Pakai: php backend/tools/import-chat-knowledge.php <file.md|file.csv>\n");
+    fwrite(STDERR, 'Pakai: php backend/tools/import-chat-knowledge.php <file.md|file.csv|file.docx|file.xlsx>' . PHP_EOL);
     exit(1);
 }
 if (!is_readable($path)) {
     fwrite(STDERR, "File tidak terbaca: {$path}\n");
     exit(1);
 }
-$raw = file_get_contents($path);
-if ($raw === false || trim($raw) === '') {
-    fwrite(STDERR, "File kosong atau gagal dibaca: {$path}\n");
-    exit(1);
-}
-// BOM UTF-8 dibuang; CSV/MD dari Excel sering menyisakan BOM.
-if (str_starts_with($raw, "\xEF\xBB\xBF")) {
-    $raw = substr($raw, 3);
-}
-
-$rows = str_ends_with(strtolower($path), '.csv') ? parseCsv($raw) : parseMarkdown($raw);
-
-if ($rows === []) {
-    fwrite(STDERR, "Tidak ada dokumen terbaca dari {$path}. "
-        . "Untuk Markdown, pastikan ada heading '#' atau blok frontmatter '---'.\n");
-    exit(1);
-}
 
 // ---------------------------------------------------------------------------
-// 2. Validasi (gerbang kualitas: format sama, validasi sama)
+// 1. Baca file (parser dari helpers/knowledge_parser.php — jalur UI pakai ini)
 // ---------------------------------------------------------------------------
-$valid = [];
-$gagal = [];
-foreach ($rows as $i => $row) {
-    $no = $i + 1;
-    $judul = trim($row['judul'] ?? '');
-    $konten = trim($row['konten'] ?? '');
-    $kategori = trim($row['kategori'] ?? '') ?: 'Umum';
-    $tags = trim($row['tags'] ?? '');
-    $sumber = trim($row['sumber'] ?? '');
+[$rows, $notes] = knowledge_parseFile($path, basename($path));
 
-    if ($judul === '' || $konten === '') {
-        $gagal[] = "baris {$no}: judul/konten kosong - dilewati";
-        continue;
-    }
-    if (!in_array($kategori, KATEGORI_DIIZINKAN, true)) {
-        // Tebakan dari konten lebih baik daripada gagal total, tapi dicatat.
-        $tebak = tebakKategori($judul . ' ' . $konten);
-        $gagal[] = "baris {$no} \"{$judul}\": kategori '{$kategori}' tidak dikenali -> dipakai '{$tebak}'";
-        $kategori = $tebak;
-    }
-    if (utf8Len($judul) > 255 || utf8Len($tags) > 255 || utf8Len($sumber) > 255) {
-        $gagal[] = "baris {$no} \"{$judul}\": judul/tags/sumber melebihi 255 karakter - dilewati";
-        continue;
-    }
-    if (utf8Len($konten) > 65000) {
-        $gagal[] = "baris {$no} \"{$judul}\": konten melebihi batas TEXT - dilewati";
-        continue;
-    }
-    $valid[] = ['judul' => $judul, 'kategori' => $kategori, 'konten' => $konten, 'tags' => $tags, 'sumber' => $sumber];
-}
+// ---------------------------------------------------------------------------
+// 2. Validasi (gerbang kualitas: format sama, validasi sama di semua pintu)
+// ---------------------------------------------------------------------------
+$hasil = knowledge_validasi($rows);
+$valid = $hasil['valid'];
+$gagal = $hasil['catatan'];
+$gagal = array_merge($notes, $gagal);
 
 // ---------------------------------------------------------------------------
 // 3. Upsert - judul sebagai kunci, jadi import ulang = update bukan duplikat
 // ---------------------------------------------------------------------------
-echo "Dibaca      : " . count($rows) . " dokumen\n";
-echo "Valid       : " . count($valid) . "\n";
+echo 'Dibaca      : ' . count($rows) . " dokumen\n";
+echo 'Valid       : ' . count($valid) . "\n";
 foreach ($gagal as $g) {
     echo "  CATATAN: {$g}\n";
 }
@@ -156,108 +107,4 @@ echo "Tersimpan   : {$ok} (total di knowledge: {$total})\n";
 if ($writeFail > 0) {
     fwrite(STDERR, "GAGAL tulis: {$writeFail}\n");
     exit(1);
-}
-
-// ---------------------------------------------------------------------------
-// Parser
-// ---------------------------------------------------------------------------
-/** Markdown -> baris. Dua pola: frontmatter '---' atau heading '#'. */
-function parseMarkdown(string $raw): array
-{
-    $rows = [];
-
-    // Pola A: heading '#' sebagai pemisah dokumen.
-    if (preg_match_all('/^#\s+(.+?)\s*$(.*?)(?=^#\s+|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
-        foreach ($m as $block) {
-            $judul = trim($block[1]);
-            // Lewati header sampul dari convert-dataset.php (bukan dokumen knowledge).
-            if ($judul === 'Knowledge base chatbot SMK Negeri 24 Jakarta') {
-                continue;
-            }
-            $rows[] = [
-                'judul' => $judul,
-                'kategori' => '',
-                'tags' => '',
-                'sumber' => '',
-                'konten' => trim(stripHeading($block[2])),
-            ];
-        }
-        if ($rows !== []) {
-            return $rows;
-        }
-    }
-
-    // Pola B: blok frontmatter '--- ... ---' lalu body.
-    if (preg_match_all('/^---[ \t]*\n(.*?)\n---[ \t]*\n(.+?)(?=\n---[ \t]*\n|\z)/ms', $raw, $m, PREG_SET_ORDER)) {
-        foreach ($m as $block) {
-            $meta = [];
-            foreach (preg_split('/\r?\n/', $block[1]) as $line) {
-                if (preg_match('/^\s*([A-Za-z_]+)\s*:\s*(.*)$/', $line, $kv)) {
-                    $meta[strtolower(trim($kv[1]))] = trim($kv[2], " \t\"'");
-                }
-            }
-            $rows[] = [
-                'judul' => $meta['judul'] ?? '',
-                'kategori' => $meta['kategori'] ?? '',
-                'tags' => $meta['tags'] ?? '',
-                'sumber' => $meta['sumber'] ?? '',
-                'konten' => trim(stripHeading($block[2])),
-            ];
-        }
-    }
-
-    return $rows;
-}
-
-/** CSV dengan header wajib judul,kategori,konten,tags,sumber. */
-function parseCsv(string $raw): array
-{
-    $lines = preg_split('/\r?\n/', trim($raw));
-    $header = array_map(fn($h) => strtolower(trim((string) $h)), (array) str_getcsv((string) array_shift($lines)));
-    $rows = [];
-    foreach ($lines as $line) {
-        if (trim($line) === '') {
-            continue;
-        }
-        $cols = str_getcsv($line);
-        $row = [];
-        foreach ($header as $i => $h) {
-            $row[$h] = trim((string) ($cols[$i] ?? ''));
-        }
-        $rows[] = $row;
-    }
-    return $rows;
-}
-
-/** Hitung panjang karakter UTF-8 tanpa bergantung ext-mbstring (bisa kosong). */
-function utf8Len(string $s): int
-{
-    if (function_exists('mb_strlen')) {
-        return mb_strlen($s);
-    }
-    return (int) preg_match_all('/./u', $s);
-}
-
-/** Buang komentar HTML/Markdown dan heading dari isi konten. */
-function stripHeading(string $text): string
-{
-    // Komentar contoh/keterangan penulis tidak boleh ikut jadi konteks AI.
-    $text = preg_replace('/<!--.*?-->/s', '', $text) ?? $text;
-    $text = preg_replace('/\{#.*?\}/', '', $text) ?? $text;
-    $text = preg_replace('/^#+[ \t]+.+$/m', '', $text) ?? $text;
-    return trim(preg_replace('/\n{3,}/', "\n\n", $text) ?? $text);
-}
-
-/** Tebak kategori dari judul+konten bila kolom tidak diisi/tidak dikenali. */
-function tebakKategori(string $haystack): string
-{
-    $t = strtolower($haystack);
-    foreach (KATEGORI_TEBAKAN as $kategori => $kata) {
-        foreach ($kata as $k) {
-            if (str_contains($t, $k)) {
-                return $kategori;
-            }
-        }
-    }
-    return 'Umum';
 }
