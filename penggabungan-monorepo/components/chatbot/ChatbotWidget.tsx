@@ -4,8 +4,10 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { motion, useReducedMotion } from "motion/react";
 import gsap from "gsap";
 import { Flip } from "gsap/Flip";
-import { Maximize2, MessageCircle, Minimize2, RotateCcw, Sparkles, X } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Maximize2, MessageCircle, Minimize2, RotateCcw, Sparkles, X } from "lucide-react";
 import type { ChatMessage } from "@/lib/types";
+import { BorderBeam } from "@/components/ui/magicui/border-beam";
+import { MagicCard } from "@/components/ui/magicui/magic-card";
 import ChatMessages from "./ChatMessages";
 import ChatInput from "./ChatInput";
 
@@ -279,9 +281,14 @@ export default function ChatbotWidget() {
           className={
             isFullscreen
               ? "fixed inset-0 z-50 flex min-h-0 flex-col overflow-hidden bg-surface text-on-surface focus:outline-none"
-              : "mb-4 flex max-h-[min(620px,calc(100dvh-6rem))] min-h-[min(460px,calc(100dvh-6rem))] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-[28px] border border-outline-variant/60 bg-surface shadow-[0_28px_80px_-28px_rgba(0,20,47,0.6)] focus:outline-none sm:w-96"
+              : "relative mb-4 flex max-h-[min(620px,calc(100dvh-6rem))] min-h-[min(460px,calc(100dvh-6rem))] w-[calc(100vw-2rem)] max-w-sm flex-col overflow-hidden rounded-[28px] border border-outline-variant/60 bg-surface shadow-[0_28px_80px_-28px_rgba(0,20,47,0.6)] focus:outline-none sm:w-96"
           }
         >
+          {/* Satu tanda hidup di tepi panel: urup cahaya token amber-navy.
+              Hanya pada mode normal — layar penuh tidak menerima efek ini. */}
+          {!isFullscreen && (
+            <BorderBeam size={96} duration={7} />
+          )}
           <div className={`relative z-10 flex shrink-0 items-center justify-between gap-3 border-b px-4 py-4 ${isFullscreen ? "border-outline-variant/50 bg-surface/85 text-primary backdrop-blur-xl sm:px-8" : "overflow-hidden border-transparent bg-gradient-to-br from-primary via-primary to-primary-container text-on-primary"}`}>
             {!isFullscreen && (
               <div
@@ -296,7 +303,10 @@ export default function ChatbotWidget() {
               <div className="min-w-0">
                 <h2 className="truncate text-sm font-bold">Asisten AI SMKN 24</h2>
                 <p className={`mt-0.5 flex items-center gap-1.5 text-xs ${isFullscreen ? "text-on-surface-variant" : "text-on-primary/75"}`}>
-                  <span className="h-1.5 w-1.5 rounded-full bg-secondary-container" aria-hidden="true" />
+                  <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
+                    <span className="badge-live-halo absolute inset-0 rounded-full bg-secondary-container" />
+                    <span className="badge-live-core relative h-1.5 w-1.5 rounded-full bg-secondary-container" />
+                  </span>
                   Siap membantu informasi sekolah
                 </p>
               </div>
@@ -358,21 +368,26 @@ export default function ChatbotWidget() {
                     </p>
                     <div className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
                       {suggestions.map((suggestion, index) => (
-                        <motion.button
-                          key={suggestion}
-                          type="button"
-                          onClick={() => void sendMessage(suggestion)}
-                          disabled={isSending}
-                          whileHover={reduceMotion ? undefined : { y: -3, scale: 1.015 }}
-                          whileTap={reduceMotion ? undefined : { scale: 0.98 }}
-                          transition={{ type: "spring", stiffness: 340, damping: 22 }}
-                          className="group flex min-h-14 items-center justify-between gap-3 rounded-2xl border border-outline-variant/60 bg-surface-container-lowest/90 px-4 py-3 text-left text-sm font-semibold leading-snug text-primary shadow-sm backdrop-blur transition-colors hover:border-secondary/50 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[4.5rem] sm:px-5"
-                        >
-                          <span>{suggestion}</span>
-                          <span aria-hidden className="shrink-0 text-secondary transition-transform duration-200 group-hover:translate-x-1">
-                            {index % 2 === 0 ? "↗" : "→"}
-                          </span>
-                        </motion.button>
+                        <MagicCard key={suggestion} gradientSize={140} className="flex rounded-2xl">
+                          <motion.button
+                            type="button"
+                            onClick={() => void sendMessage(suggestion)}
+                            disabled={isSending}
+                            whileHover={reduceMotion ? undefined : { y: -3, scale: 1.015 }}
+                            whileTap={reduceMotion ? undefined : { scale: 0.98 }}
+                            transition={{ type: "spring", stiffness: 340, damping: 22 }}
+                            className="group flex min-h-14 w-full items-center justify-between gap-3 rounded-2xl border border-outline-variant/60 bg-surface-container-lowest/90 px-4 py-3 text-left text-sm font-semibold leading-snug text-primary shadow-sm backdrop-blur transition-colors hover:border-secondary/50 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-55 sm:min-h-[4.5rem] sm:px-5"
+                          >
+                            <span>{suggestion}</span>
+                            <span aria-hidden className="shrink-0 text-secondary transition-transform duration-200 group-hover:translate-x-1">
+                              {index % 2 === 0 ? (
+                                <ArrowUpRight className="h-4 w-4" />
+                              ) : (
+                                <ArrowRight className="h-4 w-4" />
+                              )}
+                            </span>
+                          </motion.button>
+                        </MagicCard>
                       ))}
                     </div>
                   </section>
@@ -386,15 +401,16 @@ export default function ChatbotWidget() {
                     <p className="text-xs font-semibold text-on-surface-variant">Coba tanyakan:</p>
                     <div className="flex flex-wrap gap-2">
                       {suggestions.map((suggestion) => (
-                        <button
-                          key={suggestion}
-                          type="button"
-                          onClick={() => void sendMessage(suggestion)}
-                          disabled={isSending}
-                          className="max-w-full rounded-xl border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-left text-xs leading-relaxed text-primary transition-colors hover:border-secondary/50 hover:bg-secondary-fixed/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {suggestion}
-                        </button>
+                        <MagicCard key={suggestion} gradientSize={100} className="inline-flex rounded-xl">
+                          <button
+                            type="button"
+                            onClick={() => void sendMessage(suggestion)}
+                            disabled={isSending}
+                            className="max-w-full w-full rounded-xl border border-outline-variant/60 bg-surface-container-lowest px-3 py-2 text-left text-xs leading-relaxed text-primary transition-colors hover:border-secondary/50 hover:bg-secondary-fixed/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {suggestion}
+                          </button>
+                        </MagicCard>
                       ))}
                     </div>
                   </section>

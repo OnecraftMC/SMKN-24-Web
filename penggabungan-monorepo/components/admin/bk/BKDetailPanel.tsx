@@ -22,6 +22,7 @@ import MorphSelect, {
   MorphSelectValue,
 } from "@/components/ui/select-morph";
 import BKEvidence from "./BKEvidence";
+import Badge from "@/components/ui/Badge";
 import {
   GAYA_KESULITAN,
   buildAssistantPlan,
@@ -124,18 +125,12 @@ export default function BKDetailPanel({
             <div className="mt-1 flex flex-wrap items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
               <span>{row.tanggal}</span>
               {row.butuhPerhatian && (
-                <span className="rounded-full bg-error-container px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-error-container">
-                  Perlu perhatian
-                </span>
+                <Badge tone="attention" variant="errorSolid" aria-label="Pesan butuh perhatian segera" label="Perlu perhatian" />
               )}
               {row.tingkatKesulitan && (
-                <span className={`rounded-full px-2 py-0.5 font-label-sm text-label-sm font-bold ${GAYA_KESULITAN[row.tingkatKesulitan]}`}>
-                  {row.tingkatKesulitan}
-                </span>
+                <Badge variant="adat" className={GAYA_KESULITAN[row.tingkatKesulitan]} label={row.tingkatKesulitan} />
               )}
-              <span className="rounded-full bg-surface-container-high px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-surface-variant">
-                {row.status}
-              </span>
+              <Badge variant="neutral" label={row.status} />
               {antreanGenting > 0 && (
                 <span><strong>{antreanGenting}</strong> kasus prioritas lain menunggu</span>
               )}

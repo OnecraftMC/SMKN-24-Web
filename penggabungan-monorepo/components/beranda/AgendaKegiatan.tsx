@@ -1,3 +1,5 @@
+import { CalendarDays, ChevronDown, Clock, History } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 import Link from "next/link";
 import { formatDateId } from "@/lib/shared/mappers";
 import type { AgendaView } from "@/lib/shared/mappers";
@@ -29,14 +31,10 @@ export default function AgendaKegiatan({
                 aria-label={`Papan agenda, ${pastAgenda.length} agenda lampau`}
                 className="inline-flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest px-4 py-2 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container-low focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary [&::-webkit-details-marker]:hidden"
               >
-                <span className="material-symbols-outlined text-[18px]" aria-hidden="true">history</span>
+                <History aria-hidden="true" className="h-[18px] w-[18px]" />
                 <span>Papan agenda</span>
-                <span className="rounded-full bg-surface-container-high px-2 py-0.5 text-label-sm tabular-nums text-on-surface-variant">
-                  {pastAgenda.length}
-                </span>
-                <span className="material-symbols-outlined text-[18px] transition-transform group-open:rotate-180" aria-hidden="true">
-                  expand_more
-                </span>
+                <Badge variant="neutral" className="tabular-nums" label={String(pastAgenda.length)} />
+                <ChevronDown aria-hidden="true" className="h-[18px] w-[18px] transition-transform group-open:rotate-180" />
               </summary>
               <div className="absolute left-0 top-full z-30 mt-space-sm w-[min(26rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-xl sm:left-auto sm:right-0">
                 <div className="border-b border-surface-container px-space-md py-space-sm">
@@ -85,7 +83,7 @@ export default function AgendaKegiatan({
               className="inline-flex min-h-11 items-center gap-1 rounded-lg px-3 py-2 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container-low focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
             >
               <span>Kalender Akademik Lengkap</span>
-              <span className="material-symbols-outlined text-[18px]" aria-hidden="true">calendar_month</span>
+              <CalendarDays aria-hidden="true" className="h-[18px] w-[18px]" />
             </Link>
           </div>
         </div>
@@ -105,13 +103,11 @@ export default function AgendaKegiatan({
                 </span>
               </div>
               <div className="space-y-1">
-                <span className="px-2 py-0.5 rounded bg-surface-container-high text-on-surface text-xs font-bold">
-                  {item.badge}
-                </span>
+                <Badge variant="adat" className="bg-surface-container-high text-on-surface" label={item.badge} />
                 <h3 className="font-title-md text-title-md text-primary font-bold">{item.title}</h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">{item.desc}</p>
                 <p className="font-label-sm text-label-sm text-outline flex items-center gap-1 pt-1">
-                  <span className="material-symbols-outlined text-base">schedule</span>
+                  <Clock aria-hidden="true" className="h-4 w-4" />
                   {item.time}
                 </p>
               </div>

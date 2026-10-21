@@ -312,6 +312,12 @@ export interface ChatMetrik {
   persenEskalasi: number;
   luarKonteks: number;
   persenLuarKonteks: number;
+  /** Balasan bot berstatus "resolved" (sama dengan `dijawab`). */
+  terjawab: number;
+  /** Balasan bot berstatus "escalated"/"unanswered" — butuh info/intervensi. */
+  tidakTerjawab: number;
+  persenTerjawab: number;
+  persenTidakTerjawab: number;
 }
 
 export interface ChatTren {
@@ -329,7 +335,51 @@ export interface ChatTop {
   jumlah: number;
   kategori: string | null;
   statusTerakhir: string | null;
+  /**
+   * Label dua status yang sudah dipetakan backend:
+   * "Terjawab" atau "Tidak Terjawab/AI butuh info lebih lanjut"
+   * (atau "Belum ada status" untuk data lama tanpa klasifikasi).
+   * Opsional: backend lama belum mengirim label ini.
+   */
+  statusLabel?: string;
   terakhir: string;
+}
+
+/** Satu entri notifikasi otomatis Chatbot-BK (jejak bk_wa_alert). */
+export interface ChatbotBKEntry {
+  id: number;
+  jumlahLaporan: number;
+  target: string;
+  pesan: string;
+  status: "Terkirim" | "Gagal" | "Dilewati" | string;
+  error: string | null;
+  tanggal: string;
+}
+
+/** Analytics notifikasi otomatis Chatbot-BK (WhatsApp ke Guru BK). */
+export interface ChatbotBKAnalytics {
+  /** Nama persona pengirim ("Chatbot-BK"). */
+  pengirim: string;
+  /** Total percobaan notifikasi pada periode (termasuk yang dilewati). */
+  totalNotifikasi: number;
+  terkirim: number;
+  gagal: number;
+  dilewati: number;
+  /** Timestamp notifikasi terakhir yang benar-benar dicoba (null bila belum). */
+  terakhirKirim: string | null;
+  terakhirStatus: string | null;
+  /** Antrean laporan BK yang masih terbuka. */
+  laporanAktif: number;
+  /** Laporan terbuka yang perlu intervensi manusia. */
+  perluIntervensi: number;
+  /** Laporan yang sudah berstatus Selesai. */
+  sudahDitangani: number;
+  /** Ambang eskalasi yang aktif. */
+  ambang: number;
+  /** Apakah notifikasi otomatis sedang aktif. */
+  aktif: boolean;
+  /** 10 entri notifikasi terakhir pada periode. */
+  riwayat: ChatbotBKEntry[];
 }
 
 export interface ChatAnalyticsResponse {
@@ -339,6 +389,11 @@ export interface ChatAnalyticsResponse {
   kategori: ChatKategori[];
   sentimen: { positif: number; netral: number; negatif: number };
   top: ChatTop[];
+  /**
+   * Analytics notifikasi otomatis Chatbot-BK. Opsional karena backend lama
+   * (belum ada migrasi/endpoint baru) tidak mengirim blok ini.
+   */
+  chatbotBK?: ChatbotBKAnalytics;
 }
 
 export type ChatInsightTipe = "tren" | "konten_kurang" | "rekomendasi" | "teknis" | "faq";
@@ -373,6 +428,18 @@ export interface BkWaSetting {
   provider: WaProvider;
   sumber: "database" | "env";
   jumlah_laporan_terbuka: number;
+  /** Nama persona pengirim pesan ("Chatbot-BK"). */
+  pengirim: string;
+  /** Status singkat sang agen, siap ditampilkan di UI. */
+  status_agen: string;
+  /** Pratinjau isi pesan hari ini (tidak dikirim). */
+  preview_pesan: string;
+  /** Jumlah pesan yang pernah dikirim ke Guru BK. */
+  total_terkirim: number;
+  /** Timestamp pengiriman terakhir (null bila belum pernah). */
+  terakhir_kirim: string | null;
+  /** Status pengiriman terakhir. */
+  terakhir_status: string | null;
 }
 
 export interface BkWaTestResult {

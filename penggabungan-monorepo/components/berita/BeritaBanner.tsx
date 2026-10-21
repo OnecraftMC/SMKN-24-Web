@@ -1,4 +1,5 @@
 import { ArrowDown, Newspaper } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 
 export default function BeritaBanner() {
   return (
@@ -8,10 +9,17 @@ export default function BeritaBanner() {
       <div aria-hidden className="absolute bottom-0 right-[20%] -z-10 h-40 w-40 rounded-full bg-secondary/10 blur-3xl" />
       <div className="mx-auto grid max-w-container-max items-end gap-space-xl lg:grid-cols-[minmax(0,1fr)_auto]">
         <div className="max-w-4xl space-y-space-md">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-label-sm text-label-sm font-bold uppercase tracking-wider text-secondary-container">
-            <Newspaper aria-hidden className="h-4 w-4" />
-            <span>Warta Sekolah</span>
-          </div>
+          <Badge
+            variant="adat"
+            className="border border-white/15 bg-white/10 uppercase tracking-wider text-secondary-container"
+            aria-label="Warta Sekolah"
+            label={
+              <>
+                <Newspaper aria-hidden className="h-4 w-4" />
+                Warta Sekolah
+              </>
+            }
+          />
           <h1 className="font-headline-lg text-headline-lg font-bold tracking-tight text-surface lg:text-[2.75rem]">
             Cerita, prestasi, dan kabar dari SMKN 24 Jakarta
           </h1>

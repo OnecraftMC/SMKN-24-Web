@@ -1,3 +1,4 @@
+import { ArrowRight, Megaphone, Newspaper } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { BeritaView } from "@/lib/shared/mappers";
@@ -73,7 +74,7 @@ export default function FeaturedNews({
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-primary" aria-hidden="true">
-                  <span className="material-symbols-outlined text-2xl">newspaper</span>
+                  <Newspaper aria-hidden="true" className="h-6 w-6" />
                 </span>
               )}
             </div>
@@ -90,11 +91,9 @@ export default function FeaturedNews({
                 {berita.judul}
               </h2>
               <span className="inline-flex items-center gap-1 font-label-sm text-label-sm font-bold text-primary">
-                <span className="material-symbols-outlined text-[16px]">campaign</span>
+                <Megaphone aria-hidden="true" className="h-4 w-4" />
                 Baca berita pilihan
-                <span className="material-symbols-outlined text-[14px] transition-transform duration-300 group-hover:translate-x-0.5">
-                  arrow_forward
-                </span>
+                <ArrowRight aria-hidden="true" className="h-[14px] w-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
               </span>
             </div>
           </Link>
@@ -119,7 +118,7 @@ export default function FeaturedNews({
               />
             ) : (
               <div className="w-full h-full bg-surface-container-high flex items-center justify-center text-primary" aria-hidden="true">
-                <span className="material-symbols-outlined text-6xl">newspaper</span>
+                <Newspaper aria-hidden="true" className="h-[3.75rem] w-[3.75rem]" />
               </div>
             )}
           </div>
@@ -138,11 +137,11 @@ export default function FeaturedNews({
             </p>
             <div className="pt-2 flex items-center justify-between">
               <span className="text-xs font-bold text-primary flex items-center gap-1">
-                <span className="material-symbols-outlined text-[16px]">campaign</span> Berita Pilihan
+                <Megaphone aria-hidden="true" className="h-4 w-4" /> Berita Pilihan
               </span>
               <Link href={`/berita/${berita.slug}`} className="px-4 py-2 rounded-xl bg-primary text-surface font-label-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-1">
                 <span>Baca Lengkap</span>
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </Link>
             </div>
           </div>

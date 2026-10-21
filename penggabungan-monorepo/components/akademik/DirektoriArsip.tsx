@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Download, FileText, Search } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 import type { ArsipPublicDTO } from "@/lib/api";
 import MorphSelect, {
   MorphSelectTrigger,
@@ -119,9 +120,7 @@ export default function DirektoriArsip({
                           <FileText aria-hidden className="h-6 w-6" />
                         </span>
                         <div className="min-w-0">
-                          <span className="inline-flex rounded-full bg-secondary-fixed px-3 py-1 font-label-sm text-label-sm font-bold text-on-secondary-fixed">
-                            {item.kategori}
-                          </span>
+                          <Badge variant="secondary" label={item.kategori} />
                           <h2 className="mt-2 break-words font-title-md text-title-md font-bold text-primary">
                             {item.judul}
                           </h2>

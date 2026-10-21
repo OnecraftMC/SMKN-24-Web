@@ -1,4 +1,5 @@
 "use client";
+import { Clock, ExternalLink, LogIn, Mail, MessagesSquare, Phone } from "lucide-react";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -50,19 +51,19 @@ export default function Navbar() {
         <div className="max-w-container-max mx-auto flex flex-wrap items-center justify-between gap-space-xs font-label-sm text-label-sm">
           <div className="flex items-center flex-wrap gap-space-md text-surface-container-high">
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[15px]">call</span>
+              <Phone aria-hidden="true" className="h-[15px] w-[15px]" />
               (021) 844-1976
             </span>
             <span className="hidden sm:flex items-center gap-1">
-              <span className="material-symbols-outlined text-[15px]">mail</span>
+              <Mail aria-hidden="true" className="h-[15px] w-[15px]" />
               humassmkn24jakarta@gmail.com
             </span>
             <span className="hidden md:flex items-center gap-1">
-              <span className="material-symbols-outlined text-[15px]">schedule</span>
+              <Clock aria-hidden="true" className="h-[15px] w-[15px]" />
               Senin - Jumat: 07.00 - 15.00 WIB
             </span>
             <span className="flex items-center gap-1 tabular-nums" aria-label={`Waktu Indonesia Barat ${indonesiaTime}`}>
-              <span className="material-symbols-outlined text-[15px]" aria-hidden="true">schedule</span>
+              <Clock aria-hidden="true" className="h-[15px] w-[15px]" />
               {indonesiaTime} WIB
             </span>
           </div>
@@ -76,7 +77,7 @@ export default function Navbar() {
               className="hidden sm:inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold shadow-sm hover:bg-secondary-fixed-dim transition-all"
             >
               <span>Login</span>
-              <span className="material-symbols-outlined text-[16px]">login</span>
+              <LogIn aria-hidden="true" className="h-4 w-4" />
             </a>
           </div>
         </div>
@@ -126,7 +127,7 @@ export default function Navbar() {
             target="_blank"
           >
             <span>SPMB Online</span>
-            <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+            <ExternalLink aria-hidden="true" className="h-[18px] w-[18px]" />
           </a>
 
           <button
@@ -135,7 +136,7 @@ export default function Navbar() {
             className="hidden sm:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-md hover:bg-secondary-fixed-dim transition-all"
           >
             <span>Bimbingan Konseling</span>
-            <span className="material-symbols-outlined text-[18px]">forum</span>
+            <MessagesSquare aria-hidden="true" className="h-[18px] w-[18px]" />
           </button>
 
           <button

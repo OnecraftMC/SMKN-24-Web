@@ -1,3 +1,4 @@
+import { Quote, Signature } from "lucide-react";
 import Image from "next/image";
 
 export default function SambutanKepsek() {
@@ -20,9 +21,7 @@ export default function SambutanKepsek() {
                 />
               </div>
               <div className="absolute bottom-6 -right-4 flex items-center gap-3 rounded-xl bg-primary px-space-md py-space-sm text-surface shadow-lg">
-                <span aria-hidden className="material-symbols-outlined text-[28px] text-secondary-container">
-                  format_quote
-                </span>
+                <Quote aria-hidden className="h-7 w-7 text-secondary-container" />
                 <div>
                   <p className="font-label-sm text-label-sm font-bold leading-tight">Sambutan Kepala Sekolah</p>
                   <p className="font-body-sm text-body-sm text-surface-container-high">SMK Negeri 24 Jakarta</p>
@@ -63,7 +62,7 @@ export default function SambutanKepsek() {
                 <h3 className="font-title-md text-title-md font-bold text-primary">Dra. Isfariani</h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">Kepala SMK Negeri 24 Jakarta</p>
               </div>
-              <span aria-hidden className="material-symbols-outlined text-[32px] text-secondary">signature</span>
+              <Signature aria-hidden className="h-8 w-8 text-secondary" />
             </div>
           </div>
         </div>

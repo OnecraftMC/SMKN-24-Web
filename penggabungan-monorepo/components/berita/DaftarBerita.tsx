@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CalendarDays, Newspaper } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 import type { BeritaView } from "@/lib/shared/mappers";
 
 function NewsImage({ item, priority = false }: { item: BeritaView; priority?: boolean }) {
@@ -21,9 +22,11 @@ function NewsImage({ item, priority = false }: { item: BeritaView; priority?: bo
         </div>
       )}
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-primary/65 via-transparent to-primary/10" />
-      <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-primary/75 px-3 py-1 font-label-sm text-label-sm font-bold text-surface backdrop-blur">
-        {item.kategori}
-      </span>
+      <Badge
+        variant="adat"
+        className="absolute left-4 top-4 border border-white/20 bg-primary/75 backdrop-blur"
+        label={item.kategori}
+      />
     </div>
   );
 }
@@ -70,9 +73,7 @@ export default function DaftarBerita({
             </p>
           </div>
           {berita.length > 0 && (
-            <span className="w-fit rounded-full bg-surface-container-high px-3 py-1 font-label-sm text-label-sm font-bold text-on-surface-variant">
-              {berita.length} artikel
-            </span>
+            <Badge variant="neutral" className="w-fit" label={`${berita.length} artikel`} />
           )}
         </header>
 
@@ -88,9 +89,7 @@ export default function DaftarBerita({
                   <NewsImage item={unggulan} priority />
                 </div>
                 <div className="flex flex-col justify-center gap-space-md p-space-lg md:p-space-2xl">
-                  <span className="w-fit rounded-full bg-secondary-container px-3 py-1 font-label-sm text-label-sm font-bold text-on-secondary-container">
-                    Cerita pilihan
-                  </span>
+                  <Badge variant="success" className="w-fit" label="Cerita pilihan" />
                   <DateLabel value={unggulan.tanggalTampil} />
                   <h3 className="font-headline-sm text-headline-sm font-bold leading-tight text-primary transition-colors group-hover:text-secondary md:text-headline-md">
                     {unggulan.judul}

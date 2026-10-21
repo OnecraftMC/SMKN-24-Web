@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin, X } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 import type { AgendaDTO } from "@/lib/shared/mappers";
 import { MonthPicker } from "@/components/ui/month-picker";
 
@@ -81,10 +82,15 @@ export default function KalenderKegiatan({
       <div className="mx-auto max-w-container-max">
         <div className="mb-space-xl flex flex-col gap-space-sm sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-secondary-container px-3 py-1.5 font-label-sm text-label-sm font-bold text-on-secondary-container">
-              <CalendarDays aria-hidden className="h-4 w-4" />
-              Kalender sekolah
-            </span>
+            <Badge
+              variant="success"
+              label={
+                <>
+                  <CalendarDays aria-hidden className="h-4 w-4" />
+                  Kalender sekolah
+                </>
+              }
+            />
             <h2 className="mt-space-sm font-headline-md text-headline-md font-bold text-primary">
               Kegiatan SMKN 24 Jakarta
             </h2>

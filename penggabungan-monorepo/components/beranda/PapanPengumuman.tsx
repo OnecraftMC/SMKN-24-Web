@@ -1,5 +1,8 @@
+import { Megaphone } from "lucide-react";
 import Link from "next/link";
 import type { PengumumanView } from "@/lib/shared/mappers";
+import { IkonLucide } from "@/lib/ikonLucide";
+import Badge from "@/components/ui/Badge";
 
 export default function PapanPengumuman({
   pengumuman,
@@ -12,7 +15,7 @@ export default function PapanPengumuman({
     <div className="lg:col-span-5 space-y-space-lg">
       <div>
         <div className="inline-flex items-center gap-2 text-secondary font-bold font-label-sm text-label-sm uppercase tracking-wider">
-          <span className="material-symbols-outlined text-[18px]">campaign</span>
+          <Megaphone aria-hidden="true" className="h-[18px] w-[18px]" />
           <span>Papan Informasi</span>
         </div>
         <h2 className="font-headline-md text-headline-md text-primary font-bold">
@@ -31,15 +34,11 @@ export default function PapanPengumuman({
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                  item.variant === "secondary"
-                    ? "bg-secondary text-surface"
-                    : "bg-primary text-surface"
-                }`}
-              >
-                {item.badge || item.kategori}
-              </span>
+              <Badge
+                variant={item.variant === "secondary" ? "inkSecondary" : "inkSolid"}
+                className="uppercase tracking-wider"
+                label={item.badge || item.kategori}
+              />
               {item.status && (
                 <span className="font-body-sm text-body-sm text-secondary font-bold text-xs">
                   {item.status}
@@ -56,10 +55,10 @@ export default function PapanPengumuman({
                 className="mt-space-sm pt-space-xs flex items-center justify-between text-xs text-secondary font-bold cursor-pointer"
               >
                 <span className="flex items-center gap-1">
-                  <span className="material-symbols-outlined text-[16px]">{item.icon || "info"}</span>
+                  <IkonLucide nama={item.icon || "info"} className="h-4 w-4" />
                   {item.linkLabel}
                 </span>
-                <span className="material-symbols-outlined text-[18px]">{item.actionIcon || "arrow_forward"}</span>
+                <IkonLucide nama={item.actionIcon || "arrow_forward"} className="h-[18px] w-[18px]" />
               </Link>
             )}
           </div>

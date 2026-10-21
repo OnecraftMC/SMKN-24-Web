@@ -189,7 +189,8 @@ function LencanaJumlah({
   return (
     <span
       title={`${formatNumber(nilai)} di ${item.label}`}
-      className={`shrink-0 tabular-nums font-label-sm text-label-sm font-bold ${
+      key={nilai}
+      className={`badge-enter shrink-0 tabular-nums font-label-sm text-label-sm font-bold ${
         aktif ? "text-on-secondary-fixed" : "text-primary-fixed-dim"
       }`}
     >

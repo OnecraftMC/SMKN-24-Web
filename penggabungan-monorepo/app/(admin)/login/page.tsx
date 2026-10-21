@@ -1,14 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useReducedMotion } from "motion/react";
 import { ArrowLeft, Eye, EyeOff, Loader2, LogIn, TriangleAlert } from "lucide-react";
 import LogoLoadingAnimation from "@/components/ui/LogoLoadingAnimation";
 import { useAuth } from "@/lib/admin/auth";
-
-const MAIN_WEB_URL = process.env.NEXT_PUBLIC_MAIN_WEB_URL ?? "/";
 
 const inputClass =
   "w-full rounded-lg border border-outline-variant bg-surface-container-lowest px-3 py-3 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40";
@@ -103,33 +100,15 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen bg-surface">
-      <BrandPanel />
-
-      <section className="flex w-full items-center justify-center px-margin-mobile py-space-2xl md:px-margin-tablet lg:w-1/2">
-        <div className="w-full max-w-sm">
-          {/* Tombol kembali eksplisit ke website utama (tanpa history.back()). */}
-          <a
-            href={MAIN_WEB_URL}
-            className="mb-space-lg inline-flex items-center gap-space-xs rounded-lg border border-outline-variant bg-surface-container-lowest px-space-sm py-2 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container"
-          >
-            <ArrowLeft aria-hidden className="h-4 w-4" />
-            <span>Kembali ke beranda</span>
-          </a>
-
-          <div className="mb-space-2xl flex items-center gap-space-sm lg:hidden">
-            <Image
-              src="/logo-smkn24.png"
-              alt="Logo SMK Negeri 24 Jakarta"
-              width={36}
-              height={36}
-              className="h-9 w-auto rounded-md"
-            />
-            <span className="font-headline-sm text-headline-sm font-bold text-primary">
-              SMKN 24 Jakarta
-            </span>
-          </div>
-
+    <main className="flex min-h-screen items-center justify-center bg-surface px-margin-mobile py-space-2xl md:px-margin-tablet">
+      <section className="w-full max-w-sm">
+        <a
+          href="/"
+          className="mb-space-lg flex min-h-11 w-fit items-center gap-space-xs rounded-lg border border-outline-variant bg-surface-container-lowest px-space-sm py-2 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container"
+        >
+          <ArrowLeft aria-hidden className="h-4 w-4" />
+          <span>Kembali ke beranda</span>
+        </a>
           <span className="mb-space-md inline-flex items-center rounded-full bg-secondary-container/20 px-space-sm py-1 font-label-sm text-label-sm font-bold uppercase tracking-wide text-secondary">
             Portal Internal
           </span>
@@ -219,53 +198,11 @@ export default function LoginPage() {
 
           <p className="mt-space-2xl text-center font-body-sm text-body-sm text-on-surface-variant">
             Bukan admin?{" "}
-            <a href={MAIN_WEB_URL} className="font-bold text-primary hover:underline">
+            <a href="/" className="font-bold text-primary hover:underline">
               Kembali ke situs utama
             </a>
           </p>
-        </div>
       </section>
     </main>
   );
 }
-
-function BrandPanel() {
-  return (
-    <section
-      aria-hidden="true"
-      className="relative hidden flex-col justify-between overflow-hidden bg-primary-container p-space-2xl lg:flex lg:w-1/2"
-    >
-      <div className="absolute -bottom-32 -right-32 h-[28rem] w-[28rem] rounded-full bg-secondary-container/90" />
-      <div className="absolute right-10 top-1/3 h-40 w-40 rounded-full border border-surface/20" />
-
-      <div className="relative z-10 flex items-center gap-space-sm">
-        <Image
-          src="/logo-smkn24.png"
-          alt=""
-          width={40}
-          height={40}
-          className="h-10 w-auto rounded-md shadow-sm"
-        />
-        <div>
-          <p className="font-headline-sm text-headline-sm font-bold text-surface">
-            SMKN 24 Jakarta
-          </p>
-          <p className="font-label-sm text-label-sm text-surface-container-high">
-            Dashboard Admin
-          </p>
-        </div>
-      </div>
-
-      <div className="relative z-10 max-w-md space-y-space-md">
-        <p className="font-headline-lg text-headline-lg font-bold leading-tight text-surface">
-          Kelola konten sekolah dari satu tempat.
-        </p>
-        <p className="font-body-md text-body-md text-surface-container-high">
-          Berita, pengumuman, agenda, direktori guru, dan inbox BK —
-          semuanya terpusat di sini.
-        </p>
-      </div>
-    </section>
-  );
-}
-

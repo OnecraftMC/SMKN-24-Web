@@ -13,9 +13,10 @@ import {
   ListState,
   buttonGhostClass,
   buttonPrimaryClass,
-  fieldClass,
 } from "@/components/admin/ui/FormBits";
 import { UniversalDatePicker } from "@/components/ui/universal-date-picker";
+import ChatbotBKHistory from "@/components/admin/chat/ChatbotBKHistory";
+import AutomaticChatAnalyticsCta from "@/components/admin/chat/AutomaticChatAnalyticsCta";
 
 type PeriodeKey = "hari" | "7" | "30" | "custom";
 
@@ -225,11 +226,32 @@ export default function ChatAnalyticsPage() {
   const totalSentimen =
     (data?.sentimen.positif ?? 0) + (data?.sentimen.netral ?? 0) + (data?.sentimen.negatif ?? 0);
   const maksKategori = Math.max(1, ...(data?.kategori.map((k) => k.jumlah) ?? [1]));
-  const kosong = !loading && !error && (metrik?.totalSesi ?? 0) === 0;
+  // Backend lama belum mengirim metrik terjawab/tidakTerjawab — fallback ke
+  // angka yang sudah ada supaya kartu tidak pernah menampilkan "undefined".
+  const terjawab = metrik?.terjawab ?? metrik?.dijawab ?? 0;
+  const tidakTerjawab = metrik?.tidakTerjawab ?? 0;
+  const persenTerjawab = metrik?.persenTerjawab ?? metrik?.persenDijawab ?? 0;
+  const persenTidakTerjawab = metrik?.persenTidakTerjawab ?? 0;
+  // Halaman tetap terisi bila ada aktivitas Chatbot-BK walau belum ada
+  // percakapan chatbot pada periode ini.
+  const kosong =
+    !loading &&
+    !error &&
+    (metrik?.totalSesi ?? 0) === 0 &&
+    (data?.chatbotBK?.totalNotifikasi ?? 0) === 0;
 
   const kartu = [
     { label: "Total Percakapan", nilai: String(metrik?.totalSesi ?? "-"), hint: `${dari} s.d. ${sampai}` },
-    { label: "Pertanyaan Dijawab", nilai: metrik ? `${metrik.persenDijawab}%` : "-", hint: metrik ? `${metrik.dijawab} dari ${metrik.totalJawaban} jawaban` : undefined },
+    {
+      label: "Terjawab",
+      nilai: metrik ? String(terjawab) : "-",
+      hint: metrik ? `${persenTerjawab}% dari ${metrik.totalJawaban} jawaban` : undefined,
+    },
+    {
+      label: "Tidak Terjawab / Perlu Info",
+      nilai: metrik ? String(tidakTerjawab) : "-",
+      hint: metrik ? `${persenTidakTerjawab}% butuh info atau intervensi` : undefined,
+    },
     { label: "Butuh Intervensi", nilai: metrik ? `${metrik.persenEskalasi}%` : "-", hint: metrik ? `${metrik.eskalasi} eskalasi` : undefined },
     { label: "Di Luar Konteks", nilai: metrik ? `${metrik.persenLuarKonteks}%` : "-", hint: metrik ? `${metrik.luarKonteks} pertanyaan` : undefined },
     { label: "Aktif Hari Ini", nilai: String(metrik?.aktifHariIni ?? "-"), hint: "Sesi hari ini" },
@@ -368,7 +390,9 @@ export default function ChatAnalyticsPage() {
 
           <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
             <h2 className="font-title-md text-title-md font-bold text-on-surface">Top Pertanyaan</h2>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">10 pertanyaan tersering.</p>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              10 pertanyaan tersering beserta status jawaban AI.
+            </p>
             {data.top.length === 0 ? (
               <p className="mt-space-sm font-body-sm text-body-sm italic text-on-surface-variant">Belum ada pertanyaan.</p>
             ) : (
@@ -383,19 +407,49 @@ export default function ChatAnalyticsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.top.map((t, i) => (
+                    {data.top.map((t, i) => {
+                      // Backend baru mengirim label dua status; backend lama
+                      // hanya mengirim status mentah (resolved/escalated/...).
+                      const label =
+                        t.statusLabel ??
+                        (t.statusTerakhir === "resolved"
+                          ? "Terjawab"
+                          : t.statusTerakhir
+                            ? "Tidak Terjawab/AI butuh info lebih lanjut"
+                            : "Belum ada status");
+                      return (
                       <tr key={`${t.pertanyaan}-${i}`} className="border-b border-surface-container/60 last:border-0">
                         <td className="max-w-[320px] truncate py-2 pr-3 text-on-surface" title={t.pertanyaan}>{t.pertanyaan}</td>
                         <td className="py-2 pr-3 tabular-nums">{t.jumlah}</td>
                         <td className="py-2 pr-3">{t.kategori ?? "-"}</td>
-                        <td className="py-2">{t.statusTerakhir ?? "-"}</td>
+                        <td className="py-2">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 font-label-sm text-label-sm font-bold ${
+                              label === "Terjawab"
+                                ? "bg-primary-container text-on-primary-container"
+                                : label === "Belum ada status"
+                                  ? "bg-surface-container-highest text-on-surface-variant"
+                                  : "bg-error-container text-on-error-container"
+                            }`}
+                          >
+                            {label}
+                          </span>
+                        </td>
                       </tr>
-                    ))}
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
             )}
           </section>
+
+          {data.chatbotBK && (
+            <>
+              <ChatbotBKHistory data={data.chatbotBK} view="summary" />
+              <AutomaticChatAnalyticsCta data={data.chatbotBK} dari={dari} sampai={sampai} />
+            </>
+          )}
         </>
       )}
 
@@ -449,6 +503,5 @@ export default function ChatAnalyticsPage() {
     </div>
   );
 }
-
 
 

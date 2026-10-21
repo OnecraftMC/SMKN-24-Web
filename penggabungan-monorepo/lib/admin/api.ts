@@ -268,7 +268,7 @@ export async function apiDownload(path: string): Promise<Blob> {
   return response.blob();
 }
 
-/** Baca konfigurasi WA Guru BK + jumlah laporan berat terbuka. */
+/** Baca konfigurasi Chatbot-BK + status antrean + pratinjau pesan. */
 export async function getBkWaConfig(): Promise<BkWaSetting> {
   return apiRequest<BkWaSetting>("/api/bk/wa-config.php");
 }

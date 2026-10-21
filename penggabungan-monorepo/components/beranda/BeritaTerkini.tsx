@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, Newspaper } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +17,7 @@ export default function BeritaTerkini({
       <div className="flex items-center justify-between">
         <div>
           <div className="inline-flex items-center gap-2 text-secondary font-bold font-label-sm text-label-sm uppercase tracking-wider">
-            <span className="material-symbols-outlined text-[18px]">newspaper</span>
+            <Newspaper aria-hidden="true" className="h-[18px] w-[18px]" />
             <span>Warta Terkini</span>
           </div>
           <h2 className="font-headline-md text-headline-md text-primary font-bold">
@@ -28,7 +29,7 @@ export default function BeritaTerkini({
           className="text-secondary font-label-md text-label-md font-bold hover:underline flex items-center gap-1"
         >
           <span>Semua Berita</span>
-          <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+          <ArrowRight aria-hidden="true" className="h-[18px] w-[18px]" />
         </Link>
       </div>
 
@@ -50,7 +51,7 @@ export default function BeritaTerkini({
                 />
               ) : (
                 <div className="w-full h-full min-h-48 bg-surface-container-high flex items-center justify-center text-primary" aria-hidden="true">
-                  <span className="material-symbols-outlined text-4xl">newspaper</span>
+                  <Newspaper aria-hidden="true" className="h-9 w-9" />
                 </div>
               )}
             </div>
@@ -74,7 +75,7 @@ export default function BeritaTerkini({
               </div>
               <Link href={`/berita/${item.slug}`} className="pt-space-xs flex items-center gap-1 text-primary font-semibold font-label-sm text-label-sm hover:text-secondary">
                 <span>Baca Selengkapnya</span>
-                <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+                <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </Link>
             </div>
           </article>

@@ -1,4 +1,5 @@
 "use client";
+import { Images } from "lucide-react";
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
@@ -83,7 +84,7 @@ export default function GaleriVisual({
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-surface-container-high text-primary" aria-hidden="true">
-                      <span className="material-symbols-outlined text-4xl">photo_library</span>
+                      <Images aria-hidden="true" className="h-9 w-9" />
                     </div>
                   )}
                   <span className="absolute inset-x-0 bottom-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">

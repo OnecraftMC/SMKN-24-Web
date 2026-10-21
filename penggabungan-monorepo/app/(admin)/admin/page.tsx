@@ -4,8 +4,8 @@
  * Halaman Overview dashboard admin — ringkasan kondisi sekolah.
  *
  * Susunan: header hari (di shell) → strip konteks → panel analisis chatbot
- * + ringkasan notifikasi WA Guru BK. Tidak ada daftar tugas/pekerjaan bertanggal
- * agar halaman tetap berupa monitoring, bukan ruang kerja/task manager.
+ * + ringkasan Chatbot-BK (WhatsApp Guru BK). Tidak ada daftar tugas/pekerjaan
+ * bertanggal agar halaman tetap berupa monitoring, bukan ruang kerja/task manager.
  *
  * Semua angka dari backend. Kegagalan parsial dinyatakan eksplisit di baris
  * status dan per satuan di strip, tidak pernah diam-diam menjadi nol.
@@ -53,12 +53,16 @@ export default function OverviewPage() {
   const [periode, setPeriode] = useState<PeriodeStatistik>("7");
   const [chatAttempt, setChatAttempt] = useState(0);
 
-  // ---------- Mini ringkasan notifikasi WA Guru BK ----------
+  // ---------- Mini ringkasan Chatbot-BK (WhatsApp Guru BK) ----------
   const [waSummary, setWaSummary] = useState<{
     aktif: boolean;
     jumlah: number;
     threshold: number;
     target: string;
+    pengirim: string;
+    status_agen: string;
+    terakhir_kirim: string | null;
+    total_terkirim: number;
   } | null>(null);
   const [waSummaryError, setWaSummaryError] = useState<string | null>(null);
 
@@ -72,6 +76,10 @@ export default function OverviewPage() {
           jumlah: cfg.jumlah_laporan_terbuka,
           threshold: cfg.threshold,
           target: cfg.target,
+          pengirim: cfg.pengirim,
+          status_agen: cfg.status_agen,
+          terakhir_kirim: cfg.terakhir_kirim,
+          total_terkirim: cfg.total_terkirim,
         });
       })
       .catch((err) => {
@@ -262,13 +270,13 @@ export default function OverviewPage() {
           onPeriodeChange={gantiPeriode}
         />
 
-          {/* Mini ringkasan notifikasi WA Guru BK */}
+          {/* Mini ringkasan Chatbot-BK */}
           <section
-            aria-label="Ringkasan notifikasi WhatsApp Guru BK"
+            aria-label="Ringkasan Chatbot-BK untuk Guru BK"
             className="mt-space-lg rounded-xl border border-outline-variant bg-surface-container-lowest p-space-md"
           >
             <h2 className="font-title-sm text-title-sm font-bold text-on-surface mb-space-sm">
-              Notifikasi WA Guru BK
+              🤖 {waSummary?.pengirim ?? "Chatbot-BK"}
             </h2>
             {waSummaryError ? (
               <p className="font-body-sm text-body-sm text-on-error-container">
@@ -290,9 +298,14 @@ export default function OverviewPage() {
                     {waSummary.aktif ? "Aktif" : "Nonaktif"}
                   </span>
                 </div>
+                {waSummary.status_agen && (
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    {waSummary.status_agen}
+                  </p>
+                )}
                 <div className="flex items-baseline justify-between gap-space-sm">
                   <span className="font-label-sm text-label-sm text-on-surface-variant">
-                    Laporan berat terbuka
+                    Kasus perlu intervensi
                   </span>
                   <span
                     className={`font-body-md text-body-md font-bold ${
@@ -306,15 +319,25 @@ export default function OverviewPage() {
                 </div>
                 <div className="flex items-baseline justify-between gap-space-sm">
                   <span className="font-label-sm text-label-sm text-on-surface-variant">
-                    Nomor tujuan
+                    Nomor WhatsApp Guru BK
                   </span>
                   <span className="font-body-sm text-body-sm text-on-surface truncate">
                     {waSummary.target || "—"}
                   </span>
                 </div>
+                <div className="flex items-baseline justify-between gap-space-sm">
+                  <span className="font-label-sm text-label-sm text-on-surface-variant">
+                    Pesan terkirim
+                  </span>
+                  <span className="font-body-sm text-body-sm text-on-surface truncate">
+                    {waSummary.total_terkirim}
+                    {waSummary.terakhir_kirim ? ` · ${waSummary.terakhir_kirim}` : ""}
+                  </span>
+                </div>
                 {waSummary.jumlah >= waSummary.threshold && waSummary.aktif && (
                   <p className="font-body-sm text-body-sm text-error">
-                    ⚠ Ambang tercapai — notifikasi akan dikirim otomatis saat laporan baru masuk.
+                    ⚠ Ambang tercapai — {waSummary.pengirim} akan menghubungi Guru BK
+                    otomatis saat laporan baru masuk.
                   </p>
                 )}
               </div>
@@ -324,7 +347,7 @@ export default function OverviewPage() {
               className="mt-space-sm inline-flex items-center gap-1 font-label-sm text-label-sm font-bold text-primary underline underline-offset-4 hover:text-secondary"
             >
               <Phone className="h-3.5 w-3.5" />
-              Kelola konfigurasi
+              Buka ruang {waSummary?.pengirim ?? "Chatbot-BK"}
             </Link>
           </section>
         </div>

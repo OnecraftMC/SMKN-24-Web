@@ -1,4 +1,5 @@
 "use client";
+import { User } from "lucide-react";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -30,7 +31,7 @@ export default function DewanGuru({
                 key={category}
                 type="button"
                 aria-pressed={filter === category}
-                className={`px-3.5 py-1.5 rounded-lg ${filter === category ? "bg-primary text-surface font-bold" : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"} font-label-sm text-label-sm`}
+                className={`badge-press px-3.5 py-1.5 rounded-lg ${filter === category ? "bg-primary text-surface font-bold" : "bg-surface-container-lowest text-on-surface-variant hover:bg-surface-container"} font-label-sm text-label-sm`}
                 onClick={() => setFilter(category)}
               >
                 {category === "semua" ? "Semua" : category}
@@ -45,7 +46,7 @@ export default function DewanGuru({
                   <Image src={guru.image} alt={guru.name} width={112} height={112} className="w-28 h-28 mx-auto rounded-full object-cover ring-4 ring-primary/10" />
                 ) : (
                   <div className="w-28 h-28 mx-auto rounded-full bg-surface-container-high text-primary flex items-center justify-center ring-4 ring-primary/10" aria-hidden="true">
-                    <span className="material-symbols-outlined text-4xl">person</span>
+                    <User aria-hidden="true" className="h-9 w-9" />
                   </div>
                 )}
               <div>

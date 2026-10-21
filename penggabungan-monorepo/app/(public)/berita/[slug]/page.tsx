@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -68,7 +69,7 @@ export default async function BeritaDetailPage({
   return (
     <article className="mx-auto max-w-4xl px-margin-mobile py-space-4xl md:px-margin-tablet">
       <Link href="/berita" className="mb-space-lg inline-flex items-center gap-2 font-label-md font-bold text-primary hover:text-secondary">
-        <span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        <ArrowLeft aria-hidden="true" className="h-6 w-6" />
         Kembali ke daftar berita
       </Link>
       <header className="space-y-space-sm">

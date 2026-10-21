@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "react-easy-crop/react-easy-crop.css";
@@ -7,8 +8,7 @@ import "react-easy-crop/react-easy-crop.css";
  * Root layout aplikasi gabungan SMKN 24 Jakarta.
  *
  * Berisi hal-hal yang berlaku untuk SELURUH halaman (publik, login, dan
- * dashboard admin): elemen html/body, font brand self-hosted, dan stylesheet
- * ikon Material Symbols.
+ * dashboard admin): elemen html/body dan font brand self-hosted.
  *
  * Kerangka visual berbeda per area dan dipisahkan lewat route group:
  *   - `app/(public)/layout.tsx` — Navbar, Footer, Chatbot, splash publik.
@@ -33,19 +33,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="id" className={jakartaSans.variable}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Ikon Material Symbols dipakai komponen publik. Aturan `no-page-custom-font`
-            menyasar Pages Router; di App Router link pada root layout berlaku untuk
-            seluruh aplikasi. */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
-        />
-      </head>
-      <body className="bg-surface text-on-surface">{children}</body>
+      <body className="bg-surface text-on-surface">
+        {children}
+        {/* Pause badge animation loops while this tab is hidden. */}
+        <Script id="pause-hidden-tab-animations" strategy="afterInteractive">
+          {`document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('animation-paused',document.hidden)})`}
+        </Script>
+      </body>
     </html>
   );
 }

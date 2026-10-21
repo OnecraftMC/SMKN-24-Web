@@ -72,14 +72,25 @@ $topStmt = $db->prepare(
 $topStmt->execute([$dari, $sampai]);
 $top = [];
 foreach ($topStmt->fetchAll() as $b) {
+  $statusRaw = $b['status_terakhir'] !== null ? (string)$b['status_terakhir'] : null;
   $top[] = [
     'pertanyaan' => (string)($b['pertanyaan'] ?? ''),
     'jumlah' => (int)($b['jumlah'] ?? 0),
     'kategori' => $b['kategori'] !== null ? (string)$b['kategori'] : null,
-    'statusTerakhir' => $b['status_terakhir'] !== null ? (string)$b['status_terakhir'] : null,
+    'statusTerakhir' => $statusRaw,
+    // Label dua status yang dipakai UI: "Terjawab" vs
+    // "Tidak Terjawab/AI butuh info lebih lanjut".
+    'statusLabel' => chatStatusLabel($statusRaw),
     'terakhir' => (string)($b['terakhir'] ?? ''),
   ];
 }
+// Balasan bot yang butuh bantuan manusia / info lebih lanjut.
+$tidakTerjawab = $punyaKolom['status_resolusi'] ? (int) queryScalar($db,
+  "SELECT COUNT(*) FROM chat_messages WHERE sender='bot'"
+  . " AND status_resolusi IN ('escalated','unanswered') AND DATE(created_at) BETWEEN ? AND ?",
+  [$dari, $sampai]) : 0;
+// Aktivitas notifikasi otomatis Chatbot-BK + status antrean BK.
+$chatbotBK = bkWaAnalytics($db, $dari, $sampai);
 jsonResponse([
   'periode' => ['dari' => $dari, 'sampai' => $sampai],
   'metrik' => [
@@ -93,11 +104,16 @@ jsonResponse([
     'persenEskalasi' => $totalBot > 0 ? round($eskalasi / $totalBot * 100) : 0,
     'luarKonteks' => $luarKonteks,
     'persenLuarKonteks' => $totalUser > 0 ? round($luarKonteks / $totalUser * 100) : 0,
+    'terjawab' => $dijawab,
+    'tidakTerjawab' => $tidakTerjawab,
+    'persenTerjawab' => $totalBot > 0 ? round($dijawab / $totalBot * 100) : 0,
+    'persenTidakTerjawab' => $totalBot > 0 ? round($tidakTerjawab / $totalBot * 100) : 0,
   ],
   'tren' => $tren,
   'kategori' => $kategori,
   'sentimen' => $sentimen,
   'top' => $top,
+  'chatbotBK' => $chatbotBK,
 ]);
 /** Periode YYYY-MM-DD; default 7 hari terakhir, maksimal 93 hari. */
 function resolvePeriode($dariRaw, $sampaiRaw): array
@@ -142,5 +158,145 @@ function chatAnalyticsColumns(PDO $db): array
   } catch (Throwable $e) {
     return ['kategori' => false, 'sentimen' => false, 'di_luar_konteks' => false, 'status_resolusi' => false];
   }
+}
+
+/**
+ * Label status dua-kolom untuk tabel "Top Pertanyaan".
+ *
+ * resolved  -> "Terjawab"
+ * escalated -> "Tidak Terjawab/AI butuh info lebih lanjut"
+ * unanswered-> "Tidak Terjawab/AI butuh info lebih lanjut"
+ * NULL/tidak dikenal -> "Belum ada status" (data lama belum diklasifikasi).
+ */
+function chatStatusLabel(?string $status): string
+{
+  if ($status === null || $status === '') { return 'Belum ada status'; }
+  return $status === 'resolved'
+    ? 'Terjawab'
+    : 'Tidak Terjawab/AI butuh info lebih lanjut';
+}
+
+/**
+ * Analytics notifikasi otomatis Chatbot-BK (WhatsApp ke Guru BK).
+ *
+ * Sumber data nyata:
+ *  - bk_wa_alert  : jejak setiap percobaan kirim (status Terkirim/Gagal/Dilewati).
+ *  - pesan_bk     : antrean laporan BK (aktif / perlu intervensi / ditangani).
+ *
+ * Tabel bk_wa_alert belum ada (migration belum jalan) = semua angka nol,
+ * bukan error; halaman tetap bisa dirender.
+ *
+ * @return array<string, mixed>
+ */
+function bkWaAnalytics(PDO $db, string $dari, string $sampai): array
+{
+  $hasil = [
+    'pengirim' => WA_BRAND_NAME,
+    'totalNotifikasi' => 0,
+    'terkirim' => 0,
+    'gagal' => 0,
+    'dilewati' => 0,
+    'terakhirKirim' => null,
+    'terakhirStatus' => null,
+    'laporanAktif' => 0,
+    'perluIntervensi' => 0,
+    'sudahDitangani' => 0,
+    'ambang' => 0,
+    'aktif' => false,
+    // Riwayat entri otomatis (jejak bk_wa_alert terbaru pada periode).
+    'riwayat' => [],
+  ];
+
+  // Konfigurasi aktif + ambang eskalasi (aman bila tabel belum ada).
+  try {
+    $setting = waGetSetting($db);
+    $hasil['ambang'] = (int) $setting['threshold'];
+    $hasil['aktif'] = (bool) $setting['aktif'];
+  } catch (Throwable $e) {
+    error_log('[SMKN24] Gagal membaca konfigurasi WA pada analytics: ' . $e->getMessage());
+  }
+
+  // Jejak pengiriman pada periode.
+  try {
+    $stmt = $db->prepare(
+      "SELECT status, COUNT(*) AS jumlah, MAX(created_at) AS terakhir FROM bk_wa_alert
+       WHERE DATE(created_at) BETWEEN ? AND ?
+       GROUP BY status"
+    );
+    $stmt->execute([$dari, $sampai]);
+    foreach ($stmt->fetchAll() as $b) {
+      $jumlah = (int)($b['jumlah'] ?? 0);
+      $hasil['totalNotifikasi'] += $jumlah;
+      $status = (string)($b['status'] ?? '');
+      if ($status === 'Terkirim') { $hasil['terkirim'] += $jumlah; }
+      elseif ($status === 'Gagal') { $hasil['gagal'] += $jumlah; }
+      else { $hasil['dilewati'] += $jumlah; }
+    }
+  } catch (Throwable $e) {
+    error_log('[SMKN24] Gagal membaca bk_wa_alert pada analytics: ' . $e->getMessage());
+  }
+
+  // Notifikasi terakhir (terkirim/gagal) — lintas periode, ini aktivitas terakhir.
+  try {
+    $stmt = $db->query(
+      "SELECT MAX(created_at) AS terakhir,
+              SUBSTRING_INDEX(GROUP_CONCAT(status ORDER BY created_at DESC), ',', 1) AS status_terakhir
+       FROM bk_wa_alert WHERE status IN ('Terkirim','Gagal')"
+    );
+    $row = $stmt ? $stmt->fetch() : false;
+    if (is_array($row)) {
+      $hasil['terakhirKirim'] = $row['terakhir'] ?? null;
+      $hasil['terakhirStatus'] = $row['status_terakhir'] ?? null;
+    }
+  } catch (Throwable $e) {
+    error_log('[SMKN24] Gagal membaca aktivitas WA terakhir: ' . $e->getMessage());
+  }
+
+  // Riwayat entri otomatis (10 terakhir pada periode) — sumber untuk
+  // panel "Riwayat Chatbot-BK" di halaman Riwayat Chatbot.
+  try {
+    $stmt = $db->prepare(
+      'SELECT id, jumlah_laporan, target, pesan, status, error, created_at
+       FROM bk_wa_alert WHERE DATE(created_at) BETWEEN ? AND ?
+       ORDER BY created_at DESC, id DESC LIMIT 10'
+    );
+    $stmt->execute([$dari, $sampai]);
+    foreach ($stmt->fetchAll() as $b) {
+      $hasil['riwayat'][] = [
+        'id' => (int)($b['id'] ?? 0),
+        'jumlahLaporan' => (int)($b['jumlah_laporan'] ?? 0),
+        'target' => (string)($b['target'] ?? ''),
+        'pesan' => (string)($b['pesan'] ?? ''),
+        'status' => (string)($b['status'] ?? ''),
+        'error' => $b['error'] !== null ? (string)$b['error'] : null,
+        'tanggal' => (string)($b['created_at'] ?? ''),
+      ];
+    }
+  } catch (Throwable $e) {
+    error_log('[SMKN24] Gagal membaca riwayat WA pada analytics: ' . $e->getMessage());
+  }
+
+  // Status antrean laporan BK (sumber data yang sama dengan pesan WhatsApp).
+  try {
+    $stmt = $db->query(
+      "SELECT
+         SUM(CASE WHEN status <> 'Selesai' THEN 1 ELSE 0 END) AS aktif,
+         SUM(CASE WHEN status <> 'Selesai'
+                   AND (butuh_perhatian = 1 OR tingkat_kesulitan = 'Berat')
+                  THEN 1 ELSE 0 END) AS perlu,
+         SUM(CASE WHEN status = 'Selesai' THEN 1 ELSE 0 END) AS ditangani
+       FROM pesan_bk"
+    );
+    $row = $stmt ? $stmt->fetch() : false;
+    if (is_array($row)) {
+      $hasil['laporanAktif'] = (int)($row['aktif'] ?? 0);
+      $hasil['perluIntervensi'] = (int)($row['perlu'] ?? 0);
+      $hasil['sudahDitangani'] = (int)($row['ditangani'] ?? 0);
+    }
+  } catch (Throwable $e) {
+    error_log('[SMKN24] Gagal membaca antrean BK pada analytics: ' . $e->getMessage());
+  }
+
+  return $hasil;
 }
 

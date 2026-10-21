@@ -1,3 +1,5 @@
+import { MapPin, Navigation, Phone } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 export default function LokasiSekolahBanner() {
   return (
     <div className="w-full px-margin-mobile md:px-margin-tablet lg:px-margin-desktop py-space-3xl" id="lokasi-sekolah">
@@ -7,10 +9,15 @@ export default function LokasiSekolahBanner() {
 
         <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-center">
           <div className="lg:col-span-5 space-y-space-md">
-            <div className="inline-flex items-center gap-2 px-space-sm py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold">
-              <span className="material-symbols-outlined text-[16px]">location_on</span>
-              <span>Lokasi Sekolah Kami</span>
-            </div>
+            <Badge
+              variant="success"
+              label={
+                <>
+                  <MapPin aria-hidden="true" className="h-4 w-4" />
+                  Lokasi Sekolah Kami
+                </>
+              }
+            />
             <h2 className="font-headline-lg text-headline-lg text-on-primary font-bold tracking-tight">
               Kunjungi SMK Negeri 24 Jakarta
             </h2>
@@ -25,14 +32,14 @@ export default function LokasiSekolahBanner() {
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                <span className="material-symbols-outlined text-[20px]">directions</span>
+                <Navigation aria-hidden="true" className="h-5 w-5" />
                 <span>Buka di Google Maps</span>
               </a>
               <a
                 className="inline-flex items-center justify-center gap-2 px-space-lg py-3.5 rounded-lg bg-surface-container-highest/20 text-surface font-label-md text-label-md font-semibold backdrop-blur hover:bg-surface-container-highest/35 transition-all"
                 href="tel:0218441976"
               >
-                <span className="material-symbols-outlined text-[20px] text-secondary-container">call</span>
+                <Phone aria-hidden="true" className="h-5 w-5 text-secondary-container" />
                 <span>Hubungi Sekolah: (021) 844-1976</span>
               </a>
             </div>

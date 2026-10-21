@@ -90,13 +90,26 @@ class ChatAnalyticsController
                 fn ($query) => $query->addSelect(DB::raw('NULL AS status_terakhir')))
             ->where('m.sender', 'user')->whereBetween(DB::raw('DATE(m.created_at)'), [$from, $to])
             ->groupBy('m.text')->orderByDesc('jumlah')->orderByDesc('terakhir')->limit(10)->get()
-            ->map(fn (object $row): array => [
-                'pertanyaan' => (string) ($row->pertanyaan ?? ''),
-                'jumlah' => (int) $row->jumlah,
-                'kategori' => $row->kategori === null ? null : (string) $row->kategori,
-                'statusTerakhir' => $row->status_terakhir === null ? null : (string) $row->status_terakhir,
-                'terakhir' => (string) $row->terakhir,
-            ]);
+            ->map(function (object $row): array {
+                $status = $row->status_terakhir === null ? null : (string) $row->status_terakhir;
+                return [
+                    'pertanyaan' => (string) ($row->pertanyaan ?? ''),
+                    'jumlah' => (int) $row->jumlah,
+                    'kategori' => $row->kategori === null ? null : (string) $row->kategori,
+                    'statusTerakhir' => $status,
+                    // Label dua status yang dipakai UI: "Terjawab" vs
+                    // "Tidak Terjawab/AI butuh info lebih lanjut".
+                    'statusLabel' => $this->statusLabel($status),
+                    'terakhir' => (string) $row->terakhir,
+                ];
+            });
+
+        // Balasan bot yang butuh bantuan manusia / info lebih lanjut.
+        $tidakTerjawab = $columns['status_resolusi']
+            ? (clone $bots)->whereIn('status_resolusi', ['escalated', 'unanswered'])->count()
+            : 0;
+
+        $chatbotBK = $this->chatbotBK($from, $to);
 
         return response()->json([
             'periode' => ['dari' => $from, 'sampai' => $to],
@@ -111,12 +124,139 @@ class ChatAnalyticsController
                 'persenEskalasi' => $botCount > 0 ? (int) round($escalated / $botCount * 100) : 0,
                 'luarKonteks' => $outOfContext,
                 'persenLuarKonteks' => $userCount > 0 ? (int) round($outOfContext / $userCount * 100) : 0,
+                'terjawab' => $resolved,
+                'tidakTerjawab' => $tidakTerjawab,
+                'persenTerjawab' => $botCount > 0 ? (int) round($resolved / $botCount * 100) : 0,
+                'persenTidakTerjawab' => $botCount > 0 ? (int) round($tidakTerjawab / $botCount * 100) : 0,
             ],
             'tren' => $trend,
             'kategori' => $categories,
             'sentimen' => $sentiment,
             'top' => $top,
+            'chatbotBK' => $chatbotBK,
         ]);
+    }
+
+    /**
+     * Label status dua-kolom untuk tabel "Top Pertanyaan".
+     *
+     * resolved   -> "Terjawab"
+     * escalated  -> "Tidak Terjawab/AI butuh info lebih lanjut"
+     * unanswered -> "Tidak Terjawab/AI butuh info lebih lanjut"
+     * NULL/tidak dikenal -> "Belum ada status" (data lama belum diklasifikasi).
+     */
+    private function statusLabel(?string $status): string
+    {
+        if ($status === null || $status === '') {
+            return 'Belum ada status';
+        }
+        return $status === 'resolved'
+            ? 'Terjawab'
+            : 'Tidak Terjawab/AI butuh info lebih lanjut';
+    }
+
+    /**
+     * Analytics notifikasi otomatis Chatbot-BK (WhatsApp ke Guru BK).
+     *
+     * Sumber data nyata:
+     *  - bk_wa_alert : jejak setiap percobaan kirim (Terkirim/Gagal/Dilewati).
+     *  - pesan_bk    : antrean laporan BK (aktif / perlu intervensi / ditangani).
+     *
+     * Tabel belum ada (migration belum jalan) = semua angka nol, bukan error.
+     *
+     * @return array<string, mixed>
+     */
+    private function chatbotBK(string $from, string $to): array
+    {
+        $hasil = [
+            'pengirim' => 'Chatbot-BK',
+            'totalNotifikasi' => 0,
+            'terkirim' => 0,
+            'gagal' => 0,
+            'dilewati' => 0,
+            'terakhirKirim' => null,
+            'terakhirStatus' => null,
+            'laporanAktif' => 0,
+            'perluIntervensi' => 0,
+            'sudahDitangani' => 0,
+            'ambang' => 0,
+            'aktif' => false,
+            'riwayat' => [],
+        ];
+
+        if (!Schema::hasTable('bk_wa_alert')) {
+            return $hasil;
+        }
+
+        $rows = DB::table('bk_wa_alert')
+            ->selectRaw('status, COUNT(*) AS jumlah')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])
+            ->groupBy('status')
+            ->get();
+        foreach ($rows as $row) {
+            $jumlah = (int) $row->jumlah;
+            $hasil['totalNotifikasi'] += $jumlah;
+            if ($row->status === 'Terkirim') {
+                $hasil['terkirim'] += $jumlah;
+            } elseif ($row->status === 'Gagal') {
+                $hasil['gagal'] += $jumlah;
+            } else {
+                $hasil['dilewati'] += $jumlah;
+            }
+        }
+
+        $terakhir = DB::table('bk_wa_alert')
+            ->whereIn('status', ['Terkirim', 'Gagal'])
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->first();
+        if ($terakhir !== null) {
+            $hasil['terakhirKirim'] = (string) $terakhir->created_at;
+            $hasil['terakhirStatus'] = (string) $terakhir->status;
+        }
+
+        $hasil['riwayat'] = DB::table('bk_wa_alert')
+            ->whereBetween(DB::raw('DATE(created_at)'), [$from, $to])
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->limit(10)
+            ->get()
+            ->map(fn (object $row): array => [
+                'id' => (int) $row->id,
+                'jumlahLaporan' => (int) $row->jumlah_laporan,
+                'target' => (string) $row->target,
+                'pesan' => (string) ($row->pesan ?? ''),
+                'status' => (string) $row->status,
+                'error' => $row->error === null ? null : (string) $row->error,
+                'tanggal' => (string) $row->created_at,
+            ])
+            ->all();
+
+        if (Schema::hasTable('pesan_bk')) {
+            $antrean = DB::table('pesan_bk')
+                ->selectRaw(
+                    'SUM(CASE WHEN status <> \'Selesai\' THEN 1 ELSE 0 END) AS aktif,'
+                    . ' SUM(CASE WHEN status <> \'Selesai\' AND (butuh_perhatian = 1 OR tingkat_kesulitan = \'Berat\')'
+                    . ' THEN 1 ELSE 0 END) AS perlu,'
+                    . ' SUM(CASE WHEN status = \'Selesai\' THEN 1 ELSE 0 END) AS ditangani'
+                )
+                ->first();
+            if ($antrean !== null) {
+                $hasil['laporanAktif'] = (int) ($antrean->aktif ?? 0);
+                $hasil['perluIntervensi'] = (int) ($antrean->perlu ?? 0);
+                $hasil['sudahDitangani'] = (int) ($antrean->ditangani ?? 0);
+            }
+        }
+
+        if (Schema::hasTable('bk_wa_setting')) {
+            $setting = DB::table('bk_wa_setting')->where('id', 1)->first();
+            if ($setting !== null) {
+                $hasil['ambang'] = (int) $setting->threshold;
+                $hasil['aktif'] = (bool) $setting->aktif;
+            }
+        }
+
+        return $hasil;
     }
 
     private function period(mixed $from, mixed $to): array

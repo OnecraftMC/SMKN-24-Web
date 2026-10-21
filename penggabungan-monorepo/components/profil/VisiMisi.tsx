@@ -1,3 +1,4 @@
+import { Eye, Flag, HeartHandshake, Languages, Lightbulb, Medal, Star } from "lucide-react";
 export default function VisiMisi() {
   return (
     <div className="w-full py-space-3xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
@@ -6,7 +7,7 @@ export default function VisiMisi() {
           <div className="p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm flex flex-col justify-between">
             <div className="space-y-space-md">
               <div className="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
-                <span className="material-symbols-outlined text-[28px]">visibility</span>
+                <Eye aria-hidden="true" className="h-7 w-7" />
               </div>
               <h2 className="font-headline-md text-headline-md text-primary font-bold">Visi Sekolah</h2>
               <blockquote className="text-body-lg text-on-surface leading-relaxed border-l-4 border-secondary-container pl-4 italic">
@@ -14,13 +15,13 @@ export default function VisiMisi() {
               </blockquote>
             </div>
             <div className="pt-space-lg flex items-center gap-3 text-secondary font-label-md font-bold">
-              <span className="material-symbols-outlined text-[20px]">stars</span>
+              <Star aria-hidden="true" className="h-5 w-5" />
               <span>Berkarakter • Mandiri • Berwawasan global</span>
             </div>
           </div>
           <div className="p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm space-y-space-md">
             <div className="w-12 h-12 rounded-xl bg-primary text-surface flex items-center justify-center">
-              <span className="material-symbols-outlined text-[28px]">flag</span>
+              <Flag aria-hidden="true" className="h-7 w-7" />
             </div>
             <h2 className="font-headline-md text-headline-md text-primary font-bold">Misi Strategis</h2>
             <ul className="space-y-3 font-body-md text-on-surface-variant">
@@ -50,22 +51,22 @@ export default function VisiMisi() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter-sm text-center">
             <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
-              <span className="material-symbols-outlined text-secondary-container text-[36px] mb-2">military_tech</span>
+              <Medal aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Integritas</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Jujur, dapat dipercaya, dan menjunjung kebenaran etis.</p>
             </div>
             <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
-              <span className="material-symbols-outlined text-secondary-container text-[36px] mb-2">lightbulb</span>
+              <Lightbulb aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Inovatif</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Kreatif menciptakan terobosan bermanfaat untuk bangsa.</p>
             </div>
             <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
-              <span className="material-symbols-outlined text-secondary-container text-[36px] mb-2">volunteer_activism</span>
+              <HeartHandshake aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Empati</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Peka dan peduli pada sesama serta lingkungan sosial.</p>
             </div>
             <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
-              <span className="material-symbols-outlined text-secondary-container text-[36px] mb-2">language</span>
+              <Languages aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Kebangsaan</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Cinta tanah air dengan daya saing global tanpa batas.</p>
             </div>

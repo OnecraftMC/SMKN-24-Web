@@ -23,6 +23,7 @@
 import { Fragment } from "react";
 import Link from "next/link";
 import { CalendarClock, MessageSquareHeart, Trophy } from "lucide-react";
+import Badge from "@/components/ui/Badge";
 
 export type NadaTag = "netral" | "perhatian" | "mendesak";
 
@@ -59,6 +60,7 @@ const JARAK_KARTU = 8;
  * perhatian, merah muda Error untuk yang mendesak. Merah tidak pernah dipakai
  * sebagai hiasan.
  */
+/** Nada tag memandu warna; geraknya: `mendesak` berdenyut sekali. */
 const GAYA_NADA: Record<NadaTag, string> = {
   netral: "bg-surface-container text-on-surface-variant",
   perhatian: "bg-secondary-container text-on-secondary-fixed",
@@ -153,11 +155,12 @@ function KartuKerja({ item, top }: { item: WorkItem; top: number }) {
             {item.judul}
           </p>
           {item.tag && (
-            <span
-              className={`shrink-0 rounded-full px-2 py-0.5 font-label-sm text-label-sm font-bold ${GAYA_NADA[item.tag.nada]}`}
-            >
-              {item.tag.teks}
-            </span>
+            <Badge
+              variant="adat"
+              className={GAYA_NADA[item.tag.nada]}
+              tone={item.tag.nada === "mendesak" ? "attention" : "static"}
+              label={item.tag.teks}
+            />
           )}
         </div>
         <BarisMeta item={item} />
@@ -214,11 +217,12 @@ function DaftarHarian({ items, nowMenit }: { items: WorkItem[]; nowMenit: number
                   {item.judul}
                 </p>
                 {item.tag && (
-                  <span
-                    className={`ml-auto shrink-0 rounded-full px-2 py-0.5 font-label-sm text-label-sm font-bold ${GAYA_NADA[item.tag.nada]}`}
-                  >
-                    {item.tag.teks}
-                  </span>
+                  <Badge
+                    variant="adat"
+                    className={`ml-auto ${GAYA_NADA[item.tag.nada]}`}
+                    tone={item.tag.nada === "mendesak" ? "attention" : "static"}
+                    label={item.tag.teks}
+                  />
                 )}
               </div>
               <BarisMeta item={item} />

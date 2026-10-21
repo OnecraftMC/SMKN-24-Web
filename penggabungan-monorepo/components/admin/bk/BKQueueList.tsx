@@ -7,6 +7,7 @@ import type {
   TingkatKesulitanBK,
 } from "@/lib/admin/types";
 import { fieldClass, ListState } from "@/components/admin/ui/FormBits";
+import Badge from "@/components/ui/Badge";
 import MorphSelect, {
   MorphSelectContent,
   MorphSelectItem,
@@ -84,19 +85,22 @@ export default function BKQueueList({
             </span>
             <span className="flex flex-wrap items-center gap-1">
               {row.butuhPerhatian && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-error px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-error">
-                  <AlertTriangle aria-hidden className="h-3.5 w-3.5" />
-                  Perlu perhatian
-                </span>
+                <Badge
+                  tone="attention"
+                  variant="errorSolid"
+                  aria-label="Pesan butuh perhatian segera"
+                  label={
+                    <>
+                      <AlertTriangle aria-hidden className="h-3.5 w-3.5" />
+                      Perlu perhatian
+                    </>
+                  }
+                />
               )}
               {row.tingkatKesulitan && (
-                <span className={`rounded-full px-2 py-0.5 font-label-sm text-label-sm font-bold ${GAYA_KESULITAN[row.tingkatKesulitan]}`}>
-                  {row.tingkatKesulitan}
-                </span>
+                <Badge variant="adat" className={GAYA_KESULITAN[row.tingkatKesulitan]} label={row.tingkatKesulitan} />
               )}
-              <span className="rounded-full bg-surface-container-high px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-surface-variant">
-                {row.status}
-              </span>
+              <Badge variant="neutral" label={row.status} />
             </span>
           </span>
           {row.ringkasan ? (

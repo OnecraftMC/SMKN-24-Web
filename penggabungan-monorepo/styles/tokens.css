@@ -152,4 +152,12 @@
   --text-body-lg--line-height: 1.875rem;
   --text-body-lg--letter-spacing: -0.005em;
   --text-body-lg--font-weight: 400;
+
+  /* Gerak mikro badge. Primitifnya ada di components/ui/Badge.tsx;
+     keyframes-nya di app/globals.css dekat .badgeBob. */
+  --motion-duration-badge-pulse: 1800ms;
+  --motion-duration-badge-attention: 600ms;
+  --motion-duration-badge-hover: 120ms;
+  --motion-duration-badge-enter: 320ms;
+  --motion-ease-arrive: cubic-bezier(0.16, 1, 0.3, 1);
 }

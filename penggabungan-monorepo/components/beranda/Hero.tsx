@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight, Award, BadgeCheck, Compass, Globe, Hand, MessagesSquare } from "lucide-react";
 
 import Link from "next/link";
 import Image from "next/image";
@@ -26,12 +27,7 @@ export default function Hero() {
           {/* Left content */}
           <div className="lg:col-span-7 space-y-space-lg">
             <div className="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-surface-container-highest/20 backdrop-blur-md text-secondary-fixed">
-              <span
-                className="hero-badge-icon material-symbols-outlined text-[18px] text-secondary-container"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                verified
-              </span>
+              <BadgeCheck aria-hidden="true" className="hero-badge-icon h-[18px] w-[18px] text-secondary-container" />
               <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">
                 Penerimaan Peserta Didik Baru 2026/2027 Segera Dibuka
               </span>
@@ -53,33 +49,27 @@ export default function Hero() {
                 href="/#lokasi-sekolah"
                 className="inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
               >
-                <span className="material-symbols-outlined text-[20px]">forum</span>
+                <MessagesSquare aria-hidden="true" className="h-5 w-5" />
                 <span>Bimbingan Konseling</span>
-                <span className="material-symbols-outlined text-[20px] transition-transform group-hover:translate-x-1">
-                  arrow_forward
-                </span>
+                <ArrowRight aria-hidden="true" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
                 href="/profil"
                 className="inline-flex items-center justify-center gap-2 px-space-lg py-3.5 rounded-lg bg-surface-container-highest/15 text-surface font-label-md text-label-md font-semibold backdrop-blur hover:bg-surface-container-highest/30 transition-all"
               >
-                <span className="material-symbols-outlined text-[20px]">explore</span>
+                <Compass aria-hidden="true" className="h-5 w-5" />
                 <span>Jelajahi Profil Sekolah</span>
               </Link>
             </div>
 
             <div className="pt-space-md flex items-center gap-space-lg text-surface-container-high">
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary-container text-[20px]">
-                  workspace_premium
-                </span>
+                <Award aria-hidden="true" className="h-5 w-5 text-secondary-container" />
                 <span className="font-label-sm text-label-sm">Terakreditasi A • BAN-S/M 2026</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-secondary-container text-[20px]">
-                  public
-                </span>
+                <Globe aria-hidden="true" className="h-5 w-5 text-secondary-container" />
                 <span className="font-label-sm text-label-sm">
                   Sekolah Penggerak Kemendikbudristek
                 </span>
@@ -105,7 +95,7 @@ export default function Hero() {
                 <div className="p-space-md bg-primary-container flex items-center justify-between text-surface">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold">
-                      <span className="material-symbols-outlined text-[22px]">waving_hand</span>
+                      <Hand aria-hidden="true" className="h-[22px] w-[22px]" />
                     </div>
                     <div>
                       <p className="font-label-md text-label-md font-bold text-surface">Selamat Datang</p>

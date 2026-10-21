@@ -1,4 +1,5 @@
 "use client";
+import { Headset, Hourglass, Send } from "lucide-react";
 
 import { useState } from "react";
 import MorphSelect, {
@@ -68,7 +69,7 @@ export default function FormBK() {
   return (
     <div className="bg-surface-container-lowest rounded-2xl p-space-lg border border-surface-container shadow-sm">
       <div className="flex items-center gap-2 text-secondary font-bold mb-3">
-        <span className="material-symbols-outlined text-[24px]">support_agent</span>
+        <Headset aria-hidden="true" className="h-6 w-6" />
         <span className="font-label-md uppercase tracking-wider">Bimbingan Konseling</span>
       </div>
       <h3 className="font-headline-md text-headline-md text-primary font-bold mb-4">Konsultasi &amp; Bimbingan Konseling</h3>
@@ -162,7 +163,11 @@ export default function FormBK() {
           disabled={isSubmitting}
           className="w-full py-2.5 rounded-xl bg-primary text-surface font-label-md font-bold hover:bg-primary-container transition-colors flex items-center justify-center gap-2"
         >
-          <span className="material-symbols-outlined text-[18px]">{isSubmitting ? "hourglass_top" : "send"}</span>
+          {isSubmitting ? (
+            <Hourglass aria-hidden="true" className="h-[18px] w-[18px]" />
+          ) : (
+            <Send aria-hidden="true" className="h-[18px] w-[18px]" />
+          )}
           {isSubmitting ? "Mengirim pengajuan..." : "Kirim Pengajuan Konsultasi"}
         </button>
       </form>

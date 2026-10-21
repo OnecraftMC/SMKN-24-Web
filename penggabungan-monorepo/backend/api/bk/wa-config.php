@@ -31,11 +31,14 @@ switch ($method) {
         jsonError('Method tidak diizinkan', 405);
 }
 
-/** Baca konfigurasi saat ini dan hitungan laporan berat terbuka. */
+/**
+ * Baca konfigurasi saat ini, status Chatbot-BK, dan pratinjau pesan.
+ */
 function handleGet(PDO $db): void
 {
     $setting = waGetSetting($db);
     $jumlah = waCountHeavyOpen($db);
+    $aktivitas = waLastAlertInfo($db);
 
     jsonResponse([
         'target' => $setting['target'],
@@ -44,6 +47,17 @@ function handleGet(PDO $db): void
         'provider' => $setting['provider'],
         'sumber' => $setting['sumber'],
         'jumlah_laporan_terbuka' => $jumlah,
+        // Nama persona yang tampil pada pesan & antarmuka.
+        'pengirim' => WA_BRAND_NAME,
+        'status_agen' => $setting['aktif']
+            ? 'Siap menghubungi Guru BK'
+            : 'Dalam mode siaga (belum mengaktifkan pesan otomatis)',
+        // Pratinjau isi pesan hari ini (tidak dikirim).
+        'preview_pesan' => waBuildPreview($db),
+        // Aktivitas terakhir Chatbot-BK ke Guru BK.
+        'total_terkirim' => $aktivitas['total_terkirim'],
+        'terakhir_kirim' => $aktivitas['terakhir_kirim'],
+        'terakhir_status' => $aktivitas['terakhir_status'],
     ]);
 }
 
@@ -62,14 +76,23 @@ function handleSave(PDO $db): void
     }
 
     $setting = waSaveSetting($db, $body);
+    $aktivitas = waLastAlertInfo($db);
 
     jsonResponse([
-        'message' => 'Konfigurasi WhatsApp Guru BK disimpan.',
+        'message' => 'Preferensi ' . WA_BRAND_NAME . ' disimpan.',
         'target' => $setting['target'],
         'aktif' => (bool) $setting['aktif'],
         'threshold' => (int) $setting['threshold'],
         'provider' => $setting['provider'],
         'sumber' => $setting['sumber'],
+        'pengirim' => WA_BRAND_NAME,
+        'status_agen' => $setting['aktif']
+            ? 'Siap menghubungi Guru BK'
+            : 'Dalam mode siaga (belum mengaktifkan pesan otomatis)',
+        'preview_pesan' => waBuildPreview($db),
+        'total_terkirim' => $aktivitas['total_terkirim'],
+        'terakhir_kirim' => $aktivitas['terakhir_kirim'],
+        'terakhir_status' => $aktivitas['terakhir_status'],
     ]);
 }
 
@@ -87,24 +110,9 @@ function handleTest(PDO $db): void
     }
 
     $jumlah = waCountHeavyOpen($db);
-    $rows = [];
-    try {
-        $stmt = $db->query(
-            "SELECT nama, kelas, ringkasan, tingkat_kesulitan, butuh_perhatian
-             FROM pesan_bk
-             WHERE (butuh_perhatian = 1 OR tingkat_kesulitan = 'Berat')
-               AND status <> 'Selesai'
-             ORDER BY butuh_perhatian DESC,
-                      FIELD(IFNULL(tingkat_kesulitan, 'zzz'), 'Berat', 'Sedang', 'Ringan', 'zzz'),
-                      tanggal DESC
-             LIMIT " . max(1, (int) BK_WA_ALERT_MAX_CASES)
-        );
-        $rows = $stmt->fetchAll();
-    } catch (Throwable $e) {
-        error_log('[SMKN24] Gagal mengambil baris uji kirim WA: ' . $e->getMessage());
-    }
+    $rows = waTopCases($db);
 
-    $message = waBuildMessage($rows, $jumlah, $setting['threshold']);
+    $message = waBuildMessage($rows, $jumlah, $setting['threshold'], waStatistikAntrean($db));
     $result = waSendMessage($setting['target'], $message, $setting['provider']);
 
     waLogAlert($db, [
@@ -118,9 +126,12 @@ function handleTest(PDO $db): void
     jsonResponse([
         'ok' => $result['ok'],
         'status' => $result['status'],
-        'detail' => $result['detail'],
+        'detail' => $result['ok']
+            ? 'Pesan uji ' . WA_BRAND_NAME . ' terkirim ke ' . $setting['target'] . '.'
+            : $result['detail'],
         'jumlah' => $jumlah,
         'target' => $setting['target'],
         'provider' => $setting['provider'],
+        'pengirim' => WA_BRAND_NAME,
     ]);
 }

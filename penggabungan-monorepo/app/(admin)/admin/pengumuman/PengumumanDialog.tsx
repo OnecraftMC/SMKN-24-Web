@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, Save, TriangleAlert } from "lucide-react";
+import { IkonLucide } from "@/lib/ikonLucide";
 import { apiRequest, isUnauthorized } from "@/lib/admin/api";
 import type { PengumumanDTO } from "@/lib/admin/types";
 import { todayIso } from "@/lib/admin/format";
@@ -253,12 +254,8 @@ export default function PengumumanDialog({
             {form.linkLabel.trim() && form.linkHref.trim() && (
               <p className="mt-space-sm flex items-center gap-1 font-label-sm text-label-sm font-bold text-secondary">
                 {form.linkLabel}
-                {form.icon && (
-                  <span className="material-symbols-outlined text-base leading-none">{form.icon}</span>
-                )}
-                {form.actionIcon && (
-                  <span className="material-symbols-outlined text-base leading-none">{form.actionIcon}</span>
-                )}
+                {form.icon && <IkonLucide nama={form.icon} className="h-4 w-4" />}
+                {form.actionIcon && <IkonLucide nama={form.actionIcon} className="h-4 w-4" />}
               </p>
             )}
           </div>
@@ -371,7 +368,10 @@ export default function PengumumanDialog({
               <MorphSelectItem value="">Tanpa ikon</MorphSelectItem>
               {ICON_OPTIONS.map((icon) => (
                 <MorphSelectItem key={icon} value={icon}>
-                  {icon}
+                  <span className="inline-flex items-center gap-2">
+                    <IkonLucide nama={icon} className="h-4 w-4" />
+                    {icon}
+                  </span>
                 </MorphSelectItem>
               ))}
             </MorphSelectContent>
@@ -390,7 +390,10 @@ export default function PengumumanDialog({
               <MorphSelectItem value="">Tanpa ikon</MorphSelectItem>
               {ICON_OPTIONS.map((icon) => (
                 <MorphSelectItem key={icon} value={icon}>
-                  {icon}
+                  <span className="inline-flex items-center gap-2">
+                    <IkonLucide nama={icon} className="h-4 w-4" />
+                    {icon}
+                  </span>
                 </MorphSelectItem>
               ))}
             </MorphSelectContent>

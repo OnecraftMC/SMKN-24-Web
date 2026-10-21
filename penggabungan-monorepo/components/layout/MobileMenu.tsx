@@ -1,5 +1,7 @@
 "use client";
+import { ExternalLink, LogIn, MessagesSquare } from "lucide-react";
 
+import { IkonLucide } from "@/lib/ikonLucide";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
@@ -72,7 +74,7 @@ export default function MobileMenu({
                         : "text-on-surface-variant hover:bg-surface-container-low"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[20px] shrink-0">{link.icon}</span>
+                    <IkonLucide nama={link.icon} className="h-5 w-5 shrink-0" />
                     <span className="flex-1">{link.label}</span>
                   </Link>
                 );
@@ -86,7 +88,7 @@ export default function MobileMenu({
                   target="_blank"
                 >
                   Pendaftaran SPMB Online
-                  <span className="material-symbols-outlined text-[18px]">open_in_new</span>
+                  <ExternalLink aria-hidden="true" className="h-[18px] w-[18px]" />
                 </a>
 
                 <button
@@ -97,7 +99,7 @@ export default function MobileMenu({
                   }}
                   className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary-container px-5 py-3 text-on-secondary-container font-label-md font-bold shadow-sm transition-transform active:scale-[0.98]"
                 >
-                  <span className="material-symbols-outlined text-[18px]">forum</span>
+                  <MessagesSquare aria-hidden="true" className="h-[18px] w-[18px]" />
                   Bimbingan Konseling
                 </button>
 
@@ -106,7 +108,7 @@ export default function MobileMenu({
                   onClick={onClose}
                   className="flex items-center justify-center gap-2 w-full rounded-full border border-outline text-on-surface-variant px-5 py-2.5 font-label-md font-semibold transition-colors hover:bg-surface-container-low"
                 >
-                  <span className="material-symbols-outlined text-[18px]">login</span>
+                  <LogIn aria-hidden="true" className="h-[18px] w-[18px]" />
                   Login Admin
                 </a>
               </div>

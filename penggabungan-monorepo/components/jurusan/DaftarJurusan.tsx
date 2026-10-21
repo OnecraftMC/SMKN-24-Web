@@ -1,7 +1,10 @@
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { jurusanData } from "@/lib/data";
 import type { Jurusan, JurusanKey } from "@/lib/types";
+import { IkonLucide } from "@/lib/ikonLucide";
+import Badge from "@/components/ui/Badge";
 
 // Tata letak bento di desktop (3 kolom x 3 baris): satu kartu unggulan 2x2 dan
 // satu kartu lebar yang menutup baris terakhir. Jumlah sel 4+1+1+1+2 = 9, jadi
@@ -47,12 +50,8 @@ export function LatarKartu({ item, sizes }: { item: Jurusan; sizes: string }) {
       aria-hidden="true"
       className="relative h-full w-full overflow-hidden bg-gradient-to-br from-surface-container-lowest via-surface-container to-surface-container-high"
     >
-      <span className="material-symbols-outlined absolute -right-4 -top-8 select-none text-[7.5rem] leading-none text-primary/10">
-        {item.ikon}
-      </span>
-      <span className="material-symbols-outlined absolute -bottom-10 -left-6 select-none text-[6rem] leading-none text-secondary/10">
-        {item.ikon}
-      </span>
+      <IkonLucide nama={item.ikon} className="absolute -right-4 -top-8 h-[7.5rem] w-[7.5rem] select-none leading-none text-primary/10" />
+      <IkonLucide nama={item.ikon} className="absolute -bottom-10 -left-6 h-[6rem] w-[6rem] select-none leading-none text-secondary/10" />
     </div>
   );
 }
@@ -100,9 +99,7 @@ export default function DaftarJurusan({
                   <div className="relative z-10 m-space-sm shrink-0 space-y-space-xs rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
                     <div className="flex items-center gap-2">
                       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary transition-colors duration-300 group-hover:bg-secondary group-hover:text-on-secondary">
-                        <span className="material-symbols-outlined text-[20px]" aria-hidden="true">
-                          {item.ikon}
-                        </span>
+                        <IkonLucide nama={item.ikon} className="h-5 w-5" />
                       </span>
                       <h3
                         className={
@@ -127,11 +124,8 @@ export default function DaftarJurusan({
 
                     <ul className="flex flex-wrap gap-1">
                       {chipKelas.map((namaKelas) => (
-                        <li
-                          key={namaKelas}
-                          className="rounded-full bg-surface-container-low px-2 py-0.5 font-label-sm text-label-sm font-bold text-on-surface-variant"
-                        >
-                          {namaKelas}
+                        <li key={namaKelas}>
+                          <Badge variant="neutral" label={namaKelas} />
                         </li>
                       ))}
                       {kelas.length === 0 && (
@@ -146,9 +140,7 @@ export default function DaftarJurusan({
                         className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         <span>Kunjungi Website Jurusan</span>
-                        <span className="material-symbols-outlined text-[18px]" aria-hidden="true">
-                          arrow_forward
-                        </span>
+                        <ArrowRight aria-hidden="true" className="h-[18px] w-[18px]" />
                       </Link>
                     ) : (
                       <span className="inline-flex min-h-11 items-center rounded-lg bg-surface-container-high px-space-md py-2 font-label-sm text-label-sm font-bold text-on-surface-variant">

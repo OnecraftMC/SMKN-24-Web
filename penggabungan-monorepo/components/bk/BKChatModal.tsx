@@ -4,8 +4,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExter
 import { createPortal } from "react-dom";
 import Image from "next/image";
 import Cropper, { type Area } from "react-easy-crop";
-import { ArrowUp, Camera, Mic, Paperclip, Sparkles } from "lucide-react";
+import { ArrowUp, Brain, Camera, Maximize2, MessagesSquare, Mic, Minimize2, Paperclip, Sparkles, X } from "lucide-react";
 import { useReducedMotion } from "motion/react";
+import { MagicCard } from "@/components/ui/magicui/magic-card";
 import gsap from "gsap";
 import { API_BASE_URL } from "@/lib/admin/api";
 import { getDeviceId } from "./device";
@@ -497,7 +498,7 @@ export default function BKChatModal({
           <div className="relative flex items-start justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2.5">
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/25 backdrop-blur">
-                <span className="material-symbols-outlined text-[19px]">forum</span>
+                <MessagesSquare aria-hidden="true" className="h-[19px] w-[19px]" />
               </span>
               <div className="min-w-0">
                 <h2 className="text-base font-bold leading-tight">Ruang Cerita BK</h2>
@@ -521,17 +522,18 @@ export default function BKChatModal({
                 title={isFullscreen ? "Kecilkan jendela chat" : "Perbesar ke layar penuh"}
                 className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                <span className="material-symbols-outlined text-[18px]">
-                  {isFullscreen ? "close_fullscreen" : "fullscreen"}
-                </span>
-              </button>
+                {isFullscreen ? (
+                  <Minimize2 aria-hidden="true" className="h-[18px] w-[18px]" />
+                ) : (
+                  <Maximize2 aria-hidden="true" className="h-[18px] w-[18px]" />
+                )}              </button>
               <button
                 type="button"
                 onClick={closeModal}
                 aria-label="Tutup"
                 className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
+                <X aria-hidden="true" className="h-[18px] w-[18px]" />
               </button>
             </div>
           </div>
@@ -556,7 +558,10 @@ export default function BKChatModal({
             ))}
           </div>
             <span className="inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/10 px-2.5 py-1 text-[10px] font-semibold text-surface/90">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-300 motion-reduce:animate-none" />
+              <span aria-hidden="true" className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="badge-live-halo absolute inset-0 rounded-full bg-secondary-container" />
+                <span className="badge-live-core relative h-1.5 w-1.5 rounded-full bg-secondary-container" />
+              </span>
               Konselor siap mendengarkan
             </span>
           </div>
@@ -576,7 +581,7 @@ export default function BKChatModal({
                   >
                     {message.sender === "bot" && (
                       <span className="mr-1.5 mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-gradient-to-br from-secondary-container to-tertiary-container">
-                        <span className="material-symbols-outlined text-[13px] text-on-secondary-container">psychology</span>
+                        <Brain aria-hidden="true" className="h-[13px] w-[13px] text-on-secondary-container" />
                       </span>
                     )}
                     <div className={message.sender === "user"
@@ -595,18 +600,19 @@ export default function BKChatModal({
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {CONVERSATION_STARTERS.map((starter) => (
-                        <button
-                          key={starter}
-                          type="button"
-                          data-bk-suggestion
-                          onClick={() => {
-                            setDraft(starter);
-                            inputRef.current?.focus({ preventScroll: true });
-                          }}
-                          className="rounded-full border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-left text-[11px] font-medium text-on-surface transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                        >
-                          {starter}
-                        </button>
+                        <MagicCard key={starter} gradientSize={90} gradientColor="rgba(254, 166, 25, 0.14)" className="inline-flex rounded-full">
+                          <button
+                            type="button"
+                            data-bk-suggestion
+                            onClick={() => {
+                              setDraft(starter);
+                              inputRef.current?.focus({ preventScroll: true });
+                            }}
+                            className="w-full rounded-full border border-outline-variant bg-surface-container-lowest px-3 py-1.5 text-left text-[11px] font-medium text-on-surface transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                          >
+                            {starter}
+                          </button>
+                        </MagicCard>
                       ))}
                     </div>
                   </div>

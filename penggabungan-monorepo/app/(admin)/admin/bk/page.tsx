@@ -17,7 +17,7 @@ import {
   type BkWaSetting,
   type WaProvider,
 } from "@/lib/admin/types";
-import { ConfirmDialog, fieldClass, labelClass } from "@/components/admin/ui/FormBits";
+import { ConfirmDialog, Modal, fieldClass, labelClass } from "@/components/admin/ui/FormBits";
 import BKDetailPanel from "@/components/admin/bk/BKDetailPanel";
 import BKQueueList from "@/components/admin/bk/BKQueueList";
 import {
@@ -78,6 +78,7 @@ export default function BKPage() {
     status: string;
     detail: string;
   } | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const muatWaConfig = useCallback(async () => {
     try {
@@ -355,20 +356,21 @@ export default function BKPage() {
         </p>
       )}
 
-      {/* ---------- Notifikasi WhatsApp Guru BK (pindah ke atas) ---------- */}
+      {/* ---------- Chatbot-BK ↔ Guru BK (WhatsApp) ---------- */}
       <section
-        aria-label="Konfigurasi notifikasi WhatsApp Guru BK"
+        aria-label="Konfigurasi Chatbot-BK untuk Guru BK"
         className="rounded-2xl border border-orange-500/30 bg-orange-500/5 p-space-lg"
       >
         <div className="mb-space-lg flex flex-wrap items-start justify-between gap-space-sm">
           <div>
             <h2 className="flex items-center gap-space-xs font-title-sm text-title-sm font-bold text-orange-700">
               <MessageCircle className="h-5 w-5" aria-hidden />
-              Notifikasi WhatsApp Guru BK
+              Chatbot-BK ↔ Guru BK
             </h2>
             <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Eskalasi otomatis saat laporan berat terbuka mencapai ambang. Kirim ke nomor
-              Guru BK lewat Fonnte / Wablas.
+              <strong className="font-bold text-orange-700">Chatbot-BK</strong> adalah sistem pendamping
+              Bimbingan Konseling. Saat ada laporan siswa yang perlu intervensi manusia, Chatbot-BK
+              menghubungi Guru BK lewat WhatsApp dengan ringkasan kasus dan saran tindak lanjut.
             </p>
           </div>
           <a
@@ -379,9 +381,27 @@ export default function BKPage() {
             className="inline-flex items-center justify-center gap-space-xs rounded-lg bg-green-600 px-space-md py-2.5 font-label-md text-label-md font-bold text-white transition-colors hover:bg-green-700"
           >
             <Phone className="h-4 w-4" aria-hidden />
-            Verifikasi
+            Verifikasi Nomor Chatbot-BK
           </a>
         </div>
+
+        {waConfig && (
+          <div className="mb-space-lg flex flex-wrap items-center gap-space-sm">
+            <span className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-3 py-1 font-label-sm text-label-sm font-bold text-orange-700">
+              🤖 Pengirim: {waConfig.pengirim}
+            </span>
+            <span
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-label-sm text-label-sm font-bold ${
+                waConfig.aktif
+                  ? "bg-green-600/15 text-green-700"
+                  : "bg-on-surface-variant/15 text-on-surface-variant"
+              }`}
+            >
+              <span aria-hidden>{waConfig.aktif ? "●" : "○"}</span>
+              {waConfig.status_agen}
+            </span>
+          </div>
+        )}
 
         {waLoading ? (
           <p className="font-body-sm text-body-sm text-on-surface-variant">Memuat konfigurasi…</p>
@@ -393,10 +413,22 @@ export default function BKPage() {
           </div>
         ) : (
           <>
+            {/* Pratinjau bubble WhatsApp — dibuka lewat modal agar halaman tetap ringkas */}
+            <div className="mb-space-lg">
+              <button
+                type="button"
+                onClick={() => setShowPreview(true)}
+                className="inline-flex items-center justify-center gap-space-xs rounded-lg border border-orange-500/50 px-space-md py-2.5 font-label-md text-label-md font-bold text-orange-600 transition-colors hover:bg-orange-500/10"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden />
+                Lihat pratinjau pesan masuk
+              </button>
+            </div>
+
             <form onSubmit={(e) => { e.preventDefault(); simpanWaConfig(); }} className="grid gap-space-md">
               <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
                 <label htmlFor="wa-target" className={labelClass}>
-                  Nomor tujuan Guru BK
+                  Nomor WhatsApp Guru BK
                 </label>
                 <input
                   id="wa-target"
@@ -417,7 +449,7 @@ export default function BKPage() {
 
               <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
                 <label htmlFor="wa-aktif" className={labelClass}>
-                  Aktifkan notifikasi
+                  Izin Chatbot-BK menghubungi Guru BK
                 </label>
                 <label
                   htmlFor="wa-aktif"
@@ -434,13 +466,13 @@ export default function BKPage() {
                     disabled={waSaving}
                     className="h-4 w-4 shrink-0 accent-orange-500"
                   />
-                  <span>Aktifkan saat ambang tercapai</span>
+                  <span>Aktifkan pesan otomatis dari Chatbot-BK</span>
                 </label>
               </div>
 
               <div className="grid gap-1 sm:grid-cols-3 sm:items-center">
                 <label htmlFor="wa-threshold" className={labelClass}>
-                  Ambang laporan berat terbuka
+                  Ambang eskalasi laporan
                 </label>
                 <input
                   id="wa-threshold"
@@ -455,7 +487,8 @@ export default function BKPage() {
                   disabled={waSaving}
                 />
                 <p className="col-span-full sm:col-span-2 font-body-sm text-body-sm text-on-surface-variant">
-                  Kirim notifikasi saat jumlah laporan berat belum selesai mencapai angka ini.
+                  Saat jumlah laporan yang perlu intervensi mencapai angka ini, Chatbot-BK
+                  akan menghubungi Guru BK lewat WhatsApp.
                 </p>
               </div>
 
@@ -490,7 +523,7 @@ export default function BKPage() {
                 >
                   {waTesting && <Send className="h-4 w-4 animate-spin" />}
                   {!waTesting && <Send className="h-4 w-4" />}
-                  Uji kirim sekarang
+                  Uji pesan Chatbot-BK
                 </button>
                 <button
                   type="submit"
@@ -499,7 +532,7 @@ export default function BKPage() {
                 >
                   {waSaving && <Save className="h-4 w-4 animate-spin" />}
                   {!waSaving && <Save className="h-4 w-4" />}
-                  Simpan konfigurasi
+                  Simpan preferensi Chatbot-BK
                 </button>
               </div>
             </form>
@@ -507,7 +540,7 @@ export default function BKPage() {
             <div className="mt-space-lg pt-space-lg border-t border-surface-container grid gap-space-sm sm:grid-cols-2 sm:items-start">
               <div>
                 <p className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant mb-1">
-                  Status
+                  Status Chatbot-BK
                 </p>
                 <p className={`font-body-sm text-body-sm ${waConfig?.aktif ? "text-orange-500" : "text-on-surface-variant"}`}>
                   {waConfig?.aktif ? "Aktif" : "Nonaktif"}
@@ -516,6 +549,11 @@ export default function BKPage() {
                   Sumber:{" "}
                   {waConfig?.sumber === "database" ? "Database (dashboard)" : "Env (.env fallback)"}
                 </p>
+                {waConfig?.status_agen && (
+                  <p className="font-body-sm text-body-sm text-on-surface-variant">
+                    {waConfig.status_agen}
+                  </p>
+                )}
               </div>
               <div className="text-right sm:text-left">
                 <p className="font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant mb-1">
@@ -526,6 +564,10 @@ export default function BKPage() {
                 </p>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
                   Ambang: {waConfig?.threshold ?? 10}
+                </p>
+                <p className="font-body-sm text-body-sm text-on-surface-variant">
+                  Pesan terkirim: {waConfig?.total_terkirim ?? 0}
+                  {waConfig?.terakhir_status ? ` · terakhir ${waConfig.terakhir_status}` : ""}
                 </p>
               </div>
             </div>
@@ -601,6 +643,27 @@ export default function BKPage() {
           )}
         </div>
         </div>
+      {showPreview && (
+        <Modal
+          title="Pratinjau pesan masuk (belum dikirim)"
+          description="Tampilan persis seperti yang diterima Guru BK dari Chatbot-BK."
+          onClose={() => setShowPreview(false)}
+        >
+          <div className="max-w-xl rounded-2xl rounded-tl-sm bg-[#DCF8C6] p-space-md shadow-sm">
+            <p className="mb-1 font-label-sm text-label-sm font-bold text-[#075E54]">
+              🤖 {waConfig?.pengirim}
+            </p>
+            <pre className="whitespace-pre-wrap break-words font-body-sm text-body-sm text-[#0F1419]">
+              {waConfig?.preview_pesan ?? "Belum ada pratinjau."}
+            </pre>
+            <p className="mt-1 text-right font-label-sm text-label-sm text-[#667781]">
+              {waConfig?.terakhir_kirim
+                ? `Terakhir dikirim: ${waConfig.terakhir_kirim}`
+                : "Belum pernah dikirim"}
+            </p>
+          </div>
+        </Modal>
+      )}
       {deleting && (
         <ConfirmDialog
           title="Hapus pesan BK?"
