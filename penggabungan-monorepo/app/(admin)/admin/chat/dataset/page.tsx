@@ -662,16 +662,16 @@ export default function DatasetChatbotPage() {
       )}
 
       {/* --------------------------------------------------------- dialog hapus */}
-      <ConfirmDialog
-        title="Hapus memori?"
-        description={
-          deleting ? `"${deleting.judul}" akan dihapus dari memori chatbot.` : ""
-        }
-        busy={deleteBusy}
-        error={deleteError}
-        onConfirm={confirmDelete}
-        onCancel={() => setDeleting(null)}
-      />
+      {deleting && (
+        <ConfirmDialog
+          title="Hapus memori?"
+          description={`"${deleting.judul}" akan dihapus dari memori chatbot.`}
+          busy={deleteBusy}
+          error={deleteError}
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleting(null)}
+        />
+      )}
     </div>
   );
 }

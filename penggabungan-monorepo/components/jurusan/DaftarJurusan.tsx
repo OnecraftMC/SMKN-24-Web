@@ -77,7 +77,7 @@ export default function DaftarJurusan({
           </p>
         </div>
 
-        <ul id="daftar-jurusan" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[16rem] md:auto-rows-[18rem] gap-gutter-md">
+        <ul id="daftar-jurusan" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[22rem] md:auto-rows-[24rem] gap-gutter-md">
           {jurusanData.map((item) => {
             const tata = TATA_LETAK[item.key];
             const halamanJurusan = HALAMAN_JURUSAN[item.key];
