@@ -62,7 +62,7 @@ export default function Topbar({ onOpenMobile }: { onOpenMobile: () => void }) {
           type="button"
           onClick={onOpenMobile}
           aria-label="Buka menu"
-          className="rounded-md p-2 text-primary-fixed hover:bg-primary-container hover:text-on-primary lg:hidden"
+          className="micro-wiggle rounded-md p-2 text-primary-fixed hover:bg-primary-container hover:text-on-primary lg:hidden"
         >
           <Menu aria-hidden className="h-5 w-5" />
         </button>
@@ -100,7 +100,7 @@ export default function Topbar({ onOpenMobile }: { onOpenMobile: () => void }) {
           onClick={handleLogout}
           aria-label="Keluar dari dashboard"
           title="Keluar"
-          className="shrink-0 rounded-lg p-2 text-primary-fixed transition-colors hover:bg-error-container hover:text-on-error-container"
+          className="micro-wiggle shrink-0 rounded-lg p-2 text-primary-fixed transition-colors hover:bg-error-container hover:text-on-error-container"
         >
           <LogOut aria-hidden className="h-5 w-5" />
         </button>

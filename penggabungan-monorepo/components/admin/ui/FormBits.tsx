@@ -11,13 +11,13 @@ export const labelClass =
   "mb-1 block font-label-sm text-label-sm font-bold uppercase tracking-wide text-on-surface-variant";
 
 export const buttonPrimaryClass =
-  "inline-flex items-center justify-center gap-space-xs rounded-lg bg-primary px-space-md py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60";
+  "micro-cta inline-flex items-center justify-center gap-space-xs rounded-lg bg-primary px-space-md py-2.5 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container disabled:cursor-not-allowed disabled:opacity-60";
 
 export const buttonGhostClass =
-  "inline-flex items-center justify-center gap-space-xs rounded-lg border border-outline-variant px-space-md py-2.5 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-60";
+  "micro-cta inline-flex items-center justify-center gap-space-xs rounded-lg border border-outline-variant px-space-md py-2.5 font-label-md text-label-md font-bold text-primary transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-60";
 
 export const buttonDangerClass =
-  "inline-flex items-center justify-center gap-space-xs rounded-lg bg-error px-space-md py-2.5 font-label-md text-label-md font-bold text-on-error transition-colors hover:bg-on-error-container disabled:cursor-not-allowed disabled:opacity-60";
+  "micro-cta inline-flex items-center justify-center gap-space-xs rounded-lg bg-error px-space-md py-2.5 font-label-md text-label-md font-bold text-on-error transition-colors hover:bg-on-error-container disabled:cursor-not-allowed disabled:opacity-60";
 
 export function Field({
   htmlFor,
@@ -160,7 +160,7 @@ export function Modal({
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative z-10 w-full max-w-2xl rounded-2xl border border-surface-container bg-surface-container-lowest shadow-xl"
+        className="micro-pop relative z-10 w-full max-w-2xl rounded-2xl border border-surface-container bg-surface-container-lowest shadow-xl"
       >
         <div className="flex items-start justify-between gap-space-md border-b border-surface-container p-space-lg">
           <div>
@@ -175,7 +175,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="rounded-md p-1.5 text-on-surface-variant hover:bg-surface-container hover:text-primary"
+            className="micro-wiggle rounded-md p-1.5 text-on-surface-variant hover:bg-surface-container hover:text-primary"
           >
             <X aria-hidden className="h-5 w-5" />
           </button>

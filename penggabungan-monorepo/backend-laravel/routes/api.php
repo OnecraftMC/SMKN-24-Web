@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\ChatExportController;
 use App\Http\Controllers\Api\ChatHistoryController;
 use App\Http\Controllers\Api\ArsipController;
 use App\Http\Controllers\Api\FasilitasController;
+use App\Http\Controllers\Api\EkstrakurikulerController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\GuruController;
 use App\Http\Controllers\Api\JadwalController;
@@ -43,6 +44,8 @@ Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'agenda/index.php', AgendaControl
     ->name('api.agenda.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'fasilitas/index.php', FasilitasController::class)
     ->name('api.fasilitas.compatibility');
+Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'ekstrakurikuler/index.php', EkstrakurikulerController::class)
+    ->name('api.ekstrakurikuler.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'guru/index.php', GuruController::class)
     ->name('api.guru.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'galeri/index.php', GaleriController::class)

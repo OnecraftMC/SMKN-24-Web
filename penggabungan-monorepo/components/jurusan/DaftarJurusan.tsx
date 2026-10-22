@@ -77,7 +77,7 @@ export default function DaftarJurusan({
           </p>
         </div>
 
-        <ul id="daftar-jurusan" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[22rem] md:auto-rows-[24rem] gap-gutter-md">
+        <ul id="daftar-jurusan" className="micro-stagger grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[22rem] md:auto-rows-[24rem] gap-gutter-md">
           {jurusanData.map((item) => {
             const tata = TATA_LETAK[item.key];
             const halamanJurusan = HALAMAN_JURUSAN[item.key];
@@ -85,7 +85,7 @@ export default function DaftarJurusan({
             const chipKelas = tata.unggulan ? kelas : kelas.slice(0, 3);
             return (
               <li key={item.key} className={tata.kolom}>
-                <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+                <article className="micro-shine group relative flex h-full flex-col overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
                   {/* Foto hanya mengisi area atas; panel informasi tetap terpisah di bawah. */}
                   <div className="relative min-h-0 flex-1 overflow-hidden">
                     <LatarKartu item={item} sizes={tata.sizes} />
@@ -98,7 +98,7 @@ export default function DaftarJurusan({
                   {/* Panel informasi berada di bawah foto dan tidak tertimpa gambar. */}
                   <div className="relative z-10 m-space-sm shrink-0 space-y-space-xs rounded-xl border border-surface-container bg-surface-container-lowest p-space-md">
                     <div className="flex items-center gap-2">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary transition-colors duration-300 group-hover:bg-secondary group-hover:text-on-secondary">
+                      <span className="micro-icon flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-on-primary transition-colors duration-300 group-hover:bg-secondary group-hover:text-on-secondary">
                         <IkonLucide nama={item.ikon} className="h-5 w-5" />
                       </span>
                       <h3
@@ -137,10 +137,10 @@ export default function DaftarJurusan({
                       <Link
                         href={`/jurusan/${halamanJurusan}`}
                         title={`Buka website jurusan ${item.nama}`}
-                        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                        className="micro-cta inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-space-md py-2 font-label-md text-label-md font-bold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       >
                         <span>Kunjungi Website Jurusan</span>
-                        <ArrowRight aria-hidden="true" className="h-[18px] w-[18px]" />
+                        <ArrowRight aria-hidden="true" className="micro-arrow h-[18px] w-[18px]" />
                       </Link>
                     ) : (
                       <span className="inline-flex min-h-11 items-center rounded-lg bg-surface-container-high px-space-md py-2 font-label-sm text-label-sm font-bold text-on-surface-variant">

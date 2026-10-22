@@ -83,7 +83,7 @@ export default function DaftarBerita({
           </p>
         ) : unggulan ? (
           <div className="space-y-space-xl">
-            <article className="group overflow-hidden rounded-3xl border border-surface-container bg-surface-container-lowest shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <article className="micro-shine group relative overflow-hidden rounded-3xl border border-surface-container bg-surface-container-lowest shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
               <Link href={"/berita/" + unggulan.slug} className="grid h-full lg:grid-cols-[1.15fr_0.85fr]">
                 <div className="relative aspect-[16/10] min-h-64 overflow-hidden lg:aspect-auto">
                   <NewsImage item={unggulan} priority />
@@ -106,10 +106,10 @@ export default function DaftarBerita({
             </article>
 
             {lainnya.length > 0 && (
-              <ul className="grid gap-gutter-md md:grid-cols-2 xl:grid-cols-3">
+              <ul className="micro-stagger grid gap-gutter-md md:grid-cols-2 xl:grid-cols-3">
                 {lainnya.map((item) => (
                   <li key={item.id}>
-                    <article className="group h-full overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
+                    <article className="micro-shine group relative h-full overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg">
                       <Link href={"/berita/" + item.slug} className="flex h-full flex-col">
                         <div className="relative aspect-[16/10] overflow-hidden">
                           <NewsImage item={item} />

@@ -2,6 +2,7 @@ import "server-only";
 import {
   mapAgenda,
   mapBerita,
+  mapEkstrakurikuler,
   mapFasilitas,
   mapGaleri,
   mapGuru,
@@ -10,6 +11,8 @@ import {
   type AgendaView,
   type BeritaDTO,
   type BeritaView,
+  type EkstrakurikulerDTO,
+  type EkstrakurikulerView,
   type FasilitasDTO,
   type FasilitasView,
   type GaleriDTO,
@@ -182,6 +185,22 @@ export async function getFasilitas(options: { unggulan?: boolean } = {}): Promis
   const result = await request<FasilitasDTO[]>(`api/fasilitas/index.php${query}`);
   return result.data
     ? { data: result.data.map((item) => mapFasilitas(item, backendUrl())), error: null }
+    : { data: null, error: result.error };
+}
+
+export async function getEkstrakurikuler(
+  options: { unggulan?: boolean; kategori?: string } = {},
+): Promise<ApiResult<EkstrakurikulerView[]>> {
+  const params = new URLSearchParams();
+  if (options.unggulan) params.set("unggulan", "1");
+  if (options.kategori) params.set("kategori", options.kategori);
+  const query = params.size > 0 ? `?${params.toString()}` : "";
+  const result = await request<EkstrakurikulerDTO[]>(`api/ekstrakurikuler/index.php${query}`);
+  return result.data
+    ? {
+        data: result.data.map((item) => mapEkstrakurikuler(item, backendUrl())),
+        error: null,
+      }
     : { data: null, error: result.error };
 }
 

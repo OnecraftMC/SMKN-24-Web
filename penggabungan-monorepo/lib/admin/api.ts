@@ -45,7 +45,7 @@ export function assetUrl(path: string | null | undefined): string | null {
   if (!path) {
     return null;
   }
-  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("/logo")) {
+  if (/^(https?:)?\/\//i.test(path) || path.startsWith("data:") || path.startsWith("/logo") || path.startsWith("/images/")) {
     return path;
   }
   if (ASSET_ORIGIN === "") {

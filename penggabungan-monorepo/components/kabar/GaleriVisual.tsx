@@ -71,7 +71,7 @@ export default function GaleriVisual({
               {galeri.map((item) => (
                 <article
                   key={item.id}
-                  className="group relative aspect-[4/5] w-[min(70vw,18rem)] shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md md:w-[min(26vw,18rem)]"
+                  className="micro-card micro-shine group relative aspect-[4/5] w-[min(70vw,18rem)] shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md md:w-[min(26vw,18rem)]"
                 >
                   {item.image ? (
                     <Image

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo Paduan Suara">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#0c4a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <rect x="103" y="48" width="50" height="94" rx="25" fill="#f8fafc"/>
+  <path d="M80 118c0 27 21 48 48 48s48-21 48-48" fill="none" stroke="#f8fafc" stroke-width="9" stroke-linecap="round"/>
+  <path d="M128 166v30M102 202h52" stroke="#f8fafc" stroke-width="9" stroke-linecap="round"/>
+  <path d="M170 58c14 8 22 22 22 38M184 44c18 12 28 30 28 50" fill="none" stroke="#bae6fd" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="74" cy="70" r="6" fill="#bae6fd"/>
+</svg>

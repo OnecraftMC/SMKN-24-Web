@@ -192,6 +192,23 @@ CREATE TABLE IF NOT EXISTS fasilitas (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------------------------
+-- Ekstrakurikuler (kegiatan pengembangan bakat siswa)
+-- `logo` menyimpan path unggahan admin (atau aset contoh di /images).
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS ekstrakurikuler (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nama VARCHAR(150) NOT NULL,
+  deskripsi TEXT,
+  logo VARCHAR(500) DEFAULT NULL,
+  kategori VARCHAR(100) DEFAULT NULL,
+  pembina VARCHAR(150) DEFAULT NULL,
+  jadwal VARCHAR(150) DEFAULT NULL,
+  lokasi VARCHAR(150) DEFAULT NULL,
+  unggulan TINYINT(1) NOT NULL DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------------------------
 -- Pesan BK (konseling)
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS pesan_bk (
@@ -330,6 +347,16 @@ INSERT INTO guru (nama, jabatan, deskripsi, kategori, urutan) VALUES
 
 INSERT INTO fasilitas (judul, deskripsi) VALUES
 ('Hotel Training', 'Laboratorium perhotelan dan housekeeping dilengkapi kamar simulasi dan peralatan standar industri.');
+
+INSERT INTO ekstrakurikuler (nama, deskripsi, logo, kategori, pembina, jadwal, lokasi, unggulan) VALUES
+('Paskibra', 'Pasukan Pengibar Bendera melatih kedisiplinan, kepemimpinan, dan rasa cinta tanah air melalui latihan baris-berbaris serta protokol upacara.', '/images/ekstrakurikuler/paskibra.svg', 'Kepemimpinan', 'Pembina Kesiswaan', 'Sabtu, 08.00 - 10.00 WIB', 'Lapangan Utama', 1),
+('Pramuka', 'Gerakan Pramuka membentuk karakter mandiri, gotong royong, dan peduli lingkungan lewat kegiatan kepramukaan yang menyenangkan.', '/images/ekstrakurikuler/pramuka.svg', 'Kepemimpinan', 'Kak Pembina Pramuka', 'Jumat, 14.00 - 16.00 WIB', 'Aula Serbaguna', 1),
+('PMR', 'Palang Merah Remaja membekali siswa dengan pertolongan pertama, kesehatan remaja, dan kesiapsiagaan bencana.', '/images/ekstrakurikuler/pmr.svg', 'Sosial', 'Tim Kesehatan Sekolah', 'Rabu, 14.30 - 16.00 WIB', 'Ruang UKS', 0),
+('Basket', 'Klub basket mengembangkan teknik dasar, kerja sama tim, dan kebugaran melalui latihan rutin serta sparring antarsekolah.', '/images/ekstrakurikuler/basket.svg', 'Olahraga', 'Pelatih Basket', 'Selasa & Kamis, 15.30 - 17.00 WIB', 'Lapangan Basket', 1),
+('Futsal', 'Futsal menjadi wadah siswa menyalurkan minat olahraga, membangun sportivitas, dan bersiap mengikuti turnamen pelajar.', '/images/ekstrakurikuler/futsal.svg', 'Olahraga', 'Pelatih Futsal', 'Senin & Jumat, 15.30 - 17.00 WIB', 'Lapangan Futsal', 0),
+('Tari Tradisional', 'Sanggar tari melestarikan seni tari Nusantara sekaligus menyiapkan penampilan untuk acara sekolah dan festival budaya.', '/images/ekstrakurikuler/tari.svg', 'Seni', 'Guru Seni Budaya', 'Kamis, 14.00 - 16.00 WIB', 'Studio Tari', 1),
+('Paduan Suara', 'Paduan suara melatih teknik vokal, harmonisasi, dan kepercayaan diri untuk tampil pada upacara serta kompetisi.', '/images/ekstrakurikuler/paduan-suara.svg', 'Seni', 'Guru Musik', 'Rabu, 14.00 - 15.30 WIB', 'Ruang Musik', 0),
+('Jurnalistik', 'Ekstrakurikuler jurnalistik mengasah kemampuan menulis, fotografi, dan produksi konten untuk media sekolah.', '/images/ekstrakurikuler/jurnalistik.svg', 'Akademik', 'Tim Humas Sekolah', 'Jumat, 13.00 - 15.00 WIB', 'Laboratorium Komputer', 0);
 
 -- ---------------------------------------------------------------------------
 -- Knowledge base chatbot (fakta sekolah untuk AI, diisi lewat CLI import)

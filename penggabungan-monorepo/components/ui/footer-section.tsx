@@ -30,6 +30,7 @@ const quickLinks = [
   { title: 'Kabar', href: '/kabar' },
   { title: 'Bimbingan Konseling', href: '/#bimbingan-konseling' },
   { title: 'Fasilitas', href: '/profil#fasilitas' },
+  { title: 'Ekstrakurikuler', href: '/ekstrakurikuler' },
   { title: 'Berita', href: '/berita' },
   { title: 'Jurusan', href: '/jurusan' },
 ];
@@ -133,19 +134,19 @@ export function Footer() {
                       {link.href.startsWith('http') || link.href.startsWith('mailto:') || link.href.startsWith('tel:') ? (
                         <a
                           href={link.href}
-                          className="inline-flex items-center transition-all duration-300 hover:text-surface"
+                          className="micro-row inline-flex items-center transition-all duration-300 hover:text-surface"
                           target={link.href.startsWith('http') ? '_blank' : undefined}
                           rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                         >
-                          {link.icon && <link.icon className="me-1 size-4" />}
+                          {link.icon && <link.icon className="micro-icon me-1 size-4" />}
                           {link.title}
                         </a>
                       ) : (
                         <Link
                           href={link.href}
-                          className="inline-flex items-center transition-all duration-300 hover:text-surface"
+                          className="micro-row inline-flex items-center transition-all duration-300 hover:text-surface"
                         >
-                          {link.icon && <link.icon className="me-1 size-4" />}
+                          {link.icon && <link.icon className="micro-icon me-1 size-4" />}
                           {link.title}
                         </Link>
                       )}
@@ -162,13 +163,13 @@ export function Footer() {
       <div className="mt-8 flex w-full flex-col items-center justify-between gap-3 border-t border-white/20 pt-4 text-sm text-surface-container-high sm:flex-row">
         <p className="text-xs sm:text-sm">Hak Cipta © {new Date().getFullYear()} SMK Negeri 24 Jakarta. Terakreditasi A BAN-S/M.</p>
         <div className="flex items-center gap-3 sm:gap-4">
-          <button className="transition hover:text-surface hover:underline" onClick={showPrivacyNotice} type="button">
+          <button className="micro-row transition hover:text-surface hover:underline" onClick={showPrivacyNotice} type="button">
             Privasi
           </button>
-          <button className="transition hover:text-surface hover:underline" onClick={showTermsNotice} type="button">
+          <button className="micro-row transition hover:text-surface hover:underline" onClick={showTermsNotice} type="button">
             Syarat &amp; Ketentuan
           </button>
-          <Link href="/" className="transition hover:text-surface hover:underline">
+          <Link href="/" className="micro-row transition hover:text-surface hover:underline">
             Peta Situs
           </Link>
         </div>

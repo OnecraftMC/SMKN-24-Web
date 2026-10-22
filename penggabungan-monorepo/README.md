@@ -123,13 +123,13 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | URL | Isi |
 |---|---|
 | `/` | Beranda publik |
-| `/profil` · `/akademik` · `/kabar` · `/fasilitas` | Halaman publik |
+| `/profil` · `/akademik` · `/kabar` · `/fasilitas` · `/ekstrakurikuler` | Halaman publik |
 | `/berita` · `/berita/[slug]` | Daftar & detail berita (404 untuk slug salah) |
 | `/jurusan` · `/jurusan/[key]` | 5 kompetensi keahlian |
 | `/akademik/pengajuan-prestasi` | Form pengajuan prestasi (tidak ditautkan di navbar) |
 | `/login` | Login admin (origin sama) |
 | `/admin` | Overview dashboard |
-| `/admin/berita` · `pengumuman` · `agenda` · `guru` · `fasilitas` · `galeri` · `jadwal` | Modul CRUD aktif |
+| `/admin/berita` · `pengumuman` · `agenda` · `guru` · `fasilitas` · `ekstrakurikuler` · `galeri` · `jadwal` | Modul CRUD aktif |
 | `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
 | `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
 | `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
@@ -141,6 +141,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | Fitur | Detail |
 |---|---|
 | `/profil` hanya menampilkan fasilitas berflag `unggulan`; `/fasilitas` menampilkan semua | Flag dikelola di `/admin/fasilitas` (kolom `fasilitas.unggulan`, default `0`) |
+| Ekstrakurikuler punya logo + info pembina/jadwal/lokasi yang bisa diubah admin | Dikelola di `/admin/ekstrakurikuler`; kartu tampil di `/ekstrakurikuler` dan blok unggulan di `/profil`. Jalankan `backend/migrations/20261023_add_ekstrakurikuler.sql` (atau migrasi Laravel) sebelum deploy. |
 | Hotnews ringkas muncul di 5 halaman publik | Berita highlight diambil dari backend (`berita.utama`); `/kabar` tetap memakai hero |
 | Widget chatbot punya tombol fullscreen | Tidak memakai Browser Fullscreen API agar tombol Escape tidak bentrok |
 

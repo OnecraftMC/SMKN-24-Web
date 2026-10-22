@@ -29,6 +29,7 @@ import { useAuth } from "@/lib/admin/auth";
 import type {
   AgendaDTO,
   BeritaDTO,
+  EkstrakurikulerDTO,
   FasilitasDTO,
   GaleriDTO,
   GuruDTO,
@@ -44,6 +45,7 @@ export type ModulKey =
   | "agenda"
   | "guru"
   | "fasilitas"
+  | "ekstrakurikuler"
   | "galeri"
   | "bk"
   | "prestasi";
@@ -66,6 +68,7 @@ export type ModulSnapshot = {
   agenda: SumberState<AgendaDTO[]>;
   guru: SumberState<number>;
   fasilitas: SumberState<number>;
+  ekstrakurikuler: SumberState<number>;
   galeri: SumberState<number>;
   bk: SumberState<PesanBKDTO[]>;
   prestasi: SumberState<PrestasiAntrean>;
@@ -87,6 +90,7 @@ const INITIAL: ModulSnapshot = {
   agenda: { kind: "loading" },
   guru: { kind: "loading" },
   fasilitas: { kind: "loading" },
+  ekstrakurikuler: { kind: "loading" },
   galeri: { kind: "loading" },
   bk: { kind: "loading" },
   prestasi: { kind: "loading" },
@@ -121,6 +125,7 @@ export function ModulProvider({ children }: { children: ReactNode }) {
         apiRequest<AgendaDTO[]>("/api/agenda/index.php"),
         apiRequest<GuruDTO[]>("/api/guru/index.php"),
         apiRequest<FasilitasDTO[]>("/api/fasilitas/index.php"),
+        apiRequest<EkstrakurikulerDTO[]>("/api/ekstrakurikuler/index.php"),
         apiRequest<GaleriDTO[]>("/api/galeri/index.php"),
         apiRequest<PesanBKDTO[]>("/api/bk/index.php"),
         apiRequest<PrestasiResponse>("/api/prestasi/index.php?status=Baru&page=1"),
@@ -136,6 +141,7 @@ export function ModulProvider({ children }: { children: ReactNode }) {
         agenda,
         guru,
         fasilitas,
+        ekstrakurikuler,
         galeri,
         bk,
         prestasi,
@@ -188,6 +194,10 @@ export function ModulProvider({ children }: { children: ReactNode }) {
           fasilitas.status === "fulfilled"
             ? { kind: "ok", value: fasilitas.value.length }
             : gagal(fasilitas.reason, "Gagal memuat jumlah data fasilitas."),
+        ekstrakurikuler:
+          ekstrakurikuler.status === "fulfilled"
+            ? { kind: "ok", value: ekstrakurikuler.value.length }
+            : gagal(ekstrakurikuler.reason, "Gagal memuat jumlah data ekstrakurikuler."),
         galeri:
           galeri.status === "fulfilled"
             ? { kind: "ok", value: galeri.value.length }

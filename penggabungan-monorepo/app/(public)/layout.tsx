@@ -18,7 +18,7 @@ export default function PublicLayout({
     <LoadingScreenProvider>
       <PublicDataRefresh />
       <Navbar />
-      <main className="pt-[112px] md:pt-[120px] lg:pt-[132px] min-h-screen">{children}</main>
+      <main className="page-motion pt-[112px] md:pt-[120px] lg:pt-[132px] min-h-screen">{children}</main>
       <Footer />
       <ChatbotWidget />
     </LoadingScreenProvider>

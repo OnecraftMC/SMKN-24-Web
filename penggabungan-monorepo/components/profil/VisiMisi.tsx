@@ -3,8 +3,8 @@ export default function VisiMisi() {
   return (
     <div className="w-full py-space-3xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-2xl">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-gutter-lg items-stretch">
-          <div className="p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm flex flex-col justify-between">
+        <div className="micro-stagger grid grid-cols-1 lg:grid-cols-2 gap-gutter-lg items-stretch">
+          <div className="micro-card p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm flex flex-col justify-between">
             <div className="space-y-space-md">
               <div className="w-12 h-12 rounded-xl bg-secondary-container text-on-secondary-container flex items-center justify-center">
                 <Eye aria-hidden="true" className="h-7 w-7" />
@@ -19,7 +19,7 @@ export default function VisiMisi() {
               <span>Berkarakter • Mandiri • Berwawasan global</span>
             </div>
           </div>
-          <div className="p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm space-y-space-md">
+          <div className="micro-card p-space-xl rounded-3xl bg-surface-container-lowest border border-surface-container shadow-sm space-y-space-md">
             <div className="w-12 h-12 rounded-xl bg-primary text-surface flex items-center justify-center">
               <Flag aria-hidden="true" className="h-7 w-7" />
             </div>
@@ -49,23 +49,23 @@ export default function VisiMisi() {
             <span className="text-secondary-fixed font-label-sm uppercase font-bold tracking-wider">Nilai Filosofis</span>
             <h3 className="text-headline-md font-bold text-surface">Panca Karakter SMKN 24 Jakarta</h3>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-gutter-sm text-center">
-            <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
+          <div className="micro-stagger grid grid-cols-1 md:grid-cols-4 gap-gutter-sm text-center">
+            <div className="micro-card p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
               <Medal aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Integritas</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Jujur, dapat dipercaya, dan menjunjung kebenaran etis.</p>
             </div>
-            <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
+            <div className="micro-card p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
               <Lightbulb aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Inovatif</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Kreatif menciptakan terobosan bermanfaat untuk bangsa.</p>
             </div>
-            <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
+            <div className="micro-card p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
               <HeartHandshake aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Empati</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Peka dan peduli pada sesama serta lingkungan sosial.</p>
             </div>
-            <div className="p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
+            <div className="micro-card p-space-md rounded-2xl bg-surface-container-high/10 border border-surface-container-high/15">
               <Languages aria-hidden="true" className="h-9 w-9 text-secondary-container mb-2" />
               <h4 className="font-title-md font-bold text-surface">Kebangsaan</h4>
               <p className="font-body-sm text-surface-container-high mt-1 text-xs">Cinta tanah air dengan daya saing global tanpa batas.</p>

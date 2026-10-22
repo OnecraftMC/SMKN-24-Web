@@ -25,7 +25,7 @@ export default function Hero() {
       <div className="relative max-w-container-max mx-auto px-margin-mobile md:px-margin-tablet lg:px-margin-desktop pt-space-2xl pb-space-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg items-center">
           {/* Left content */}
-          <div className="lg:col-span-7 space-y-space-lg">
+          <div className="micro-stagger lg:col-span-7 space-y-space-lg">
             <div className="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-full bg-surface-container-highest/20 backdrop-blur-md text-secondary-fixed">
               <BadgeCheck aria-hidden="true" className="hero-badge-icon h-[18px] w-[18px] text-secondary-container" />
               <span className="font-label-sm text-label-sm uppercase tracking-wider font-bold">
@@ -47,18 +47,18 @@ export default function Hero() {
             <div className="flex flex-wrap items-center gap-space-md pt-space-sm">
               <Link
                 href="/#lokasi-sekolah"
-                className="inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
+                className="micro-cta inline-flex items-center justify-center gap-2 px-space-xl py-3.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-xl hover:bg-secondary-fixed-dim transition-all group"
               >
-                <MessagesSquare aria-hidden="true" className="h-5 w-5" />
+                <MessagesSquare aria-hidden="true" className="micro-icon h-5 w-5" />
                 <span>Bimbingan Konseling</span>
-                <ArrowRight aria-hidden="true" className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                <ArrowRight aria-hidden="true" className="micro-arrow h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
 
               <Link
                 href="/profil"
-                className="inline-flex items-center justify-center gap-2 px-space-lg py-3.5 rounded-lg bg-surface-container-highest/15 text-surface font-label-md text-label-md font-semibold backdrop-blur hover:bg-surface-container-highest/30 transition-all"
+                className="micro-cta inline-flex items-center justify-center gap-2 px-space-lg py-3.5 rounded-lg bg-surface-container-highest/15 text-surface font-label-md text-label-md font-semibold backdrop-blur hover:bg-surface-container-highest/30 transition-all"
               >
-                <Compass aria-hidden="true" className="h-5 w-5" />
+                <Compass aria-hidden="true" className="micro-icon h-5 w-5" />
                 <span>Jelajahi Profil Sekolah</span>
               </Link>
             </div>
@@ -82,7 +82,7 @@ export default function Hero() {
             <div className="relative mx-auto max-w-md lg:max-w-none">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-secondary-container/20 to-primary-container blur-2xl -z-10" />
 
-              <div className="overflow-hidden rounded-2xl shadow-2xl bg-primary-container">
+              <div className="micro-card micro-shine overflow-hidden rounded-2xl shadow-2xl bg-primary-container">
                 <Image
                   alt="Gedung SMKN 24 Jakarta"
                   className="w-full h-80 lg:h-[420px] object-cover hover:scale-105 transition-transform duration-700"

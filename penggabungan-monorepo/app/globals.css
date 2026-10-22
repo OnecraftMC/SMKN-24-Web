@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "../styles/tokens.css";
+@import "../styles/micro-motion.css";
 @import "react-day-picker/src/style.css";
 
 /* =============================================================================

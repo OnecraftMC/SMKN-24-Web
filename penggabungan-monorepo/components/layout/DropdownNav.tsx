@@ -226,9 +226,9 @@ export default function DropdownNav({ items, className }: DropdownNavProps) {
                                   <Link
                                     href={sub.href}
                                     onClick={() => setOpenId(null)}
-                                    className="group/sub -mx-2.5 flex items-start gap-3 rounded-2xl p-2.5 transition-colors hover:bg-surface-container-low focus-visible:outline-2 focus-visible:outline-primary"
+                                    className="micro-row group/sub -mx-2.5 flex items-start gap-3 rounded-2xl p-2.5 transition-colors hover:bg-surface-container-low focus-visible:outline-2 focus-visible:outline-primary"
                                   >
-                                    <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-primary transition-colors duration-300 motion-reduce:transition-none group-hover/sub:bg-primary group-hover/sub:text-surface">
+                                    <span className="micro-icon flex size-9 shrink-0 items-center justify-center rounded-xl bg-surface-container-low text-primary transition-colors duration-300 motion-reduce:transition-none group-hover/sub:bg-primary group-hover/sub:text-surface">
                                       <IkonLucide nama={sub.ikon} className="h-5 w-5" />
                                     </span>
                                     <span className="min-w-0 leading-5">

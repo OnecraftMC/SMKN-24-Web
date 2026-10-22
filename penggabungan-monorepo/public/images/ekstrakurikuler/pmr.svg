@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo Palang Merah Remaja">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f43f5e"/>
+      <stop offset="1" stop-color="#9f1239"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <circle cx="128" cy="128" r="78" fill="#fff"/>
+  <path d="M110 78h36v32h32v36h-32v32h-36v-32H78v-36h32z" fill="#e11d48"/>
+  <path d="M128 176c-24-16-38-30-38-48 0-13 11-24 24-24 8 0 14 4 18 10 4-6 10-10 18-10 13 0 24 11 24 24 0 18-14 32-38 48l-4 3z" fill="#fb7185" opacity=".9"/>
+</svg>

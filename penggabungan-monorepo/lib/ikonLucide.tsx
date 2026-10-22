@@ -68,6 +68,7 @@ import {
   Trophy,
   User,
   Users,
+  Volleyball,
   X,
 } from "lucide-react";
 
@@ -133,6 +134,7 @@ export const PETA_IKON: Record<string, LucideIcon> = {
   send: Send,
   signature: Signature,
   smartphone: Smartphone,
+  sports_soccer: Volleyball,
   star: Star,
   stars: Star,
   stars_filled: Stars,

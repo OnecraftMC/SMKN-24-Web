@@ -98,7 +98,7 @@ export default function MobileMenu({
                         type="button"
                         aria-expanded={isExpanded}
                         onClick={() => setExpandedId(isExpanded ? null : link.href)}
-                        className={`flex items-center gap-3 w-full text-left px-space-md py-3 rounded-2xl font-label-md transition-colors ${
+                        className={`micro-row flex items-center gap-3 w-full text-left px-space-md py-3 rounded-2xl font-label-md transition-colors ${
                           isActive
                             ? "bg-primary/10 text-primary font-bold"
                             : "text-on-surface-variant hover:bg-surface-container-low"
@@ -129,7 +129,7 @@ export default function MobileMenu({
                               <Link
                                 href={link.href}
                                 onClick={handleClose}
-                                className="flex items-center gap-3 rounded-xl px-space-md py-2.5 text-primary font-label-md font-bold hover:bg-surface-container"
+                                className="micro-row flex items-center gap-3 rounded-xl px-space-md py-2.5 text-primary font-label-md font-bold hover:bg-surface-container"
                               >
                                 <IkonLucide nama={link.ikon} className="h-4 w-4 shrink-0" />
                                 <span>Lihat Semua {link.label}</span>
@@ -139,7 +139,7 @@ export default function MobileMenu({
                                   key={sub.label}
                                   href={sub.href}
                                   onClick={handleClose}
-                                  className="flex items-center gap-3 rounded-xl px-space-md py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
+                                  className="micro-row flex items-center gap-3 rounded-xl px-space-md py-2.5 text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
                                 >
                                   <IkonLucide nama={sub.ikon} className="h-4 w-4 shrink-0 text-primary" />
                                   <span className="text-sm">{sub.label}</span>
@@ -158,7 +158,7 @@ export default function MobileMenu({
                     key={link.href}
                     href={link.href}
                     onClick={handleClose}
-                    className={`flex items-center gap-3 w-full text-left px-space-md py-3 rounded-2xl font-label-md transition-colors ${
+                    className={`micro-row flex items-center gap-3 w-full text-left px-space-md py-3 rounded-2xl font-label-md transition-colors ${
                       isActive
                         ? "bg-primary/10 text-primary font-bold"
                         : "text-on-surface-variant hover:bg-surface-container-low"
@@ -172,7 +172,7 @@ export default function MobileMenu({
 
               <div className="mt-3 flex flex-col gap-2 border-t border-surface-container pt-3">
                 <a
-                  className="flex items-center justify-center gap-2 w-full rounded-full bg-primary px-5 py-3 text-surface font-label-md font-bold transition-opacity hover:opacity-90"
+                  className="micro-cta flex items-center justify-center gap-2 w-full rounded-full bg-primary px-5 py-3 text-surface font-label-md font-bold transition-opacity hover:opacity-90"
                   href="https://spmb.jakarta.go.id"
                   rel="noopener noreferrer"
                   target="_blank"
@@ -187,7 +187,7 @@ export default function MobileMenu({
                     onClose();
                     onOpenBK();
                   }}
-                  className="flex items-center justify-center gap-2 w-full rounded-full bg-secondary-container px-5 py-3 text-on-secondary-container font-label-md font-bold shadow-sm transition-transform active:scale-[0.98]"
+                  className="micro-cta flex items-center justify-center gap-2 w-full rounded-full bg-secondary-container px-5 py-3 text-on-secondary-container font-label-md font-bold shadow-sm transition-transform active:scale-[0.98]"
                 >
                   <MessagesSquare aria-hidden="true" className="h-[18px] w-[18px]" />
                   Bimbingan Konseling

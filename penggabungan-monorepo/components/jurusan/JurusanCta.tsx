@@ -8,7 +8,7 @@ export default function JurusanCta() {
     <div className="px-margin-mobile md:px-margin-tablet lg:px-margin-desktop pb-space-4xl">
       <div className="max-w-container-max mx-auto relative overflow-hidden rounded-3xl bg-primary px-margin-mobile py-space-2xl md:px-space-2xl">
         <div aria-hidden="true" className="absolute -right-10 -top-24 select-none">
-          <GraduationCap aria-hidden="true" className="h-[11rem] w-[11rem] leading-none text-primary-container" />
+          <GraduationCap aria-hidden="true" className="micro-float-slow h-[11rem] w-[11rem] leading-none text-primary-container" />
         </div>
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-space-lg">
           <div className="max-w-2xl space-y-2">
@@ -23,18 +23,18 @@ export default function JurusanCta() {
           <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <Link
               href="/kabar"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-secondary-container px-space-lg py-3 font-label-md text-label-md font-bold text-on-secondary-container transition hover:brightness-95"
+              className="micro-cta inline-flex items-center justify-center gap-2 rounded-xl bg-secondary-container px-space-lg py-3 font-label-md text-label-md font-bold text-on-secondary-container transition hover:brightness-95"
             >
-              <Images aria-hidden="true" className="h-5 w-5" />
+              <Images aria-hidden="true" className="micro-icon h-5 w-5" />
               <span>Galeri Kegiatan</span>
             </Link>
             <a
               href="https://spmb.jakarta.go.id"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary-fixed/40 px-space-lg py-3 font-label-md text-label-md font-bold text-surface transition hover:bg-primary-container"
+              className="micro-cta inline-flex items-center justify-center gap-2 rounded-xl border border-primary-fixed/40 px-space-lg py-3 font-label-md text-label-md font-bold text-surface transition hover:bg-primary-container"
             >
-              <ExternalLink aria-hidden="true" className="h-5 w-5" />
+              <ExternalLink aria-hidden="true" className="micro-icon h-5 w-5" />
               <span>SPMB Online</span>
             </a>
           </div>

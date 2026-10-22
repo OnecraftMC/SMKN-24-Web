@@ -15,7 +15,7 @@ export default function PapanPengumuman({
     <div className="lg:col-span-5 space-y-space-lg">
       <div>
         <div className="inline-flex items-center gap-2 text-secondary font-bold font-label-sm text-label-sm uppercase tracking-wider">
-          <Megaphone aria-hidden="true" className="h-[18px] w-[18px]" />
+          <Megaphone aria-hidden="true" className="micro-icon h-[18px] w-[18px]" />
           <span>Papan Informasi</span>
         </div>
         <h2 className="font-headline-md text-headline-md text-primary font-bold">
@@ -23,11 +23,11 @@ export default function PapanPengumuman({
         </h2>
       </div>
 
-      <div className="space-y-space-sm">
+      <div className="micro-stagger space-y-space-sm">
         {pengumuman.map((item) => (
           <div
             key={item.id}
-            className={`p-space-md rounded-2xl ${
+            className={`micro-row p-space-md rounded-2xl ${
               item.variant === "secondary"
                 ? "bg-secondary-container/15 text-on-surface transition-all hover:bg-secondary-container/25 border border-secondary-container/20"
                 : "bg-surface-container-low text-on-surface transition-all hover:bg-surface-container border border-surface-container"
@@ -58,7 +58,7 @@ export default function PapanPengumuman({
                   <IkonLucide nama={item.icon || "info"} className="h-4 w-4" />
                   {item.linkLabel}
                 </span>
-                <IkonLucide nama={item.actionIcon || "arrow_forward"} className="h-[18px] w-[18px]" />
+                <IkonLucide nama={item.actionIcon || "arrow_forward"} className="micro-arrow h-[18px] w-[18px]" />
               </Link>
             )}
           </div>

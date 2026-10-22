@@ -11,6 +11,7 @@ import {
   CalendarClock,
   CalendarDays,
   Database,
+  Dumbbell,
   FolderOpen,
   GraduationCap,
   Images,
@@ -61,6 +62,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: `${ADMIN_BASE}/agenda`, label: "Agenda Kegiatan", icon: CalendarDays, ready: true, jumlah: "agenda" },
       { href: `${ADMIN_BASE}/galeri`, label: "Galeri Kegiatan", icon: Images, ready: true, jumlah: "galeri" },
       { href: `${ADMIN_BASE}/fasilitas`, label: "Fasilitas Sekolah", icon: Building2, ready: true, jumlah: "fasilitas" },
+      { href: `${ADMIN_BASE}/ekstrakurikuler`, label: "Ekstrakurikuler", icon: Dumbbell, ready: true, jumlah: "ekstrakurikuler" },
       { href: `${ADMIN_BASE}/guru`, label: "Direktori Guru", icon: GraduationCap, ready: true, jumlah: "guru" },
     ],
   },
@@ -139,6 +141,8 @@ function hitungLencana(modul: ModulContextValue, key?: ModulKey): Lencana | null
       return dariSumber(modul.guru, (n) => n);
     case "fasilitas":
       return dariSumber(modul.fasilitas, (n) => n);
+    case "ekstrakurikuler":
+      return dariSumber(modul.ekstrakurikuler, (n) => n);
     case "galeri":
       return dariSumber(modul.galeri, (n) => n);
     case "pengumuman":

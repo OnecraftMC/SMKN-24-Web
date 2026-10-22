@@ -60,7 +60,7 @@ export default function FeaturedNews({
         <div className="max-w-container-max mx-auto">
           <Link
             href={`/berita/${berita.slug}`}
-            className="group flex items-center gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-sm shadow-sm transition-colors hover:bg-surface-container"
+            className="micro-row micro-shine group relative flex items-center gap-space-md rounded-2xl border border-surface-container bg-surface-container-lowest p-space-sm shadow-sm transition-colors hover:bg-surface-container"
           >
             <div className="h-16 w-24 shrink-0 overflow-hidden rounded-xl bg-surface-container-high sm:h-20 sm:w-32">
               {berita.gambar ? (
@@ -91,9 +91,9 @@ export default function FeaturedNews({
                 {berita.judul}
               </h2>
               <span className="inline-flex items-center gap-1 font-label-sm text-label-sm font-bold text-primary">
-                <Megaphone aria-hidden="true" className="h-4 w-4" />
+                <Megaphone aria-hidden="true" className="micro-icon h-4 w-4" />
                 Baca berita pilihan
-                <ArrowRight aria-hidden="true" className="h-[14px] w-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
+                <ArrowRight aria-hidden="true" className="micro-arrow h-[14px] w-[14px] transition-transform duration-300 group-hover:translate-x-0.5" />
               </span>
             </div>
           </Link>
@@ -105,7 +105,7 @@ export default function FeaturedNews({
   return (
     <div className="w-full py-space-3xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto">
-        <div className="rounded-3xl overflow-hidden bg-surface-container-lowest border border-surface-container shadow-lg grid grid-cols-1 lg:grid-cols-12 items-center">
+        <div className="micro-shine relative rounded-3xl overflow-hidden bg-surface-container-lowest border border-surface-container shadow-lg grid grid-cols-1 lg:grid-cols-12 items-center">
           <div className="lg:col-span-7 h-72 lg:h-[420px] overflow-hidden">
             {berita.gambar ? (
               <Image
@@ -139,9 +139,9 @@ export default function FeaturedNews({
               <span className="text-xs font-bold text-primary flex items-center gap-1">
                 <Megaphone aria-hidden="true" className="h-4 w-4" /> Berita Pilihan
               </span>
-              <Link href={`/berita/${berita.slug}`} className="px-4 py-2 rounded-xl bg-primary text-surface font-label-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-1">
+              <Link href={`/berita/${berita.slug}`} className="micro-cta px-4 py-2 rounded-xl bg-primary text-surface font-label-sm font-bold hover:bg-primary-container transition-colors flex items-center gap-1">
                 <span>Baca Lengkap</span>
-                <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                <ArrowRight aria-hidden="true" className="micro-arrow h-4 w-4" />
               </Link>
             </div>
           </div>

@@ -23,12 +23,15 @@ export default function ImageField({
   label = "Gambar",
   cropAspectRatio,
   cropShape = "rect",
+  fit = "cover",
 }: {
   value: string | null;
   onChange: (path: string | null) => void;
   label?: string;
   cropAspectRatio?: number;
   cropShape?: "rect" | "round";
+  /** `contain` cocok untuk logo agar bentuk asli tidak terpotong. */
+  fit?: "cover" | "contain";
 }) {
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -145,7 +148,7 @@ export default function ImageField({
               alt="Pratinjau gambar"
               width={160}
               height={96}
-              className="h-full w-full object-cover"
+              className={`h-full w-full ${fit === "contain" ? "object-contain p-2" : "object-cover"}`}
               unoptimized
             />
           ) : (

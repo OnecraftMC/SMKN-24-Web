@@ -84,7 +84,7 @@ export default function QuickHighlights() {
   return (
     <div className="w-full -mt-space-2xl relative z-20 px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto">
-        <div ref={gridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-gutter-sm bg-surface-container-lowest rounded-2xl p-space-md md:p-space-lg shadow-xl shadow-primary/5 border border-surface-container">
+        <div ref={gridRef} className="micro-stagger grid grid-cols-2 lg:grid-cols-4 gap-gutter-sm bg-surface-container-lowest rounded-2xl p-space-md md:p-space-lg shadow-xl shadow-primary/5 border border-surface-container">
           {highlights.map((item, index) => {
             const progress = elapsed === null
               ? 1
@@ -97,7 +97,7 @@ export default function QuickHighlights() {
             return (
             <div
               key={item.label}
-              className="group p-space-md flex flex-col justify-center rounded-xl bg-surface-container-low transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none"
+              className="micro-shine group relative p-space-md flex flex-col justify-center rounded-xl bg-surface-container-low transition-all duration-300 hover:-translate-y-1 hover:bg-surface-container hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none"
             >
               <div className="flex items-center gap-2 text-secondary font-bold mb-1">
                 <IkonLucide nama={item.icon} className="h-[22px] w-[22px] transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6 motion-reduce:transform-none motion-reduce:transition-none" />

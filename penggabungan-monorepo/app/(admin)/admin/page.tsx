@@ -37,6 +37,7 @@ const LABEL_SUMBER: Record<ModulKey, string> = {
   agenda: "Agenda",
   guru: "Guru",
   fasilitas: "Fasilitas",
+  ekstrakurikuler: "Ekstrakurikuler",
   galeri: "Galeri",
   bk: "Inbox BK",
   prestasi: "Pengajuan Prestasi",

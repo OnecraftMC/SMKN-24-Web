@@ -73,6 +73,18 @@ export interface FasilitasDTO {
   unggulan: boolean;
 }
 
+export interface EkstrakurikulerDTO {
+  id: number;
+  nama: string;
+  deskripsi: string | null;
+  logo: string | null;
+  kategori: string | null;
+  pembina: string | null;
+  jadwal: string | null;
+  lokasi: string | null;
+  unggulan: boolean;
+}
+
 export interface GaleriDTO {
   id: number;
   judul: string;
@@ -135,6 +147,18 @@ export interface FasilitasView {
   title: string;
   desc: string;
   image: string | null;
+  unggulan: boolean;
+}
+
+export interface EkstrakurikulerView {
+  id: number;
+  nama: string;
+  deskripsi: string;
+  logo: string | null;
+  kategori: string;
+  pembina: string;
+  jadwal: string;
+  lokasi: string;
   unggulan: boolean;
 }
 
@@ -232,6 +256,29 @@ export function mapFasilitas(item: FasilitasDTO, backendUrl: string): FasilitasV
     title: item.judul,
     desc: item.deskripsi ?? "",
     image: assetUrl(item.gambar, backendUrl),
+    unggulan: item.unggulan,
+  };
+}
+
+export function mapEkstrakurikuler(
+  item: EkstrakurikulerDTO,
+  backendUrl: string,
+): EkstrakurikulerView {
+  // Logo contoh ikut di-build bersama Next (`/images/...`) dan tidak boleh
+  // ditempelkan ke origin backend; unggahan admin tetap memakai assetUrl.
+  const isWebsiteAsset =
+    typeof item.logo === "string" &&
+    (item.logo.startsWith("/images/") || item.logo.startsWith("/logo"));
+
+  return {
+    id: item.id,
+    nama: item.nama,
+    deskripsi: item.deskripsi ?? "",
+    logo: isWebsiteAsset ? item.logo : assetUrl(item.logo, backendUrl),
+    kategori: item.kategori ?? "",
+    pembina: item.pembina ?? "",
+    jadwal: item.jadwal ?? "",
+    lokasi: item.lokasi ?? "",
     unggulan: item.unggulan,
   };
 }

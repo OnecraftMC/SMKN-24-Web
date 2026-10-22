@@ -74,6 +74,12 @@ export default function Navbar() {
               href: "/profil#fasilitas",
               ikon: "apartment",
             },
+            {
+              label: "Ekstrakurikuler",
+              description: "Klub, sanggar & kegiatan siswa",
+              href: "/ekstrakurikuler",
+              ikon: "sports_soccer",
+            },
           ],
         },
       ],
@@ -156,7 +162,7 @@ export default function Navbar() {
             <span className="hidden sm:inline text-surface-container-high">BAN-S/M</span>
             <a
               href={adminUrl}
-              className="hidden sm:inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold shadow-sm hover:bg-secondary-fixed-dim transition-all"
+              className="micro-cta hidden sm:inline-flex items-center gap-1 px-space-sm py-1.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold shadow-sm hover:bg-secondary-fixed-dim transition-all"
             >
               <span>Login</span>
               <LogIn aria-hidden="true" className="h-4 w-4" />
@@ -203,7 +209,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-space-sm">
           <a
-            className="hidden md:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-primary text-surface font-label-md text-label-md font-bold shadow-md hover:bg-primary-container transition-all"
+            className="micro-cta hidden md:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-primary text-surface font-label-md text-label-md font-bold shadow-md hover:bg-primary-container transition-all"
             href="https://spmb.jakarta.go.id"
             rel="noopener noreferrer"
             target="_blank"
@@ -215,7 +221,7 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsBKOpen(true)}
-            className="hidden sm:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-md hover:bg-secondary-fixed-dim transition-all"
+            className="micro-cta hidden sm:inline-flex items-center gap-1.5 px-space-md py-2.5 rounded-lg bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold shadow-md hover:bg-secondary-fixed-dim transition-all"
           >
             <span>Bimbingan Konseling</span>
             <MessagesSquare aria-hidden="true" className="h-[18px] w-[18px]" />
@@ -225,7 +231,7 @@ export default function Navbar() {
             aria-controls={MOBILE_MENU_ID}
             aria-expanded={isMobileOpen}
             aria-label={isMobileOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
-            className="lg:hidden p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container"
+            className="micro-wiggle lg:hidden p-2 rounded-lg bg-surface-container-low text-primary hover:bg-surface-container"
             onClick={() => setIsMobileOpen(!isMobileOpen)}
             type="button"
           >

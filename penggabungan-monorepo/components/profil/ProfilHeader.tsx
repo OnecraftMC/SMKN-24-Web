@@ -4,7 +4,7 @@ export default function ProfilHeader() {
     <div className="bg-primary text-on-primary py-space-2xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop relative overflow-hidden">
       <div className="max-w-container-max mx-auto space-y-3 relative z-10">
         <div className="inline-flex items-center gap-2 text-secondary-container font-label-sm font-bold uppercase tracking-wider">
-          <ShieldCheck aria-hidden="true" className="h-[18px] w-[18px]" />
+          <ShieldCheck aria-hidden="true" className="micro-icon h-[18px] w-[18px]" />
           <span>Identitas &amp; Visi Masa Depan</span>
         </div>
         <h1 className="font-headline-lg text-headline-lg lg:text-[2.75rem] font-bold text-surface tracking-tight">Profil Lengkap SMKN 24 Jakarta</h1>

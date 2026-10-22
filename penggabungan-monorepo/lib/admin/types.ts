@@ -145,6 +145,18 @@ export interface FasilitasDTO {
   unggulan: boolean;
 }
 
+export interface EkstrakurikulerDTO {
+  id: number;
+  nama: string;
+  deskripsi: string | null;
+  logo: string | null;
+  kategori: string | null;
+  pembina: string | null;
+  jadwal: string | null;
+  lokasi: string | null;
+  unggulan: boolean;
+}
+
 // -----------------------------------------------------------------------------
 // Jadwal mingguan per kelas, hari, dan rentang jam pelajaran
 // -----------------------------------------------------------------------------

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo Tari Tradisional">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a855f7"/>
+      <stop offset="1" stop-color="#581c87"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <path d="M128 48c8 20 8 40 0 60-8-20-8-40 0-60z" fill="#fde68a"/>
+  <path d="M100 86c18 8 30 24 28 46-20-10-30-26-28-46zM156 86c-18 8-30 24-28 46 20-10 30-26 28-46z" fill="#fcd34d"/>
+  <circle cx="128" cy="120" r="22" fill="#f8fafc"/>
+  <path d="M92 168c14-18 58-18 72 0l18 46H74z" fill="#f8fafc"/>
+  <path d="M104 168c8 10 40 10 48 0" stroke="#a855f7" stroke-width="6" fill="none" stroke-linecap="round"/>
+  <path d="M68 86c8-8 20-8 28 0M188 86c-8-8-20-8-28 0" stroke="#fde68a" stroke-width="6" stroke-linecap="round" fill="none"/>
+</svg>

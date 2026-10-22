@@ -88,11 +88,11 @@ export default function AgendaKegiatan({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
+        <div className="micro-stagger grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
           {agenda.map((item) => (
             <div
               key={item.id}
-              className="group bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex items-start gap-space-md border border-surface-container motion-reduce:transform-none motion-reduce:transition-none"
+              className="micro-shine group relative bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex items-start gap-space-md border border-surface-container motion-reduce:transform-none motion-reduce:transition-none"
             >
               <div className="flex-shrink-0 w-20 h-20 rounded-xl bg-primary text-surface flex flex-col items-center justify-center text-center transition-transform duration-300 group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none">
                 <span className="font-headline-md text-headline-md font-extrabold text-secondary-container leading-none">

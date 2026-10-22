@@ -43,7 +43,7 @@ export default function FasilitasKampus({
         aria-modal="true"
         aria-label={selected.title}
         onClick={(event) => event.stopPropagation()}
-        className="relative max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-surface-container-lowest shadow-xl"
+        className="relative max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto rounded-2xl bg-surface-container-lowest shadow-xl micro-pop"
       >
         <button
           type="button"
@@ -138,7 +138,7 @@ export default function FasilitasKampus({
                     key={item.id}
                     type="button"
                     onClick={() => setSelected(item)}
-                    className="flex w-full min-w-0 items-center gap-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-sm text-left transition hover:border-primary/40 hover:shadow-sm"
+                    className="micro-card micro-shine flex w-full min-w-0 items-center gap-space-md rounded-xl border border-surface-container bg-surface-container-lowest p-space-sm text-left transition hover:border-primary/40 hover:shadow-sm"
                   >
                     <div className="h-20 w-24 shrink-0 overflow-hidden rounded-lg bg-surface-container-high sm:h-24 sm:w-28">
                       {item.image ? (
@@ -196,7 +196,7 @@ export default function FasilitasKampus({
               key={item.id}
               type="button"
               onClick={() => setSelected(item)}
-              className="block w-full rounded-2xl overflow-hidden border border-surface-container bg-surface-container-lowest shadow-sm group text-left transition hover:border-primary/40 hover:shadow-md"
+              className="micro-card micro-shine block w-full rounded-2xl overflow-hidden border border-surface-container bg-surface-container-lowest shadow-sm group text-left transition hover:border-primary/40 hover:shadow-md"
             >
               <div className="h-52 overflow-hidden">
                 {item.image ? (
@@ -210,7 +210,7 @@ export default function FasilitasKampus({
               <div className="p-space-md space-y-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-title-md font-bold text-primary">{item.title}</h3>
-                  <Library aria-hidden="true" className="h-6 w-6 text-secondary" />
+                  <Library aria-hidden="true" className="micro-icon h-6 w-6 text-secondary" />
                 </div>
                 <p className="text-body-sm text-on-surface-variant">{item.desc}</p>
               </div>

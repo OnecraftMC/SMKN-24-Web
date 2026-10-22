@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Logo Pramuka">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8b5e34"/>
+      <stop offset="1" stop-color="#3f2a17"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <path d="M128 48c35 0 64 28 64 63 0 44-40 75-64 97-24-22-64-53-64-97 0-35 29-63 64-63z" fill="#f8f4e9"/>
+  <path d="M128 70c22 0 42 18 42 41 0 29-25 51-42 68-17-17-42-39-42-68 0-23 20-41 42-41z" fill="#4d7c3a"/>
+  <path d="M128 84v86" stroke="#f8f4e9" stroke-width="9" stroke-linecap="round"/>
+  <path d="M104 112c8-8 16-12 24-22 8 10 16 14 24 22" stroke="#f8f4e9" stroke-width="9" stroke-linecap="round" fill="none"/>
+  <circle cx="128" cy="188" r="7" fill="#ffd166"/>
+</svg>

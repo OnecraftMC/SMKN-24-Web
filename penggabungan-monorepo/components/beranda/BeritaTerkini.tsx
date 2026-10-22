@@ -29,15 +29,15 @@ export default function BeritaTerkini({
           className="text-secondary font-label-md text-label-md font-bold hover:underline flex items-center gap-1"
         >
           <span>Semua Berita</span>
-          <ArrowRight aria-hidden="true" className="h-[18px] w-[18px]" />
+          <ArrowRight aria-hidden="true" className="micro-arrow h-[18px] w-[18px]" />
         </Link>
       </div>
 
-      <div className="space-y-space-md">
+      <div className="micro-stagger space-y-space-md">
         {berita.map((item) => (
           <article
             key={item.id}
-            className="bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row group border border-surface-container"
+            className="micro-card micro-shine bg-surface-container-lowest rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row group border border-surface-container"
           >
             <div className="sm:w-2/5 h-48 sm:h-auto overflow-hidden">
               {item.gambar ? (

@@ -39,13 +39,13 @@ export default function DewanGuru({
             ))}
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-md">
+        <div className="micro-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-md">
           {filteredGuru.map((guru) => (
-            <div key={guru.id} className="bg-surface-container-lowest rounded-2xl overflow-hidden p-space-md border border-surface-container shadow-sm text-center space-y-3">
+            <div key={guru.id} className="micro-card micro-shine bg-surface-container-lowest rounded-2xl overflow-hidden p-space-md border border-surface-container shadow-sm text-center space-y-3">
                 {guru.image ? (
-                  <Image src={guru.image} alt={guru.name} width={112} height={112} className="w-28 h-28 mx-auto rounded-full object-cover ring-4 ring-primary/10" />
+                  <Image src={guru.image} alt={guru.name} width={112} height={112} className="micro-icon w-28 h-28 mx-auto rounded-full object-cover ring-4 ring-primary/10" />
                 ) : (
-                  <div className="w-28 h-28 mx-auto rounded-full bg-surface-container-high text-primary flex items-center justify-center ring-4 ring-primary/10" aria-hidden="true">
+                  <div className="micro-icon w-28 h-28 mx-auto rounded-full bg-surface-container-high text-primary flex items-center justify-center ring-4 ring-primary/10" aria-hidden="true">
                     <User aria-hidden="true" className="h-9 w-9" />
                   </div>
                 )}
