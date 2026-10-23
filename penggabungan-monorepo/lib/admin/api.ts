@@ -75,6 +75,11 @@ export function isUnauthorized(error: unknown): boolean {
   return error instanceof ApiError && error.status === 401;
 }
 
+/** 404 biasanya berarti endpoint belum diunggah ke server, bukan data kosong. */
+export function isNotFound(error: unknown): boolean {
+  return error instanceof ApiError && error.status === 404;
+}
+
 /** Aman dipanggil di server: mengembalikan null bila tidak ada `window`. */
 export function getStoredToken(): string | null {
   if (typeof window === "undefined") {

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { CalendarClock, MapPin, Pencil, Plus, Search, Sparkles, Trash2, UserRound } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
-import { apiRequest, assetUrl, isUnauthorized } from "@/lib/admin/api";
+import { apiRequest, assetUrl, isNotFound, isUnauthorized } from "@/lib/admin/api";
 import type { EkstrakurikulerDTO } from "@/lib/admin/types";
 import {
   ConfirmDialog,
@@ -49,6 +49,12 @@ export default function EkstrakurikulerPage() {
         if (cancelled) return;
         if (isUnauthorized(err)) {
           logout();
+          return;
+        }
+        if (isNotFound(err)) {
+          setError(
+            "Endpoint ekstrakurikuler belum ada di server (HTTP 404). Unggah folder backend/api/ekstrakurikuler ke backend produksi, lalu muat ulang halaman ini.",
+          );
           return;
         }
         setError(err instanceof Error ? err.message : "Gagal memuat data ekstrakurikuler.");
