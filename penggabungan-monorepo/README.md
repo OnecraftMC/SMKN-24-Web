@@ -141,7 +141,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | Fitur | Detail |
 |---|---|
 | `/profil` hanya menampilkan fasilitas berflag `unggulan`; `/fasilitas` menampilkan semua | Flag dikelola di `/admin/fasilitas` (kolom `fasilitas.unggulan`, default `0`) |
-| Ekstrakurikuler punya logo + info pembina/jadwal/lokasi yang bisa diubah admin | Dikelola di `/admin/ekstrakurikuler`; kartu tampil di `/ekstrakurikuler` dan blok unggulan di `/profil`. Jalankan `backend/migrations/20261023_add_ekstrakurikuler.sql` (atau migrasi Laravel) sebelum deploy. |
+| Ekstrakurikuler punya logo + info pembina/jadwal/lokasi yang bisa diubah admin | Dikelola di `/admin/ekstrakurikuler`; kartu tampil di `/ekstrakurikuler` dan blok unggulan di `/profil`. Endpoint `backend/api/ekstrakurikuler` membuat tabel + data contoh otomatis bila migrasi belum dijalankan; migrasi manual tetap tersedia di `backend/migrations/20261023_add_ekstrakurikuler.sql`. |
 | Hotnews ringkas muncul di 5 halaman publik | Berita highlight diambil dari backend (`berita.utama`); `/kabar` tetap memakai hero |
 | Widget chatbot punya tombol fullscreen | Tidak memakai Browser Fullscreen API agar tombol Escape tidak bentrok |
 

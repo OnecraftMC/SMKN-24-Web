@@ -128,6 +128,7 @@ backend/
     ├── jadwal/index.php    GET/POST/DELETE (matriks per jurusan & sesi)
     ├── galeri/index.php    GET/POST/PUT/DELETE
     ├── fasilitas/index.php GET/POST/PUT/DELETE
+    ├── ekstrakurikuler/index.php GET/POST/PUT/DELETE (tabel dibuat otomatis)
     ├── bk/index.php        POST (publik) / GET,PUT,DELETE (admin)
     ├── aspirasi/index.php  POST (publik) / GET,PUT,DELETE (admin)
     ├── chat/

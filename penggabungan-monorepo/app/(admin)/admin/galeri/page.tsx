@@ -37,6 +37,9 @@ export default function GaleriPage() {
 
   const [query, setQuery] = useState("");
   const [kategoriFilter, setKategoriFilter] = useState("semua");
+  // Thumbnail bisa 404 bila berkas di server sudah terhapus; tampilkan
+  // placeholder agar grid tidak dipenuhi ikon gambar rusak.
+  const [gagalDimuat, setGagalDimuat] = useState<Record<number, boolean>>({});
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -187,13 +190,14 @@ export default function GaleriPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {visibleRows.map((row) => {
             const src = assetUrl(row.gambar);
+            const gambarRusak = gagalDimuat[row.id] === true;
             return (
               <article
                 key={row.id}
                 className="group overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm"
               >
                 <div className="relative aspect-square overflow-hidden bg-surface-container-low">
-                  {src ? (
+                  {src && !gambarRusak ? (
                     <Image
                       src={src}
                       alt={row.judul}
@@ -201,10 +205,14 @@ export default function GaleriPage() {
                       sizes="(max-width: 768px) 50vw, 25vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       unoptimized
+                      onError={() =>
+                        setGagalDimuat((previous) => ({ ...previous, [row.id]: true }))
+                      }
                     />
                   ) : (
-                    <div className="flex h-full items-center justify-center font-body-sm text-body-sm text-on-surface-variant">
-                      Tidak ada gambar
+                    <div className="flex h-full flex-col items-center justify-center gap-1 px-3 text-center font-body-sm text-body-sm text-on-surface-variant">
+                      <span>Gambar tidak tersedia</span>
+                      <span className="text-xs">Unggah ulang foto ini.</span>
                     </div>
                   )}
                 </div>

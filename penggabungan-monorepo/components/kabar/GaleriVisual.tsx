@@ -1,7 +1,7 @@
 "use client";
 import { Images } from "lucide-react";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -19,6 +19,9 @@ export default function GaleriVisual({
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  // Foto lama bisa saja sudah tidak ada di server (404). Catat per id agar
+  // kartu menampilkan placeholder, bukan ikon gambar rusak.
+  const [gagalDimuat, setGagalDimuat] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -68,30 +71,40 @@ export default function GaleriVisual({
             aria-label="Galeri momen emas siswa, geser untuk melihat foto lainnya"
           >
             <div ref={trackRef} className="flex w-max gap-4">
-              {galeri.map((item) => (
-                <article
-                  key={item.id}
-                  className="micro-card micro-shine group relative aspect-[4/5] w-[min(70vw,18rem)] shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md md:w-[min(26vw,18rem)]"
-                >
-                  {item.image ? (
-                    <Image
-                      src={item.image}
-                      alt={item.title}
-                      width={480}
-                      height={600}
-                      sizes="(max-width: 767px) 70vw, 26vw"
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-surface-container-high text-primary" aria-hidden="true">
-                      <Images aria-hidden="true" className="h-9 w-9" />
-                    </div>
-                  )}
-                  <span className="absolute inset-x-0 bottom-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
-                    {item.title}
-                  </span>
-                </article>
-              ))}
+              {galeri.map((item) => {
+                const gambarRusak = gagalDimuat[item.id] === true;
+                return (
+                  <article
+                    key={item.id}
+                    className="micro-card micro-shine group relative aspect-[4/5] w-[min(70vw,18rem)] shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md md:w-[min(26vw,18rem)]"
+                  >
+                    {item.image && !gambarRusak ? (
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        width={480}
+                        height={600}
+                        sizes="(max-width: 767px) 70vw, 26vw"
+                        unoptimized
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        onError={() =>
+                          setGagalDimuat((previous) => ({ ...previous, [item.id]: true }))
+                        }
+                      />
+                    ) : (
+                      <div className="flex h-full flex-col items-center justify-center gap-2 bg-surface-container-high px-4 text-center text-primary" aria-label={`Foto ${item.title} belum tersedia`}>
+                        <Images aria-hidden="true" className="h-9 w-9" />
+                        <span className="text-xs font-semibold text-on-surface-variant">
+                          Foto belum tersedia
+                        </span>
+                      </div>
+                    )}
+                    <span className="absolute inset-x-0 bottom-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
+                      {item.title}
+                    </span>
+                  </article>
+                );
+              })}
             </div>
           </div>
         ) : (

@@ -7,8 +7,13 @@ import type { NextConfig } from "next";
  * - `lh3.googleusercontent.com` : foto berita dari backend.
  * - `ak-d.tripcdn.com`          : foto gedung sekolah pada Hero.
  * - origin `BACKEND_URL`        : aset lama yang masih dilayani backend PHP.
+ * - origin `NEXT_PUBLIC_ASSET_URL` : aset publik saat API dipisah ke subdomain.
  */
-const backendImagePatterns = [process.env.BACKEND_URL, process.env.LARAVEL_API_URL].flatMap(
+const backendImagePatterns = [
+  process.env.BACKEND_URL,
+  process.env.LARAVEL_API_URL,
+  process.env.NEXT_PUBLIC_ASSET_URL,
+].flatMap(
   (value) => {
     if (!value) return [];
     try {

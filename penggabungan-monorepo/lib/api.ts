@@ -111,7 +111,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<ApiResult<T
 }
 
 function backendUrl(): string {
-  const value = process.env.BACKEND_URL?.trim();
+  // BACKEND_URL tetap sumber utama. Saat API dipisah ke subdomain (Laravel),
+  // aset lama bisa saja hanya dikonfigurasi lewat NEXT_PUBLIC_ASSET_URL;
+  // pakai itu sebagai fallback agar gambar galeri/fasilitas tidak gagal
+  // dipetakan ketika BACKEND_URL tidak diisi di server Next.
+  const value = (process.env.BACKEND_URL ?? process.env.NEXT_PUBLIC_ASSET_URL)?.trim();
   if (!value) throw new Error("BACKEND_URL tidak tersedia untuk memetakan aset backend.");
   try {
     const url = new URL(value);
