@@ -78,7 +78,7 @@ export default function KalenderKegiatan({
     : [];
 
   return (
-    <section className="w-full px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop">
+    <section id="kalender-kegiatan" className="w-full px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop">
       <div className="mx-auto max-w-container-max">
         <div className="mb-space-xl flex flex-col gap-space-sm sm:flex-row sm:items-end sm:justify-between">
           <div>

@@ -10,7 +10,7 @@ export default function KalenderUnduhan({
   error: string | null;
 }) {
   return (
-    <section aria-labelledby="pusat-arsip-heading" className="space-y-space-lg">
+    <section id="arsip-kalender" aria-labelledby="pusat-arsip-heading" className="space-y-space-lg">
       <div>
         <span className="font-label-md font-bold uppercase tracking-wider text-secondary">
           Pusat Arsip

@@ -18,7 +18,7 @@ export default function DewanGuru({
   const filteredGuru = filter === "semua" ? guru : guru.filter((item) => item.category === filter);
 
   return (
-    <div className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
+    <div id="dewan-guru" className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
           <div>

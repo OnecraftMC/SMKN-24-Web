@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import MobileMenu from "./MobileMenu";
-import PillNavIndicator from "./PillNavIndicator";
+import DropdownNav from "./DropdownNav";
 import BKChatModal from "@/components/bk/BKChatModal";
 
 /** id dropdown mobile — dipakai tombol toggle untuk `aria-controls`. */
@@ -35,13 +35,95 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: "/", label: "Beranda", icon: "home" },
-    { href: "/profil", label: "Profil", icon: "domain" },
-    { href: "/akademik", label: "Akademik", icon: "calendar_month" },
-    { href: "/kabar", label: "Galeri", icon: "newspaper" },
-    { href: "/jurusan", label: "Jurusan", icon: "school" },
-    { href: "/berita", label: "Berita", icon: "article" },
-    { href: "/fasilitas", label: "Fasilitas", icon: "apartment" },
+    { id: "beranda", href: "/", label: "Beranda", ikon: "home" },
+    {
+      id: "profil",
+      href: "/profil",
+      label: "Profil",
+      ikon: "domain",
+      groups: [
+        {
+          title: "Tentang Sekolah",
+          items: [
+            {
+              label: "Informasi Sekolah",
+              description: "Profil & program SMKN 24 Jakarta",
+              href: "/profil",
+              ikon: "domain",
+            },
+            {
+              label: "Kalender Kegiatan",
+              description: "Agenda kegiatan siswa & sekolah",
+              href: "/profil#kalender-kegiatan",
+              ikon: "calendar_month",
+            },
+          ],
+        },
+        {
+          title: "Direktori & Sarana",
+          items: [
+            {
+              label: "Direktori Guru",
+              description: "Pendidik & tenaga manajemen",
+              href: "/profil#dewan-guru",
+              ikon: "groups",
+            },
+            {
+              label: "Fasilitas Unggulan",
+              description: "Sorotan sarana prasarana kampus",
+              href: "/profil#fasilitas",
+              ikon: "apartment",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "akademik",
+      href: "/akademik",
+      label: "Akademik",
+      ikon: "calendar_month",
+      groups: [
+        {
+          title: "Pembelajaran",
+          items: [
+            {
+              label: "Jadwal Program Keahlian",
+              description: "Jadwal pembelajaran tiap jurusan",
+              href: "/akademik",
+              ikon: "schedule",
+            },
+            {
+              label: "Kalender Akademik",
+              description: "Unduh kalender & dokumen tahunan",
+              href: "/akademik#arsip-kalender",
+              ikon: "download",
+            },
+          ],
+        },
+        {
+          title: "Pengembangan Siswa",
+          items: [
+            {
+              label: "Pengajuan Prestasi",
+              description: "Ajukan capaian lomba & juara",
+              href: "/akademik/pengajuan-prestasi",
+              ikon: "emoji_events",
+            },
+            {
+              label: "Pusat Arsip",
+              description: "Dokumen & album kegiatan",
+              href: "/akademik/arsip",
+              ikon: "folder",
+            },
+          ],
+        },
+      ],
+    },
+    { id: "galeri", href: "/kabar", label: "Galeri", ikon: "photo_library" },
+    { id: "jurusan", href: "/jurusan", label: "Jurusan", ikon: "school" },
+    { id: "berita", href: "/berita", label: "Berita", ikon: "article" },
+    { id: "fasilitas", href: "/fasilitas", label: "Fasilitas", ikon: "apartment" },
   ];
 
   return (
@@ -114,7 +196,7 @@ export default function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <PillNavIndicator
+        <DropdownNav
           className="hidden lg:flex"
           items={navLinks}
         />
