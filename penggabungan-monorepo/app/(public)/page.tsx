@@ -7,6 +7,7 @@ import AgendaKegiatan from '@/components/beranda/AgendaKegiatan';
 import LokasiSekolahBanner from '@/components/beranda/LokasiSekolahBanner';
 import { Reveal } from '@/components/ui/Reveal';
 import { getAgenda, getBerita, getPengumuman } from '@/lib/api';
+import AlasanMemilih from '@/components/beranda/AlasanMemilih';
 
 // Backend adalah sumber kebenaran; setiap bagian menampilkan error/konfigurasi
 // kosong, bukan menggantinya dengan konten contoh arsip.
@@ -17,7 +18,9 @@ export default async function Home() {
     getAgenda(),
   ]);
   const berita = beritaRes.data ?? [];
-  const pengumuman = pengumumanRes.data ?? [];
+  const pengumuman = [...(pengumumanRes.data ?? [])].sort(
+    (a, b) => Number(b.penting) - Number(a.penting),
+  );
   const allAgenda = agendaRes.data ?? [];
   const today = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Jakarta",
@@ -34,18 +37,21 @@ export default async function Home() {
     <>
       <Hero />
       <Reveal>
+        <AlasanMemilih />
+      </Reveal>
+      <Reveal>
+        <PapanPengumuman pengumuman={pengumuman} error={pengumumanRes.error} />
+      </Reveal>
+      <Reveal>
         <QuickHighlights />
       </Reveal>
       <Reveal>
         <SambutanKepsek />
       </Reveal>
       <Reveal>
-        <section className="w-full py-space-4xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
-          <div className="max-w-container-max mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter-lg">
-              <BeritaTerkini berita={berita} error={beritaRes.error} />
-              <PapanPengumuman pengumuman={pengumuman} error={pengumumanRes.error} />
-            </div>
+        <section className="w-full px-margin-mobile py-space-4xl md:px-margin-tablet lg:px-margin-desktop">
+          <div className="mx-auto max-w-container-max">
+            <BeritaTerkini berita={berita} error={beritaRes.error} />
           </div>
         </section>
       </Reveal>

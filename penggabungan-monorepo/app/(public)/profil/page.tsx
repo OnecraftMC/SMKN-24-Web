@@ -4,6 +4,7 @@ import DewanGuru from '@/components/profil/DewanGuru';
 import FasilitasKampus from '@/components/profil/FasilitasKampus';
 import EkstrakurikulerKampus from '@/components/ekstrakurikuler/EkstrakurikulerKampus';
 import KalenderKegiatan from '@/components/profil/KalenderKegiatan';
+import HubIndustri from '@/components/profil/HubIndustri';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
 import { getAgendaCalendar, getBerita, getEkstrakurikuler, getFasilitas, getGuru } from '@/lib/api';
@@ -42,6 +43,9 @@ export default async function ProfilPage() {
       </Reveal>
       <Reveal>
         <DewanGuru guru={guru} error={guruRes.error} />
+      </Reveal>
+      <Reveal>
+        <HubIndustri />
       </Reveal>
       <Reveal>
         <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} variant="featured" />

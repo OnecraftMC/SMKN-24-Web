@@ -8,7 +8,7 @@ export default function JurusanBanner() {
           <span>Lima Kompetensi Keahlian</span>
         </div>
         <h1 className="font-headline-lg text-headline-lg lg:text-[2.75rem] font-bold text-surface tracking-tight">
-          Jurusan &amp; Program Keahlian SMKN 24 Jakarta
+          Program Keahlian SMKN 24 Jakarta
         </h1>
         <p className="font-body-lg text-primary-fixed max-w-3xl">
           Perhotelan, Kuliner, Tata Busana, Rekayasa Perangkat Lunak, dan Usaha Layanan

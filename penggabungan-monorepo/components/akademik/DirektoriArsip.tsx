@@ -72,6 +72,21 @@ export default function DirektoriArsip({
 
       <main className="px-margin-mobile py-space-2xl md:px-margin-tablet lg:px-margin-desktop">
         <div className="mx-auto max-w-container-max space-y-space-xl">
+          <section aria-label="Testimoni alumni dan arsip kelulusan" className="grid gap-gutter-md md:grid-cols-2">
+            <article className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg">
+              <p className="font-label-sm font-bold uppercase tracking-wider text-secondary">Cerita lulusan</p>
+              <h2 className="mt-2 font-title-lg text-title-lg font-bold text-primary">Testimoni Alumni</h2>
+              <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">Testimoni alumni akan ditampilkan setelah materi terverifikasi dan diterbitkan oleh sekolah. Alumni dapat mengirim cerita dan persetujuan publikasi melalui kanal resmi.</p>
+              <a href="mailto:humassmkn24jakarta@gmail.com?subject=Testimoni%20Alumni%20SMKN%2024%20Jakarta" className="mt-4 inline-flex min-h-11 items-center rounded-xl border border-outline-variant px-4 py-2 text-sm font-bold text-primary hover:bg-surface-container-low">Kirim testimoni alumni</a>
+            </article>
+            <article className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg">
+              <p className="font-label-sm font-bold uppercase tracking-wider text-secondary">Dokumen lulusan</p>
+              <h2 id="arsip-alumni" className="mt-2 font-title-lg text-title-lg font-bold text-primary">Informasi &amp; Arsip Kelulusan</h2>
+              <p className="mt-2 text-sm leading-relaxed text-on-surface-variant">Pengumuman kelulusan dan dokumen alumni yang sudah dipublikasikan dapat diakses melalui pusat informasi kelulusan.</p>
+              <Link href="/pengumuman-kelulusan" className="mt-4 inline-flex min-h-11 items-center rounded-xl bg-primary px-4 py-2 text-sm font-bold text-on-primary hover:bg-primary/90">Buka informasi kelulusan</Link>
+            </article>
+          </section>
+
           <div className="flex flex-col gap-space-md md:flex-row md:items-center">
             <label className="relative block min-w-0 flex-1">
               <span className="sr-only">Cari dokumen arsip</span>
@@ -137,6 +152,7 @@ export default function DirektoriArsip({
                         </p>
                         <a
                           href={item.downloadUrl}
+                          download={item.namaFile}
                           className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-label-sm font-bold text-on-primary transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                         >
                           <Download aria-hidden className="h-4 w-4" />

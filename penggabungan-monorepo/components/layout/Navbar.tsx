@@ -16,9 +16,14 @@ export default function Navbar() {
   const [isBKOpen, setIsBKOpen] = useState(false);
   const [indonesiaTime, setIndonesiaTime] = useState("--:--:--");
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
+  const [language, setLanguage] = useState<"id" | "en">("id");
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("id-ID", {
@@ -34,49 +39,50 @@ export default function Navbar() {
     return () => window.clearInterval(interval);
   }, []);
 
+  const inEnglish = language === "en";
   const navLinks = [
-    { id: "beranda", href: "/", label: "Beranda", ikon: "home" },
+    { id: "beranda", href: "/", label: inEnglish ? "Home" : "Beranda", ikon: "home" },
     {
       id: "profil",
       href: "/profil",
-      label: "Profil",
+      label: inEnglish ? "Profile" : "Profil",
       ikon: "domain",
       groups: [
         {
-          title: "Tentang Sekolah",
+          title: inEnglish ? "About the School" : "Tentang Sekolah",
           items: [
             {
-              label: "Informasi Sekolah",
-              description: "Profil & program SMKN 24 Jakarta",
+              label: inEnglish ? "School Information" : "Informasi Sekolah",
+              description: inEnglish ? "Profile & programs of SMKN 24 Jakarta" : "Profil & program SMKN 24 Jakarta",
               href: "/profil",
               ikon: "domain",
             },
             {
-              label: "Kalender Kegiatan",
-              description: "Agenda kegiatan siswa & sekolah",
+              label: inEnglish ? "School Calendar" : "Kalender Kegiatan",
+              description: inEnglish ? "Student and school events" : "Agenda kegiatan siswa & sekolah",
               href: "/profil#kalender-kegiatan",
               ikon: "calendar_month",
             },
           ],
         },
         {
-          title: "Direktori & Sarana",
+          title: inEnglish ? "Directory & Facilities" : "Direktori & Sarana",
           items: [
             {
-              label: "Direktori Guru",
-              description: "Pendidik & tenaga manajemen",
+              label: inEnglish ? "Staff Directory" : "Direktori Guru",
+              description: inEnglish ? "Educators and school staff" : "Pendidik & tenaga manajemen",
               href: "/profil#dewan-guru",
               ikon: "groups",
             },
             {
-              label: "Fasilitas Unggulan",
-              description: "Sorotan sarana prasarana kampus",
+              label: inEnglish ? "School Facilities" : "Fasilitas Sekolah",
+              description: inEnglish ? "Campus facilities and learning spaces" : "Sorotan sarana prasarana kampus",
               href: "/profil#fasilitas",
               ikon: "apartment",
             },
             {
-              label: "Ekstrakurikuler",
-              description: "Klub, sanggar & kegiatan siswa",
+              label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler",
+              description: inEnglish ? "Student clubs and activities" : "Klub, sanggar & kegiatan siswa",
               href: "/ekstrakurikuler",
               ikon: "sports_soccer",
             },
@@ -87,20 +93,20 @@ export default function Navbar() {
     {
       id: "akademik",
       href: "/akademik",
-      label: "Akademik",
+      label: inEnglish ? "Academics" : "Akademik",
       ikon: "calendar_month",
       groups: [
         {
-          title: "Pembelajaran",
+          title: inEnglish ? "Learning" : "Pembelajaran",
           items: [
             {
-              label: "Jadwal Program Keahlian",
+              label: inEnglish ? "Program Schedule" : "Jadwal Program Keahlian",
               description: "Jadwal pembelajaran tiap jurusan",
               href: "/akademik",
               ikon: "schedule",
             },
             {
-              label: "Kalender Akademik",
+              label: inEnglish ? "Academic Calendar" : "Kalender Akademik",
               description: "Unduh kalender & dokumen tahunan",
               href: "/akademik#arsip-kalender",
               ikon: "download",
@@ -108,16 +114,16 @@ export default function Navbar() {
           ],
         },
         {
-          title: "Pengembangan Siswa",
+          title: inEnglish ? "Student Development" : "Pengembangan Siswa",
           items: [
             {
-              label: "Pengajuan Prestasi",
+              label: inEnglish ? "Submit an Achievement" : "Pengajuan Prestasi",
               description: "Ajukan capaian lomba & juara",
               href: "/akademik/pengajuan-prestasi",
               ikon: "emoji_events",
             },
             {
-              label: "Pusat Arsip",
+              label: inEnglish ? "Archive Center" : "Pusat Arsip",
               description: "Dokumen & album kegiatan",
               href: "/akademik/arsip",
               ikon: "folder",
@@ -126,10 +132,23 @@ export default function Navbar() {
         },
       ],
     },
-    { id: "galeri", href: "/kabar", label: "Galeri", ikon: "photo_library" },
-    { id: "jurusan", href: "/jurusan", label: "Jurusan", ikon: "school" },
-    { id: "berita", href: "/berita", label: "Berita", ikon: "article" },
-    { id: "fasilitas", href: "/fasilitas", label: "Fasilitas", ikon: "apartment" },
+    { id: "galeri", href: "/kabar", label: inEnglish ? "Gallery" : "Galeri", ikon: "photo_library" },
+    {
+      id: "program", href: "/jurusan", label: inEnglish ? "Programs" : "Program", ikon: "school",
+      groups: [{ title: inEnglish ? "Student Programs" : "Program Siswa", items: [
+        { label: inEnglish ? "Expertise Programs" : "Profil Jurusan / Program Keahlian", description: inEnglish ? "Explore the school's expertise programs" : "Kenali kompetensi keahlian di sekolah", href: "/jurusan", ikon: "school" },
+        { label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler (Eskul)", description: inEnglish ? "Clubs and student activities" : "Klub dan kegiatan pengembangan siswa", href: "/ekstrakurikuler", ikon: "sports_soccer" },
+        { label: inEnglish ? "CCP Education" : "Program Pendidikan CCP", description: "Character, Content & Process", href: "/program/ccp", ikon: "psychology" },
+        { label: "Future Skills Academic", description: inEnglish ? "Industry mentors and future-ready learning" : "Mentor industri dan pengalaman belajar", href: "/program/future-skills", ikon: "lightbulb" },
+      ] }],
+    },
+    {
+      id: "informasi", href: "/berita", label: inEnglish ? "Information" : "Informasi", ikon: "article",
+      groups: [{ title: inEnglish ? "School Information" : "Informasi Sekolah", items: [
+        { label: inEnglish ? "News" : "Berita", description: inEnglish ? "Latest news and school achievements" : "Kabar terbaru dan prestasi sekolah", href: "/berita", ikon: "article" },
+        { label: inEnglish ? "Graduation Information" : "Pengumuman Kelulusan", description: inEnglish ? "Graduation information and alumni records" : "Informasi kelulusan dan data alumni", href: "/pengumuman-kelulusan", ikon: "school" },
+      ] }],
+    },
   ];
 
   return (
@@ -157,8 +176,15 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-space-sm">
             <span className="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold text-[11px] tracking-wide uppercase">
-              Terakreditasi A
+              {inEnglish ? "Accredited A" : "Terakreditasi A"}
             </span>
+            <div className="inline-flex rounded-full border border-white/25 p-0.5" aria-label="Pilih bahasa">
+              {(["id", "en"] as const).map((locale) => (
+                <button key={locale} type="button" lang={locale} aria-pressed={language === locale} onClick={() => setLanguage(locale)} className={`min-h-7 rounded-full px-2 text-[11px] font-bold uppercase transition-colors ${language === locale ? "bg-white text-primary" : "text-surface-container-high hover:bg-white/10"}`}>
+                  {locale}
+                </button>
+              ))}
+            </div>
             <span className="hidden sm:inline text-surface-container-high">BAN-S/M</span>
             <a
               href={adminUrl}
