@@ -82,10 +82,10 @@ export default function Hero() {
             <div className="relative mx-auto max-w-md lg:max-w-none">
               <div className="absolute -inset-4 rounded-3xl bg-gradient-to-tr from-secondary-container/20 to-primary-container blur-2xl -z-10" />
 
-              <div className="micro-card micro-shine overflow-hidden rounded-2xl shadow-2xl bg-primary-container">
+              <div className="hero-photo-motion overflow-hidden rounded-2xl shadow-2xl bg-primary-container">
                 <Image
                   alt="Gedung SMKN 24 Jakarta"
-                  className="w-full h-80 lg:h-[420px] object-cover hover:scale-105 transition-transform duration-700"
+                  className="w-full h-80 object-cover lg:h-[420px]"
                   src="https://ak-d.tripcdn.com/images/0220v12000abn4uu41DB9_R_960_660_R5_D.jpg"
                   width={960}
                   height={660}

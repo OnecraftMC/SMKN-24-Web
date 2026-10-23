@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import "react-easy-crop/react-easy-crop.css";
@@ -35,10 +34,6 @@ export default function RootLayout({
     <html lang="id" className={jakartaSans.variable}>
       <body className="bg-surface text-on-surface">
         {children}
-        {/* Pause badge animation loops while this tab is hidden. */}
-        <Script id="pause-hidden-tab-animations" strategy="afterInteractive">
-          {`document.addEventListener('visibilitychange',function(){document.documentElement.classList.toggle('animation-paused',document.hidden)})`}
-        </Script>
       </body>
     </html>
   );

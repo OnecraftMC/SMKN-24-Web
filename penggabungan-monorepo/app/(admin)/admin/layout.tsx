@@ -54,8 +54,8 @@ export default function DashboardLayout({
           }`}
         >
           <Topbar onOpenMobile={() => setMobileOpen(true)} />
-          <main className="page-motion flex-1 px-margin-mobile py-space-lg md:px-margin-tablet lg:px-margin-desktop">
-            {children}
+          <main className="min-w-0 flex-1 px-margin-mobile py-space-lg md:px-margin-tablet lg:px-margin-desktop">
+            <div className="mx-auto w-full max-w-[1600px]">{children}</div>
           </main>
         </div>
       </div>

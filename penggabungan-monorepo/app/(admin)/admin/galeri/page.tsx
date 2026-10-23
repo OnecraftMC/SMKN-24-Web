@@ -39,7 +39,7 @@ export default function GaleriPage() {
   const [kategoriFilter, setKategoriFilter] = useState("semua");
   // Thumbnail bisa 404 bila berkas di server sudah terhapus; tampilkan
   // placeholder agar grid tidak dipenuhi ikon gambar rusak.
-  const [gagalDimuat, setGagalDimuat] = useState<Record<number, boolean>>({});
+  const [gagalDimuat, setGagalDimuat] = useState<Record<string, boolean>>({});
 
   const reload = useCallback(() => {
     setLoading(true);
@@ -190,7 +190,10 @@ export default function GaleriPage() {
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {visibleRows.map((row) => {
             const src = assetUrl(row.gambar);
-            const gambarRusak = gagalDimuat[row.id] === true;
+            // Path masuk ke key agar unggahan pengganti pada entri yang sama
+            // dapat tampil setelah gambar lama pernah gagal dimuat.
+            const imageKey = `${row.id}:${row.gambar}`;
+            const gambarRusak = gagalDimuat[imageKey] === true;
             return (
               <article
                 key={row.id}
@@ -206,7 +209,7 @@ export default function GaleriPage() {
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       unoptimized
                       onError={() =>
-                        setGagalDimuat((previous) => ({ ...previous, [row.id]: true }))
+                        setGagalDimuat((previous) => ({ ...previous, [imageKey]: true }))
                       }
                     />
                   ) : (
