@@ -6,6 +6,7 @@ import {
   mapFasilitas,
   mapGaleri,
   mapGuru,
+  mapHubIndustri,
   mapPengumuman,
   type AgendaDTO,
   type AgendaView,
@@ -19,6 +20,8 @@ import {
   type GaleriView,
   type GuruDTO,
   type GuruView,
+  type HubIndustriDTO,
+  type HubIndustriView,
   type JadwalDataDTO,
   type PengumumanDTO,
   type PengumumanView,
@@ -189,6 +192,13 @@ export async function getFasilitas(options: { unggulan?: boolean } = {}): Promis
   const result = await request<FasilitasDTO[]>(`api/fasilitas/index.php${query}`);
   return result.data
     ? { data: result.data.map((item) => mapFasilitas(item, backendUrl())), error: null }
+    : { data: null, error: result.error };
+}
+
+export async function getHubIndustri(): Promise<ApiResult<HubIndustriView[]>> {
+  const result = await request<HubIndustriDTO[]>("api/hub-industri/index.php?public=1");
+  return result.data
+    ? { data: result.data.map((item) => mapHubIndustri(item, backendUrl())), error: null }
     : { data: null, error: result.error };
 }
 

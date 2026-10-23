@@ -1,30 +1,66 @@
 import Image from "next/image";
-import { ArrowUpRight, Building2, Mail, MapPin, Phone } from "lucide-react";
+import { ArrowUpRight, Building2, MapPin } from "lucide-react";
+import type { HubIndustriView } from "@/lib/shared/mappers";
 
-export default function HubIndustri() {
+export default function HubIndustri({
+  mitra,
+  error,
+}: {
+  mitra: HubIndustriView[];
+  error: string | null;
+}) {
   return (
     <section id="hub-industri" aria-labelledby="hub-industri-heading" className="scroll-mt-32 w-full px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop">
       <div className="mx-auto max-w-container-max">
-        <div className="max-w-2xl">
-          <p className="font-label-sm font-bold uppercase tracking-wider text-secondary">Kolaborasi dan karier</p>
-          <h2 id="hub-industri-heading" className="mt-2 font-headline-md text-headline-md font-bold text-primary">Hub Industri</h2>
-          <p className="mt-2 text-body-md text-on-surface-variant">Hubungi sekolah untuk informasi kemitraan, sinkronisasi kompetensi, praktik kerja lapangan, dan peluang kolaborasi.</p>
+        <div className="mx-auto mb-space-xl max-w-3xl text-center">
+          <span aria-hidden className="mx-auto mb-3 block h-1 w-20 rounded-full bg-[#c8102e]" />
+          <h2 id="hub-industri-heading" className="font-headline-md text-headline-md font-bold text-primary">
+            Kolaborasi Nyata untuk <span className="text-[#c8102e]">Generasi Digital yang Siap Bersaing.</span>
+          </h2>
+          <p className="mt-3 text-body-sm text-on-surface-variant">Kenali mitra industri dan peluang kolaborasi pembelajaran SMKN 24 Jakarta.</p>
         </div>
-        <article className="mt-space-lg grid overflow-hidden rounded-3xl border border-surface-container bg-surface-container-lowest shadow-sm md:grid-cols-[minmax(15rem,0.8fr)_1.2fr]">
-          <div className="flex min-h-52 items-center justify-center bg-surface-container-low p-space-xl">
-            <Image src="/logo-smkn24.png" alt="Logo SMKN 24 Jakarta" width={120} height={120} className="h-24 w-24 object-contain" />
+
+        <div className="grid gap-gutter-md sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex min-h-48 flex-col items-center justify-center rounded-2xl bg-[#c8102e] p-space-lg text-center text-white shadow-sm">
+            <Building2 aria-hidden className="size-7" />
+            <p className="mt-4 font-headline-sm text-headline-sm font-bold">Hub Industri</p>
+            <p className="mt-1 max-w-52 text-sm text-white/90">Kolaborasi untuk pengalaman belajar dan kesiapan kerja siswa.</p>
           </div>
-          <div className="p-space-lg md:p-space-xl">
-            <div className="flex items-center gap-2 text-secondary"><Building2 aria-hidden className="size-5" /><span className="text-xs font-bold uppercase tracking-wider">Kontak kemitraan sekolah</span></div>
-            <h3 className="mt-2 font-title-lg text-title-lg font-bold text-primary">SMKN 24 Jakarta</h3>
-            <p className="mt-3 text-body-sm leading-relaxed text-on-surface-variant">Sekolah menerima komunikasi dari mitra industri untuk membahas kebutuhan kompetensi, kegiatan pembelajaran, dan penempatan praktik. Rincian mitra aktif dapat dikonfirmasi langsung kepada sekolah.</p>
-            <p className="mt-4 flex items-start gap-2 text-sm text-on-surface-variant"><MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-primary" />Jalan Bambu Hitam, Bambu Apus, Cipayung, Jakarta Timur, DKI Jakarta</p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <a href="mailto:humassmkn24jakarta@gmail.com" className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-4 py-2 font-label-sm font-bold text-on-primary hover:bg-primary/90"><Mail aria-hidden className="size-4" /> Hubungi via email <ArrowUpRight aria-hidden className="size-4" /></a>
-              <a href="tel:+62218441976" className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-outline-variant px-4 py-2 font-label-sm font-bold text-primary hover:bg-surface-container-low"><Phone aria-hidden className="size-4" />(021) 844-1976</a>
-            </div>
-          </div>
-        </article>
+
+          {mitra.map((item) => {
+            const external = item.linkHref?.startsWith("http") ?? false;
+            return (
+              <article key={item.id} className="flex h-full min-h-48 flex-col rounded-2xl border border-dashed border-slate-300 bg-white p-space-md transition hover:border-[#c8102e]/50 hover:shadow-md">
+                <div className="flex items-center justify-between gap-3">
+                  {item.logo ? (
+                    <Image src={item.logo} alt={`Logo ${item.nama}`} width={120} height={48} className="h-10 max-w-36 object-contain object-left" unoptimized />
+                  ) : (
+                    <span className="grid size-10 place-items-center rounded-lg bg-surface-container-low text-primary"><Building2 aria-hidden className="size-5" /></span>
+                  )}
+                  {item.linkHref && (
+                    <a href={item.linkHref} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} aria-label={`${item.linkLabel || "Kunjungi"} — ${item.nama}`} className="grid size-9 shrink-0 place-items-center rounded-full bg-[#c8102e] text-white transition hover:bg-[#a60d25]">
+                      <ArrowUpRight aria-hidden className="size-4" />
+                    </a>
+                  )}
+                </div>
+                <h3 className="mt-3 font-title-md text-title-md font-bold text-primary">{item.nama}</h3>
+                <p className="mt-1 flex items-start gap-1.5 text-xs leading-relaxed text-on-surface-variant"><MapPin aria-hidden className="mt-0.5 size-3.5 shrink-0" />{item.alamat}</p>
+                <p className="mt-2 flex-1 text-xs leading-relaxed text-on-surface-variant">{item.deskripsi}</p>
+                {item.linkHref && item.linkLabel && (
+                  <a href={item.linkHref} target={external ? "_blank" : undefined} rel={external ? "noopener noreferrer" : undefined} className="mt-3 inline-flex min-h-9 items-center self-start text-xs font-bold text-[#c8102e] hover:underline">
+                    {item.linkLabel} <ArrowUpRight aria-hidden className="ml-1 size-3.5" />
+                  </a>
+                )}
+              </article>
+            );
+          })}
+        </div>
+
+        {error ? (
+          <p role="status" className="mt-4 rounded-xl border border-error-container bg-error-container/30 p-space-md text-sm text-on-error-container">Daftar mitra belum dapat dimuat. {error}</p>
+        ) : mitra.length === 0 ? (
+          <p role="status" className="mt-4 rounded-xl border border-dashed border-surface-container bg-surface-container-lowest p-space-md text-center text-sm text-on-surface-variant">Belum ada mitra industri yang dipublikasikan. Informasi akan ditampilkan setelah ditambahkan melalui admin.</p>
+        ) : null}
       </div>
     </section>
   );

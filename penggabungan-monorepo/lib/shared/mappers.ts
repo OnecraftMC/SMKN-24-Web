@@ -73,6 +73,18 @@ export interface FasilitasDTO {
   unggulan: boolean;
 }
 
+export interface HubIndustriDTO {
+  id: number;
+  nama: string;
+  logo: string | null;
+  alamat: string;
+  deskripsi: string;
+  linkLabel: string | null;
+  linkHref: string | null;
+  urutan: number;
+  aktif: boolean;
+}
+
 export interface EkstrakurikulerDTO {
   id: number;
   nama: string;
@@ -148,6 +160,10 @@ export interface FasilitasView {
   desc: string;
   image: string | null;
   unggulan: boolean;
+}
+
+export interface HubIndustriView extends Omit<HubIndustriDTO, "logo"> {
+  logo: string | null;
 }
 
 export interface EkstrakurikulerView {
@@ -258,6 +274,10 @@ export function mapFasilitas(item: FasilitasDTO, backendUrl: string): FasilitasV
     image: assetUrl(item.gambar, backendUrl),
     unggulan: item.unggulan,
   };
+}
+
+export function mapHubIndustri(item: HubIndustriDTO, backendUrl: string): HubIndustriView {
+  return { ...item, logo: assetUrl(item.logo, backendUrl) };
 }
 
 export function mapEkstrakurikuler(

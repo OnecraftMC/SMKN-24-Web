@@ -25,6 +25,7 @@ use App\Http\Controllers\Api\FasilitasController;
 use App\Http\Controllers\Api\EkstrakurikulerController;
 use App\Http\Controllers\Api\GaleriController;
 use App\Http\Controllers\Api\GuruController;
+use App\Http\Controllers\Api\HubIndustriController;
 use App\Http\Controllers\Api\JadwalController;
 use App\Http\Controllers\Api\KategoriController;
 use App\Http\Controllers\Api\PengumumanController;
@@ -48,6 +49,8 @@ Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'ekstrakurikuler/index.php', Ekst
     ->name('api.ekstrakurikuler.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'guru/index.php', GuruController::class)
     ->name('api.guru.compatibility');
+Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'hub-industri/index.php', HubIndustriController::class)
+    ->name('api.hub-industri.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'galeri/index.php', GaleriController::class)
     ->name('api.galeri.compatibility');
 Route::match(['GET', 'POST', 'DELETE'], 'jadwal/index.php', JadwalController::class)

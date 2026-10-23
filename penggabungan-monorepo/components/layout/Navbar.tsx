@@ -49,19 +49,13 @@ export default function Navbar() {
       ikon: "domain",
       groups: [
         {
-          title: inEnglish ? "About the School" : "Tentang Sekolah",
+          title: inEnglish ? "School Information" : "Informasi Sekolah",
           items: [
             {
               label: inEnglish ? "About the School" : "Tentang Sekolah",
               description: inEnglish ? "School profile, programs, and learning facilities" : "Profil, program, dan fasilitas belajar sekolah",
               href: "/profil#tentang-sekolah",
               ikon: "domain",
-            },
-            {
-              label: inEnglish ? "School Information" : "Informasi Sekolah",
-              description: inEnglish ? "School identity and location" : "Identitas dan lokasi sekolah",
-              href: "/profil#info-sekolah",
-              ikon: "info",
             },
             {
               label: inEnglish ? "School Calendar" : "Kalender Kegiatan",
@@ -89,6 +83,22 @@ export default function Navbar() {
           ],
         },
       ],
+    },
+    {
+      id: "informasi", href: "/berita", label: inEnglish ? "Information" : "Informasi", ikon: "article",
+      groups: [{ title: inEnglish ? "School Information" : "Informasi Sekolah", items: [
+        { label: inEnglish ? "News" : "Berita", description: inEnglish ? "Latest news and school achievements" : "Kabar terbaru dan prestasi sekolah", href: "/berita", ikon: "article" },
+        { label: inEnglish ? "Graduation Information" : "Pengumuman Kelulusan", description: inEnglish ? "Graduation information and alumni records" : "Informasi kelulusan dan data alumni", href: "/pengumuman-kelulusan", ikon: "school" },
+      ] }],
+    },
+    {
+      id: "program", href: "/jurusan", label: inEnglish ? "Programs" : "Program", ikon: "school",
+      groups: [{ title: inEnglish ? "Student Programs" : "Program Siswa", items: [
+        { label: inEnglish ? "Expertise Programs" : "Profil Jurusan / Program Keahlian", description: inEnglish ? "Explore the school's expertise programs" : "Kenali kompetensi keahlian di sekolah", href: "/jurusan", ikon: "school" },
+        { label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler (Eskul)", description: inEnglish ? "Clubs and student activities" : "Klub dan kegiatan pengembangan siswa", href: "/ekstrakurikuler", ikon: "sports_soccer" },
+        { label: inEnglish ? "CCP Education" : "Program Pendidikan CCP", description: "Character, Content & Process", href: "/program/ccp", ikon: "psychology" },
+        { label: "Future Skills Academic", description: inEnglish ? "Industry mentors and future-ready learning" : "Mentor industri dan pengalaman belajar", href: "/program/future-skills", ikon: "lightbulb" },
+      ] }],
     },
     {
       id: "akademik",
@@ -133,22 +143,6 @@ export default function Navbar() {
       ],
     },
     { id: "galeri", href: "/kabar", label: inEnglish ? "Gallery" : "Galeri", ikon: "photo_library" },
-    {
-      id: "program", href: "/jurusan", label: inEnglish ? "Programs" : "Program", ikon: "school",
-      groups: [{ title: inEnglish ? "Student Programs" : "Program Siswa", items: [
-        { label: inEnglish ? "Expertise Programs" : "Profil Jurusan / Program Keahlian", description: inEnglish ? "Explore the school's expertise programs" : "Kenali kompetensi keahlian di sekolah", href: "/jurusan", ikon: "school" },
-        { label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler (Eskul)", description: inEnglish ? "Clubs and student activities" : "Klub dan kegiatan pengembangan siswa", href: "/ekstrakurikuler", ikon: "sports_soccer" },
-        { label: inEnglish ? "CCP Education" : "Program Pendidikan CCP", description: "Character, Content & Process", href: "/program/ccp", ikon: "psychology" },
-        { label: "Future Skills Academic", description: inEnglish ? "Industry mentors and future-ready learning" : "Mentor industri dan pengalaman belajar", href: "/program/future-skills", ikon: "lightbulb" },
-      ] }],
-    },
-    {
-      id: "informasi", href: "/berita", label: inEnglish ? "Information" : "Informasi", ikon: "article",
-      groups: [{ title: inEnglish ? "School Information" : "Informasi Sekolah", items: [
-        { label: inEnglish ? "News" : "Berita", description: inEnglish ? "Latest news and school achievements" : "Kabar terbaru dan prestasi sekolah", href: "/berita", ikon: "article" },
-        { label: inEnglish ? "Graduation Information" : "Pengumuman Kelulusan", description: inEnglish ? "Graduation information and alumni records" : "Informasi kelulusan dan data alumni", href: "/pengumuman-kelulusan", ikon: "school" },
-      ] }],
-    },
   ];
 
   return (

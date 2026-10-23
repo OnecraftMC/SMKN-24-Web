@@ -37,6 +37,9 @@ export default async function Home() {
     <>
       <Hero />
       <Reveal>
+        <QuickHighlights />
+      </Reveal>
+      <Reveal>
         <SambutanKepsek />
       </Reveal>
       <Reveal>
@@ -44,9 +47,6 @@ export default async function Home() {
       </Reveal>
       <Reveal>
         <PapanPengumuman pengumuman={pengumuman} error={pengumumanRes.error} />
-      </Reveal>
-      <Reveal>
-        <QuickHighlights />
       </Reveal>
       <Reveal>
         <section className="w-full px-margin-mobile py-space-4xl md:px-margin-tablet lg:px-margin-desktop">
