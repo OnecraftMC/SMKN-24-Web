@@ -29,7 +29,7 @@ export default function GaleriVisual({
                   width={600}
                   height={800}
                   sizes={galeri.length >= 4 ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 50vw"}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-surface-container-high text-primary" aria-hidden="true">

@@ -19,10 +19,6 @@
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
       rel="stylesheet"
     />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-      rel="stylesheet"
-    />
     <style>
       @layer base {
         html,
@@ -287,7 +283,11 @@
           0 1px 2px rgba(0, 0, 0, 0.6),
           inset 0 1px 1px rgba(255, 255, 255, 0.6);
       }
-      #hotelDoorFrame.door-open .wood-door-left {
+      #hotelDoorFrame:focus-visible,
+.flip-card:focus-visible {
+  outline: 3px solid #ffb95f;
+  outline-offset: 4px;
+}
         transform: translateX(-100%);
       }
       #hotelDoorFrame.door-open .wood-door-right {
@@ -713,7 +713,7 @@
                 >
                   Jurusan
                   <span
-                    class="italic font-display font-normal text-transparent bg-clip-text bg-gradient-to-r from-secondary via-secondary-fixed-dim to-primary"
+                    class="italic font-display font-normal text-secondary"
                     >Perhotelan</span
                   >: Belajar Mengelola dan Melayani.
                 </h1>
@@ -795,7 +795,7 @@
                         class="px-space-sm py-1 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface flex items-center gap-space-xxs font-label-sm text-label-sm"
                       >
                         <span
-                          class="w-2 h-2 rounded-full bg-secondary animate-pulse"
+                          class="w-2 h-2 rounded-full bg-secondary "
                         ></span
                         ><span>Praktik Front Office</span>
                       </div>
@@ -861,7 +861,7 @@
                       class="absolute inset-0 z-30 flex flex-col items-center justify-center gap-space-xs pointer-events-none"
                     >
                       <div
-                        class="w-14 h-14 rounded-full bg-surface-container-lowest/90 backdrop-blur-md flex items-center justify-center text-secondary shadow-xl animate-pulse"
+                        class="w-14 h-14 rounded-full bg-surface-container-lowest/90 backdrop-blur-md flex items-center justify-center text-secondary shadow-xl "
                       >
                         <span class="material-symbols-outlined text-[26px]"
                           >meeting_room</span
@@ -905,7 +905,7 @@
             >
               <div class="flex flex-col gap-1 p-space-xs">
                 <span
-                  class="font-display text-display text-transparent bg-clip-text bg-gradient-to-r from-secondary to-secondary-fixed font-bold leading-none"
+                  class="font-display text-display text-secondary font-bold leading-none"
                   >3</span
                 >
                 <span
@@ -918,7 +918,7 @@
               </div>
               <div class="flex flex-col gap-1 p-space-xs">
                 <span
-                  class="font-display text-display text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-fixed font-bold leading-none"
+                  class="font-display text-display text-primary font-bold leading-none"
                   >3</span
                 >
                 <span
@@ -931,7 +931,7 @@
               </div>
               <div class="flex flex-col gap-1 p-space-xs">
                 <span
-                  class="font-display text-display text-transparent bg-clip-text bg-gradient-to-r from-secondary to-secondary-fixed font-bold leading-none"
+                  class="font-display text-display text-secondary font-bold leading-none"
                   >4</span
                 >
                 <span
@@ -944,7 +944,7 @@
               </div>
               <div class="flex flex-col gap-1 p-space-xs">
                 <span
-                  class="font-display text-display text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary-fixed font-bold leading-none"
+                  class="font-display text-display text-primary font-bold leading-none"
                   >4</span
                 >
                 <span
@@ -1216,7 +1216,7 @@
                       >Room - Public Area - Laundry</span
                     >
                     <div
-                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm animate-pulse"
+                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm "
                     >
                       <span class="material-symbols-outlined text-[16px]"
                         >touch_app</span
@@ -1347,7 +1347,7 @@
                       >Bertemu Tamu Pertama Kali</span
                     >
                     <div
-                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm animate-pulse"
+                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm "
                     >
                       <span class="material-symbols-outlined text-[16px]"
                         >touch_app</span
@@ -1479,7 +1479,7 @@
                       >Pelayanan Restoran</span
                     >
                     <div
-                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm animate-pulse"
+                      class="absolute bottom-space-lg flex items-center gap-space-xxs text-on-surface-variant font-label-sm text-label-sm "
                     >
                       <span class="material-symbols-outlined text-[16px]"
                         >touch_app</span
@@ -2495,8 +2495,8 @@
           >
             <img
               id="lightbox-img"
-              src=""
-              alt=""
+              src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+              alt="Pratinjau galeri kegiatan Perhotelan"
               class="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl opacity-0 transition-opacity duration-200 ease-out"
             />
             <div class="text-center">
