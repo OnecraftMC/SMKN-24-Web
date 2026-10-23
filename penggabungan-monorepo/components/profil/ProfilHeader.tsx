@@ -1,7 +1,7 @@
 import { ShieldCheck } from "lucide-react";
 export default function ProfilHeader() {
   return (
-    <div className="bg-primary text-on-primary py-space-2xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop relative overflow-hidden">
+    <div id="profil-sekolah-header" className="bg-primary text-on-primary py-space-2xl px-margin-mobile md:px-margin-tablet lg:px-margin-desktop relative overflow-hidden">
       <div className="max-w-container-max mx-auto space-y-3 relative z-10">
         <div className="inline-flex items-center gap-2 text-secondary-container font-label-sm font-bold uppercase tracking-wider">
           <ShieldCheck aria-hidden="true" className="micro-icon h-[18px] w-[18px]" />

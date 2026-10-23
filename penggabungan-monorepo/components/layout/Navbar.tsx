@@ -52,10 +52,16 @@ export default function Navbar() {
           title: inEnglish ? "About the School" : "Tentang Sekolah",
           items: [
             {
-              label: inEnglish ? "School Information" : "Informasi Sekolah",
-              description: inEnglish ? "Profile & programs of SMKN 24 Jakarta" : "Profil & program SMKN 24 Jakarta",
-              href: "/profil",
+              label: inEnglish ? "About the School" : "Tentang Sekolah",
+              description: inEnglish ? "School profile, programs, and learning facilities" : "Profil, program, dan fasilitas belajar sekolah",
+              href: "/profil#tentang-sekolah",
               ikon: "domain",
+            },
+            {
+              label: inEnglish ? "School Information" : "Informasi Sekolah",
+              description: inEnglish ? "School identity and location" : "Identitas dan lokasi sekolah",
+              href: "/profil#info-sekolah",
+              ikon: "info",
             },
             {
               label: inEnglish ? "School Calendar" : "Kalender Kegiatan",
@@ -79,12 +85,6 @@ export default function Navbar() {
               description: inEnglish ? "Campus facilities and learning spaces" : "Sorotan sarana prasarana kampus",
               href: "/profil#fasilitas",
               ikon: "apartment",
-            },
-            {
-              label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler",
-              description: inEnglish ? "Student clubs and activities" : "Klub, sanggar & kegiatan siswa",
-              href: "/ekstrakurikuler",
-              ikon: "sports_soccer",
             },
           ],
         },
