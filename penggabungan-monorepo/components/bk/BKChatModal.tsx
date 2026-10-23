@@ -9,7 +9,12 @@ import { useReducedMotion } from "motion/react";
 import { MagicCard } from "@/components/ui/magicui/magic-card";
 import gsap from "gsap";
 import { API_BASE_URL } from "@/lib/admin/api";
-import { getDeviceId } from "./device";
+import {
+  clearActiveConversation,
+  getDeviceId,
+  loadActiveConversation,
+  saveActiveConversation,
+} from "./device";
 import BKHistoryPanel from "./BKHistoryPanel";
 
 type Sender = "user" | "bot";
@@ -56,6 +61,7 @@ export default function BKChatModal({
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [audioClip, setAudioClip] = useState<AudioEvidence | null>(null);
+  const [conversationRestored, setConversationRestored] = useState(false);
   const reduceMotion = useReducedMotion();
 
   const listRef = useRef<HTMLDivElement | null>(null);
@@ -72,6 +78,21 @@ export default function BKChatModal({
   const recordingStreamRef = useRef<MediaStream | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const recordingTimeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const saved = loadActiveConversation();
+    if (saved) {
+      setMessages(saved.messages);
+      setDone(saved.done);
+    }
+    setConversationRestored(true);
+  }, [mounted]);
+
+  useEffect(() => {
+    if (!mounted || !conversationRestored) return;
+    saveActiveConversation({ messages, done });
+  }, [conversationRestored, done, messages, mounted]);
 
   const closeModal = useCallback(() => {
     if (recordingTimeoutRef.current !== null) {
@@ -466,6 +487,12 @@ export default function BKChatModal({
     }
     recordingStreamRef.current?.getTracks().forEach((track) => track.stop());
     audioChunksRef.current = [];
+    clearActiveConversation();
+    setConversationRestored(false);
+    setMessages([{ id: "greeting", sender: "bot", text: GREETING }]);
+    setDone(false);
+    setDraft("");
+    setError(null);
     window.close();
     window.location.replace("about:blank");
   };
