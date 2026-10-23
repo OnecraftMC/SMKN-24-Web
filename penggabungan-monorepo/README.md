@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="../.assets/frontend.svg" alt="Frontend Banner" width="100%">
+</p>
 # SMKN 24 Jakarta — Aplikasi Tunggal (Website Publik + Dashboard Admin)
 
 Salinan **mandiri** dari monorepo: satu aplikasi Next.js yang melayani website
