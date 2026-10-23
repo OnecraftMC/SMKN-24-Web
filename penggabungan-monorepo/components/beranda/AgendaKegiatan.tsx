@@ -1,4 +1,7 @@
-import { CalendarDays, ChevronDown, Clock, History } from "lucide-react";
+"use client";
+
+import { useMemo, useState } from "react";
+import { CalendarDays, ChevronDown, Clock, History, Search, X } from "lucide-react";
 import Badge from "@/components/ui/Badge";
 import Link from "next/link";
 import { formatDateId } from "@/lib/shared/mappers";
@@ -13,6 +16,27 @@ export default function AgendaKegiatan({
   pastAgenda: AgendaView[];
   error: string | null;
 }) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredPastAgenda = useMemo(() => {
+    const query = searchQuery.trim().toLocaleLowerCase("id-ID");
+    if (!query) return pastAgenda;
+
+    return pastAgenda.filter((item) =>
+      [
+        item.title,
+        item.deskripsi,
+        item.lokasi,
+        item.waktu,
+        formatDateId(item.tglMulai),
+        item.tglSelesai ? formatDateId(item.tglSelesai) : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLocaleLowerCase("id-ID")
+        .includes(query),
+    );
+  }, [pastAgenda, searchQuery]);
+
   return (
     <section className="w-full py-space-3xl bg-surface-container-low px-margin-mobile md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto space-y-space-xl">
@@ -43,13 +67,37 @@ export default function AgendaKegiatan({
                     Kegiatan yang sudah selesai.
                   </p>
                 </div>
+                <div className="border-b border-surface-container p-space-sm">
+                  <label htmlFor="past-agenda-search" className="sr-only">Cari agenda lampau</label>
+                  <div className="flex min-h-11 items-center gap-2 rounded-xl border border-outline-variant bg-surface-container-lowest px-3 focus-within:ring-2 focus-within:ring-secondary">
+                    <Search aria-hidden="true" className="size-4 shrink-0 text-on-surface-variant" />
+                    <input
+                      id="past-agenda-search"
+                      type="search"
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.target.value)}
+                      placeholder="Cari judul, tanggal, waktu, atau lokasi"
+                      className="min-w-0 flex-1 bg-transparent font-body-sm text-on-surface outline-none placeholder:text-on-surface-variant"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        aria-label="Hapus pencarian agenda"
+                        className="grid size-8 shrink-0 place-items-center rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary"
+                      >
+                        <X aria-hidden="true" className="size-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
                 {error ? (
                   <p className="px-space-md py-space-lg font-body-sm text-error" role="alert">
                     Agenda lampau belum dapat dimuat: {error}
                   </p>
-                ) : pastAgenda.length > 0 ? (
+                ) : filteredPastAgenda.length > 0 ? (
                   <ul className="max-h-80 divide-y divide-surface-container overflow-y-auto px-space-md">
-                    {pastAgenda.map((item) => (
+                    {filteredPastAgenda.map((item) => (
                       <li key={item.id} className="py-space-sm">
                         <p className="font-label-sm font-bold text-on-surface-variant">
                           {formatDateId(item.tglMulai)}
@@ -73,7 +121,9 @@ export default function AgendaKegiatan({
                   </ul>
                 ) : (
                   <p className="px-space-md py-space-lg font-body-sm text-on-surface-variant" role="status">
-                    Belum ada agenda yang berlalu.
+                    {pastAgenda.length === 0
+                      ? "Belum ada agenda yang berlalu."
+                      : "Agenda tidak ditemukan. Coba kata kunci lain."}
                   </p>
                 )}
               </div>

@@ -1,13 +1,9 @@
 "use client";
-import { Images } from "lucide-react";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Images } from "lucide-react";
 import type { GaleriView } from "@/lib/shared/mappers";
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function GaleriVisual({
   galeri,
@@ -16,100 +12,75 @@ export default function GaleriVisual({
   galeri: GaleriView[];
   error: string | null;
 }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  // Foto lama bisa saja sudah tidak ada di server (404). Catat per id agar
-  // kartu menampilkan placeholder, bukan ikon gambar rusak.
-  const [gagalDimuat, setGagalDimuat] = useState<Record<number, boolean>>({});
-
-  useEffect(() => {
-    const section = sectionRef.current;
-    const viewport = viewportRef.current;
-    const track = trackRef.current;
-    if (!section || !viewport || !track || galeri.length < 2) return;
-
-    const media = gsap.matchMedia();
-    media.add("(min-width: 768px) and (prefers-reduced-motion: no-preference)", () => {
-      const scrollDistance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
-      if (scrollDistance() === 0) return;
-
-      gsap.to(track, {
-        x: () => -scrollDistance(),
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          start: "top top+=120",
-          end: () => `+=${scrollDistance()}`,
-          pin: true,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        },
-      });
-    });
-
-    return () => media.revert();
-  }, [galeri.length]);
+  // Key mencakup path gambar supaya foto pengganti dengan id yang sama tidak
+  // mewarisi status rusak dari unggahan sebelumnya.
+  const [gambarGagal, setGambarGagal] = useState<Record<string, boolean>>({});
 
   return (
     <section
-      ref={sectionRef}
       aria-labelledby="galeri-momen-emas"
-      className="w-full overflow-hidden bg-surface-container-low px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop"
+      className="w-full bg-surface-container-low px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop"
     >
-      <div className="max-w-container-max mx-auto space-y-space-xl">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
-          <div>
-            <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Galeri Foto &amp; Lensa Kampus</span>
-            <h2 id="galeri-momen-emas" className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Dokumentasi Momen Emas Siswa</h2>
+      <div className="mx-auto max-w-container-max space-y-space-xl">
+        <header className="flex flex-wrap items-end justify-between gap-space-md">
+          <div className="max-w-3xl">
+            <span className="font-label-md font-bold uppercase tracking-wider text-secondary">
+              Galeri foto &amp; lensa kampus
+            </span>
+            <h2 id="galeri-momen-emas" className="mt-2 font-headline-lg text-headline-lg font-bold tracking-tight text-primary">
+              Dokumentasi Kegiatan Sekolah
+            </h2>
+            <p className="mt-3 text-body-md leading-relaxed text-on-surface-variant">
+              Lihat kegiatan, karya, dan pengalaman belajar siswa SMKN 24 Jakarta.
+            </p>
           </div>
-        </div>
+          {galeri.length > 0 && (
+            <p className="rounded-full bg-surface-container-high px-3 py-1.5 text-sm font-bold text-on-surface-variant">
+              {galeri.length} foto
+            </p>
+          )}
+        </header>
+
         {galeri.length > 0 ? (
-          <div
-            ref={viewportRef}
-            className="overflow-x-auto overscroll-x-contain pb-3 md:overflow-visible md:pb-0"
-            aria-label="Galeri momen emas siswa, geser untuk melihat foto lainnya"
-          >
-            <div ref={trackRef} className="flex w-max gap-4">
-              {galeri.map((item) => {
-                const gambarRusak = gagalDimuat[item.id] === true;
-                return (
-                  <article
-                    key={item.id}
-                    className="micro-card micro-shine group relative aspect-[4/5] w-[min(70vw,18rem)] shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md md:w-[min(26vw,18rem)]"
-                  >
-                    {item.image && !gambarRusak ? (
-                      <Image
-                        src={item.image}
-                        alt={item.title}
-                        width={480}
-                        height={600}
-                        sizes="(max-width: 767px) 70vw, 26vw"
-                        unoptimized
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        onError={() =>
-                          setGagalDimuat((previous) => ({ ...previous, [item.id]: true }))
-                        }
-                      />
-                    ) : (
-                      <div className="flex h-full flex-col items-center justify-center gap-2 bg-surface-container-high px-4 text-center text-primary" aria-label={`Foto ${item.title} belum tersedia`}>
-                        <Images aria-hidden="true" className="h-9 w-9" />
-                        <span className="text-xs font-semibold text-on-surface-variant">
-                          Foto belum tersedia
-                        </span>
-                      </div>
-                    )}
-                    <span className="absolute inset-x-0 bottom-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
-                      {item.title}
-                    </span>
-                  </article>
-                );
-              })}
-            </div>
-          </div>
+          <ul className="grid grid-cols-1 gap-gutter-md sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {galeri.map((item) => {
+              const imageKey = `${item.id}:${item.image ?? ""}`;
+              const imageFailed = gambarGagal[imageKey] === true;
+              return (
+                <li key={item.id}>
+                  <figure className="h-full overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-surface-container-high">
+                      {item.image && !imageFailed ? (
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                          unoptimized
+                          className="object-cover"
+                          onError={() => setGambarGagal((previous) => ({ ...previous, [imageKey]: true }))}
+                        />
+                      ) : (
+                        <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center text-on-surface-variant" role="img" aria-label={`Foto ${item.title} tidak tersedia`}>
+                          <Images aria-hidden className="size-9" />
+                          <span className="text-sm font-semibold">Foto tidak tersedia</span>
+                        </div>
+                      )}
+                    </div>
+                    <figcaption className="p-space-md">
+                      <p className="font-title-md font-bold text-primary">{item.title}</p>
+                      <p className="mt-2 inline-flex rounded-full bg-surface-container-high px-2.5 py-1 text-xs font-bold text-on-surface-variant">
+                        {item.category}
+                      </p>
+                    </figcaption>
+                  </figure>
+                </li>
+              );
+            })}
+          </ul>
         ) : (
           <p className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
-            {error ? `Galeri belum dapat dimuat: ${error}` : "Belum ada dokumentasi."}
+            {error ? `Galeri belum dapat dimuat: ${error}` : "Belum ada dokumentasi kegiatan."}
           </p>
         )}
       </div>

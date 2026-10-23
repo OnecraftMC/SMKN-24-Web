@@ -1,285 +1,78 @@
-/* =============================================================================
- * micro-motion.css — lapisan gerak mikro lintas halaman.
- *
- * Prinsip:
- *  - Halus, singkat (150–450 ms), dan tidak menggeser tata letak.
- *  - Hanya memakai transform/opacity/filter agar tetap 60fps.
- *  - Semua animasi berhenti saat `prefers-reduced-motion: reduce`.
- *
- * Kelas dipakai komponen publik, admin, dan halaman ekstrakurikuler.
- * ========================================================================== */
-
-@keyframes microFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+/*
+ * Gerak dekoratif sengaja dibatasi. Kartu sambutan pada foto utama menjadi
+ * satu-satunya elemen konten yang mendapat efek hover (lihat Hero.tsx).
+ * Kelas lama tetap netral agar komponen yang belum dibersihkan tidak bergerak.
+ */
+.page-motion,
+.micro-stagger > *,
+.micro-pop,
+.micro-float,
+.micro-float-slow,
+.micro-pulse {
+  animation: none !important;
 }
 
-@keyframes microFadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+.micro-card,
+.micro-row,
+.micro-arrow,
+.micro-icon,
+.micro-cta,
+.micro-table-row,
+.micro-wiggle {
+  transition: none !important;
 }
 
-@keyframes microPop {
-  0% { opacity: 0; transform: scale(0.92); }
-  70% { opacity: 1; transform: scale(1.02); }
-  100% { opacity: 1; transform: scale(1); }
-}
-
-@keyframes microFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
-}
-
-@keyframes microFloatSlow {
-  0%, 100% { transform: translateY(0) translateX(0); }
-  50% { transform: translateY(-12px) translateX(6px); }
-}
-
-@keyframes microPulseSoft {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.72; transform: scale(1.06); }
-}
-
-@keyframes microShineSweep {
-  from { transform: translateX(-140%) skewX(-18deg); }
-  to { transform: translateX(240%) skewX(-18deg); }
-}
-
-@keyframes microArrowNudge {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(4px); }
-}
-
-@keyframes microIconWiggle {
-  0%, 100% { transform: rotate(0deg) scale(1); }
-  35% { transform: rotate(-7deg) scale(1.08); }
-  70% { transform: rotate(5deg) scale(1.04); }
-}
-
-/* Transisi masuk halaman. Dipasang di <main> publik dan admin. */
-.page-motion {
-  animation: microFadeIn 360ms cubic-bezier(0.2, 0, 0, 1) both;
-}
-
-/* Kartu interaktif: naik sedikit, bayangan menguat, border menyala. */
-.micro-card {
-  position: relative;
-  transition:
-    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 260ms ease,
-    border-color 260ms ease,
-    background-color 260ms ease;
-  will-change: transform;
-}
-
-.micro-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 40px -22px rgba(15, 41, 74, 0.4);
-  border-color: color-mix(in srgb, var(--color-primary) 35%, transparent);
-}
-
-.micro-card:active {
-  transform: translateY(-1px) scale(0.992);
-}
-
-/* Kilau tipis melintas saat hover. */
-.micro-shine {
-  isolation: isolate;
-}
-
-.micro-shine::after {
-  content: "";
-  position: absolute;
-  inset: -40% auto -40% -30%;
-  z-index: 1;
-  width: 26%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
-  opacity: 0;
-  transform: translateX(-140%) skewX(-18deg);
-}
-
-.micro-shine:hover::after,
-.micro-shine:focus-visible::after {
-  opacity: 1;
-  animation: microShineSweep 780ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-/* Baris tautan/menu: geser halus + panah mengikuti. */
-.micro-row {
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 200ms ease, color 200ms ease;
-}
-
-.micro-row:hover {
-  transform: translateX(3px);
-}
-
-.micro-arrow {
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 200ms ease;
-}
-
-.micro-row:hover .micro-arrow,
-.micro-card:hover .micro-arrow,
-a:hover > .micro-arrow,
-button:hover > .micro-arrow {
-  transform: translateX(4px);
-}
-
-/* Ikon kecil bereaksi saat induknya disentuh. */
-.micro-icon {
-  transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1), color 200ms ease;
-}
-
+.micro-card:hover,
+.micro-card:active,
+.micro-row:hover,
+.micro-cta:hover,
+.micro-table-row:hover,
 .micro-card:hover .micro-icon,
 .micro-row:hover .micro-icon,
-a:hover > .micro-icon,
-button:hover > .micro-icon {
-  transform: translateY(-1px) rotate(-6deg) scale(1.08);
+.micro-row:hover .micro-arrow,
+.micro-card:hover .micro-arrow,
+.micro-wiggle:hover {
+  transform: none !important;
 }
 
-/* Tombol/tautan utama dengan kilau halus. */
-.micro-cta {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 220ms ease, background-color 200ms ease;
-}
-
-.micro-cta:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 24px -14px rgba(15, 41, 74, 0.55);
-}
-
+.micro-shine::before,
+.micro-shine::after,
 .micro-cta::before {
-  content: "";
-  position: absolute;
-  inset: -60% auto -60% -30%;
-  width: 30%;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  opacity: 0;
-  transform: translateX(-160%) skewX(-18deg);
+  display: none !important;
+  animation: none !important;
 }
 
-.micro-cta:hover::before {
-  opacity: 1;
-  animation: microShineSweep 720ms cubic-bezier(0.2, 0.8, 0.2, 1);
+/* Hanya foto utama beranda yang mendapat sedikit zoom saat hover. */
+.hero-photo-motion img {
+  transition: transform 260ms ease-out !important;
 }
 
-/* Elemen dekoratif mengambang. */
-.micro-float {
-  animation: microFloat 5.5s ease-in-out infinite;
+.hero-photo-motion:hover img {
+  transform: scale(1.035) !important;
 }
 
-.micro-float-slow {
-  animation: microFloatSlow 9s ease-in-out infinite;
+/* Foto di kartu lain tidak membesar atau bergeser saat hover. */
+img:not(.hero-photo-motion img) {
+  transition: none !important;
 }
 
-.micro-pulse {
-  animation: microPulseSoft 2.6s ease-in-out infinite;
+.group:hover img:not(.hero-photo-motion img),
+img:not(.hero-photo-motion img):hover {
+  transform: none !important;
 }
 
-/* Daftar dengan kemunculan bertahap (maks. 10 anak). */
-.micro-stagger > * {
-  /* `backwards`, bukan `both`: setelah animasi selesai gaya dilepas agar
-     transform hover milik kartu (micro-card / hover:-translate-y-*) tetap
-     bekerja. */
-  animation: microFadeUp 420ms cubic-bezier(0.2, 0, 0, 1) backwards;
-}
-
-.micro-stagger > *:nth-child(1) { animation-delay: 20ms; }
-.micro-stagger > *:nth-child(2) { animation-delay: 55ms; }
-.micro-stagger > *:nth-child(3) { animation-delay: 90ms; }
-.micro-stagger > *:nth-child(4) { animation-delay: 125ms; }
-.micro-stagger > *:nth-child(5) { animation-delay: 160ms; }
-.micro-stagger > *:nth-child(6) { animation-delay: 195ms; }
-.micro-stagger > *:nth-child(7) { animation-delay: 230ms; }
-.micro-stagger > *:nth-child(8) { animation-delay: 265ms; }
-.micro-stagger > *:nth-child(9) { animation-delay: 300ms; }
-.micro-stagger > *:nth-child(10) { animation-delay: 335ms; }
-
-/* Kontrol formulir: fokus terasa hidup tanpa mengubah ukuran layout. */
-input,
-textarea,
-select {
-  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
-}
-
-/* Catatan: jangan menimpa box-shadow fokus di sini — field admin sudah punya
-   focus ring sendiri (focus:ring-2). Cukup transisi halus di atas. */
-
-/* Baris tabel/daftar admin ikut bernapas saat disorot. */
-.micro-table-row {
-  transition: background-color 180ms ease, transform 180ms ease;
-}
-
-.micro-table-row:hover {
-  background-color: color-mix(in srgb, var(--color-surface-container-low) 75%, transparent);
-  transform: translateX(2px);
-}
-
-/* Scroll halus untuk tautan anchor di dalam situs. */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-
-  .micro-arrow-auto:hover .micro-arrow,
-  .group:hover .micro-arrow-auto {
-    animation: microArrowNudge 700ms ease-in-out infinite;
-  }
-
-  .micro-wiggle:hover {
-    animation: microIconWiggle 420ms ease-in-out;
-  }
-
-  .micro-pop {
-    animation: microPop 320ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-  }
+/* Skeleton data tetap statis; indikator kerja animate-spin tetap berfungsi. */
+.animate-pulse {
+  animation: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-motion,
-  .micro-stagger > *,
-  .micro-pop,
-  .micro-float,
-  .micro-float-slow,
-  .micro-pulse,
-  .micro-shine::after,
-  .micro-cta::before {
-    animation: none !important;
-  }
-
-  .micro-card,
-  .micro-row,
-  .micro-arrow,
-  .micro-icon,
-  .micro-cta,
-  input,
-  textarea,
-  select,
-  .micro-table-row {
-    transition: none !important;
-  }
-
-  .micro-card:hover,
-  .micro-card:active,
-  .micro-row:hover,
-  .micro-cta:hover,
-  .micro-table-row:hover,
-  .micro-card:hover .micro-icon,
-  .micro-row:hover .micro-icon,
-  .micro-row:hover .micro-arrow,
-  .micro-card:hover .micro-arrow {
-    transform: none !important;
-  }
-
-  .micro-shine::after,
-  .micro-cta::before {
-    display: none;
-  }
-
-  html {
-    scroll-behavior: auto;
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
