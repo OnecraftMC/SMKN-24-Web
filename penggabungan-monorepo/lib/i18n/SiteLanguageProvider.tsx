@@ -59,8 +59,6 @@ export function SiteLanguageProvider({ children }: { children: ReactNode }) {
       records.set(node, { source, translated });
       if (translated !== current) node.nodeValue = translated;
     };
-    const elementRecords = new WeakMap<Element, Map<string, TranslationRecord>>();
-
     const translateSubtree = (root: Node) => {
       if (root.nodeType === Node.TEXT_NODE) {
         translateText(root);
