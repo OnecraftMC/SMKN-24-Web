@@ -1,129 +1,132 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="100%" height="100%">
   <defs>
-    <!-- Dynamic Shifting Linear Gradient -->
-    <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#06B6D4">
-        <animate attributeName="stop-color" values="#06B6D4; #6366F1; #EC4899; #10B981; #06B6D4" dur="7s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="50%" stop-color="#8B5CF6">
-        <animate attributeName="stop-color" values="#8B5CF6; #EC4899; #10B981; #06B6D4; #8B5CF6" dur="7s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="100%" stop-color="#EC4899">
-        <animate attributeName="stop-color" values="#EC4899; #10B981; #06B6D4; #6366F1; #EC4899" dur="7s" repeatCount="indefinite" />
-      </stop>
+    <!-- Dynamic Color Gradient -->
+    <linearGradient id="cyber-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="35%" stop-color="#06B6D4" />
+      <stop offset="70%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#8B5CF6" />
     </linearGradient>
 
-    <!-- Subtle Glass Background Gradient -->
-    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F172A" stop-opacity="0.7" />
-      <stop offset="100%" stop-color="#1E1B4B" stop-opacity="0.4" />
-    </linearGradient>
+    <!-- Grid Pattern for Tech Vibe -->
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1" />
+    </pattern>
 
-    <!-- Glow Filter for High Tech Effect -->
-    <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="8" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <!-- Soft Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
     </filter>
   </defs>
 
   <style>
-    .bg-card {
-      fill: url(#bg-gradient);
-      stroke: rgba(255, 255, 255, 0.12);
-      stroke-width: 1.5px;
-      rx: 20px;
+    .bg {
+      fill: #0B0F19;
+      rx: 16px;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 1.5;
     }
 
-    .main-text {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    .grid-bg {
+      fill: url(#grid);
+    }
+
+    .stroke-text {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
       font-weight: 900;
-      font-size: 76px;
-      letter-spacing: 8px;
-      fill: url(#neon-gradient);
+      font-size: 70px;
+      letter-spacing: 12px;
+      fill: none;
+      stroke: url(#cyber-gradient);
+      stroke-width: 2.5;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: drawText 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
       text-anchor: middle;
       dominant-baseline: central;
     }
 
-    .bracket {
-      font-family: 'Fira Code', 'Courier New', monospace;
-      font-weight: 700;
-      font-size: 54px;
-      fill: #38BDF8;
-      opacity: 0.8;
-      animation: floatBracket 3s ease-in-out infinite alternate;
-    }
-
-    .bracket-left {
-      animation-delay: 0s;
-    }
-
-    .bracket-right {
-      animation-delay: 1.5s;
-    }
-
-    .sub-text {
-      font-family: 'Fira Code', 'Courier New', monospace;
-      font-weight: 600;
-      font-size: 14px;
-      letter-spacing: 5px;
-      fill: #94A3B8;
+    .filled-text {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      font-weight: 900;
+      font-size: 70px;
+      letter-spacing: 12px;
+      fill: url(#cyber-gradient);
+      opacity: 0;
+      animation: fadeInText 0.8s ease forwards 2.2s;
       text-anchor: middle;
-      text-transform: uppercase;
+      dominant-baseline: central;
     }
 
-    .dot-accent {
-      fill: #38BDF8;
-      opacity: 0.4;
-      animation: pulseDot 2s ease-in-out infinite alternate;
+    .terminal-title {
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 12px;
+      fill: #64748B;
+      letter-spacing: 1.5px;
     }
 
-    @keyframes floatBracket {
-      0% { transform: translateY(0px); opacity: 0.5; }
-      100% { transform: translateY(-8px); opacity: 1; }
+    .tag-text {
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 13px;
+      fill: #34D399;
+      letter-spacing: 3px;
+      text-anchor: middle;
     }
 
-    @keyframes pulseDot {
-      0% { opacity: 0.2; transform: scale(0.8); }
-      100% { opacity: 0.8; transform: scale(1.2); }
+    .cursor {
+      fill: #34D399;
+      animation: blink 0.8s infinite alternate;
+    }
+
+    @keyframes drawText {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes fadeInText {
+      to {
+        opacity: 0.95;
+      }
+    }
+
+    @keyframes blink {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
     }
   </style>
 
-  <!-- Container / Frame Glass Card -->
-  <rect x="15" y="15" width="770" height="190" class="bg-card" />
+  <!-- Container Base Card -->
+  <rect x="10" y="10" width="780" height="200" class="bg" />
+  
+  <!-- Subtle Tech Grid -->
+  <rect x="10" y="10" width="780" height="200" class="grid-bg" rx="16" />
 
-  <!-- Decorative Tech Dots Grid -->
-  <g class="dot-accent">
-    <circle cx="50" cy="45" r="2" />
-    <circle cx="65" cy="45" r="2" />
-    <circle cx="80" cy="45" r="2" />
-    <circle cx="50" cy="60" r="2" />
-    <circle cx="65" cy="60" r="2" />
-    
-    <circle cx="720" cy="160" r="2" />
-    <circle cx="735" cy="160" r="2" />
-    <circle cx="750" cy="160" r="2" />
-    <circle cx="735" cy="175" r="2" />
-    <circle cx="750" cy="175" r="2" />
+  <!-- Terminal Window Controls -->
+  <g transform="translate(30, 32)">
+    <circle cx="0" cy="0" r="5" fill="#EF4444" opacity="0.8" />
+    <circle cx="15" cy="0" r="5" fill="#F59E0B" opacity="0.8" />
+    <circle cx="30" cy="0" r="5" fill="#10B981" opacity="0.8" />
   </g>
-
-  <!-- Animated Code Brackets < /> -->
-  <g transform="translate(100, 105)">
-    <text class="bracket bracket-left" text-anchor="middle"><</text>
-  </g>
-  <g transform="translate(700, 105)">
-    <text class="bracket bracket-right" text-anchor="middle">/></text>
-  </g>
+  <text x="400" y="32" class="terminal-title" text-anchor="middle">~/developer/frontend.tsx</text>
 
   <!-- Main Animated Text -->
-  <g transform="translate(400, 95)">
-    <!-- Ambient Glow Layer -->
-    <text class="main-text" filter="url(#neon-glow)" opacity="0.5">FRONTEND</text>
-    <!-- Sharp Foreground Text -->
-    <text class="main-text">FRONTEND</text>
+  <g transform="translate(406, 115)">
+    <!-- Stroke Path Drawing -->
+    <text class="stroke-text" filter="url(#glow)">FRONTEND</text>
+    <!-- Smooth Solid Fill Glow -->
+    <text class="filled-text">FRONTEND</text>
   </g>
 
-  <!-- Subtitle Tagline -->
-  <g transform="translate(400, 155)">
-    <text class="sub-text">ENGINEERING & INTERFACE ARCHITECTURE</text>
+  <!-- Terminal Bottom Command Prompt -->
+  <g transform="translate(400, 172)">
+    <text class="tag-text">
+      <tspan fill="#60A5FA">> </tspan>BUILDING MODERN WEB EXPERIENCE
+      <tspan class="cursor">_</tspan>
+    </text>
   </g>
 </svg>
