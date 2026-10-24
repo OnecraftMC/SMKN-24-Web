@@ -4,182 +4,133 @@
 
 # SMKN 24 Jakarta
 
-Website publik dan dashboard admin SMK Negeri 24 Jakarta. Repository ini menggunakan dua aplikasi Next.js:
+Website publik dan dashboard admin SMK Negeri 24 Jakarta. Aplikasi yang
+digunakan dan dikembangkan saat ini berada di `penggabungan-monorepo/`.
+Folder `apps/main-web/`, `apps/admin/`, dan `packages/` di root adalah
+monorepo versi lama; strukturnya masih tersedia sebagai referensi, tetapi
+bukan source of truth dan tidak selalu memuat fitur terbaru.
 
-- `apps/main-web`: website utama publik.
-- `apps/admin`: dashboard administrasi yang mengakses API `main-web`.
-
-## _Prasyarat_
-
-Pastikan perangkat sudah memiliki Git, Node.js 20 atau lebih baru, npm, dan akun GitHub jika ingin melakukan push ke repository publik.
-
-Periksa instalasi:
-
-```bash
-node --version
-npm --version
-git --version
-```
-
-## Instalasi
-
-Clone repository, lalu masuk ke folder proyek:
-
-```bash
-git clone https://github.com/USERNAME/NAMA-REPOSITORY.git
-cd NAMA-REPOSITORY
-```
-
-Instal dependensi website utama:
-
-```bash
-cd apps/main-web
-npm install
-```
-
-Instal dependensi dashboard admin dari folder root proyek:
-
-```bash
-cd ../admin
-npm install
-```
-
-Tidak perlu menjalankan `npm install` dari root karena file `package.json` berada di masing-masing aplikasi.
-
-## Instalasi shadcn/ui
-
-Jalankan inisialisasi shadcn/ui satu kali dari folder aplikasi yang akan menggunakannya. Script di setiap `package.json` menjalankan perintah `npx shadcn@latest init`.
-
-Untuk website utama:
-
-```bash
-cd apps/main-web
-npm install
-npm run shadcn:init
-```
-
-Untuk dashboard admin:
-
-```bash
-cd apps/admin
-npm install
-npm run shadcn:init
-```
-
-Ikuti inisiasi shadcn/ui sampai selesai. Jalankan perintah dari folder aplikasi terkait agar `components.json`, dependensi, dan konfigurasi dibuat pada aplikasi yang benar. Perintah ini tidak perlu dijalankan setiap kali development server dimulai.
-
-## Environment Variable
-
-Dashboard admin memerlukan URL website utama. Dari folder `apps/admin`, salin file contoh.
-
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-macOS/Linux:
-
-```bash
-cp .env.example .env.local
-```
-
-Isi `apps/admin/.env.local`:
-
-```env
-NEXT_PUBLIC_MAIN_WEB_URL=http://localhost:3000
-```
-
-Jangan commit file `.env.local`, token, password, atau secret ke repository publik. File environment lokal sudah diatur dalam `.gitignore`.
-
-## Menjalankan Saat Development
-
-### Website utama
-
-Dari folder `apps/main-web`:
-
-```bash
-npm run dev
-```
-
-Buka [http://localhost:3000](http://localhost:3000).
-
-### Dashboard admin
-
-Karena port `3000` digunakan website utama, jalankan dashboard admin pada port `3001`. Dari folder `apps/admin`:
-
-```bash
-npm run dev -- -p 3001
-```
-
-Buka [http://localhost:3001](http://localhost:3001).
-
-Jalankan kedua aplikasi secara bersamaan jika ingin menguji alur admin yang terhubung ke API website utama.
-
-## Perintah yang Tersedia
-
-Jalankan perintah dari folder aplikasi terkait:
-
-```bash
-npm run dev      # server development
-npm run lint     # pemeriksaan kode
-npm run build    # build production
-npm run start    # menjalankan hasil build production
-```
-
-Contoh pemeriksaan sebelum deploy:
-
-```bash
-cd apps/main-web
-npm run lint
-npm run build
-```
-
-## Struktur Direktori
+## Struktur repository
 
 ```text
 .
-├── apps/
-│   ├── main-web/    # Website publik dan API
-│   └── admin/       # Dashboard admin
-├── packages/shared/ # Tipe yang digunakan bersama
-├── .assets/         # Aset dokumentasi/proyek
+├── penggabungan-monorepo/  # Aplikasi aktif: Next.js publik + dashboard admin
+│   ├── app/
+│   ├── backend/            # Backend PHP native, direkomendasikan
+│   └── backend-laravel/    # Backend hasil migrasi, masih tertinggal pada beberapa fitur
+├── apps/                   # Aplikasi monorepo lama; bukan target pengembangan aktif
+├── packages/               # Paket monorepo lama
+├── .assets/                # Aset dokumentasi
 └── README.md
 ```
 
-## Push Manual ke GitHub Public Repository
+Untuk fitur, instalasi, perintah, atau konfigurasi aplikasi aktif, lihat
+[penggabungan-monorepo/README.md](penggabungan-monorepo/README.md).
 
-Pastikan file rahasia dan hasil build tidak ikut ter-upload. Periksa terlebih dahulu:
+## Memilih backend
 
-```bash
-git status --short
-git diff -- .gitignore README.md
+Aplikasi aktif dapat diarahkan ke salah satu dari dua backend. **PHP native
+direkomendasikan untuk penggunaan saat ini**, karena menerima sejumlah
+pembaruan yang belum tersedia di Laravel, termasuk Hub Industri. Laravel
+merupakan hasil migrasi yang dapat dipilih untuk pengembangan atau uji migrasi,
+tetapi jangan menganggap fitur dan perilakunya sudah sepenuhnya setara dengan
+PHP.
+
+| Backend | Lokasi | Gunakan saat |
+|---|---|---|
+| PHP native | `penggabungan-monorepo/backend/` | Pilihan yang disarankan untuk mendapatkan fitur terbaru |
+| Laravel | `penggabungan-monorepo/backend-laravel/` | Menguji hasil migrasi atau menjalankan fitur Laravel yang sudah tersedia; periksa gap fitur terlebih dahulu |
+
+Pilih satu backend sebagai API aktif untuk satu proses frontend. Jangan
+mengarahkan API browser dan server ke backend berbeda untuk operasi tulis, dan
+jangan menjalankan dua backend untuk menulis ke database yang sama secara
+bersamaan. Keduanya memakai format kompatibilitas endpoint lama, tetapi
+kesetaraan fitur tidak dijamin.
+
+## Konfigurasi frontend
+
+Atur environment di `penggabungan-monorepo/.env.local` **sebelum** menjalankan
+development server atau build. Variabel `NEXT_PUBLIC_*` ditanam ke bundle saat
+build; perubahan sesudah build memerlukan build ulang.
+
+```env
+# PHP native
+BACKEND_URL=http://127.0.0.1:8000/backend
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000/backend
+NEXT_PUBLIC_ASSET_URL=http://127.0.0.1:8000
+NEXT_PUBLIC_MAIN_WEB_URL=/
 ```
 
-Jika repository GitHub masih kosong, jalankan dari folder root proyek:
+Untuk memilih Laravel, ganti base API browser dan tambahkan URL Laravel
+server-side. Pertahankan URL PHP untuk aset lama seperti
+`/backend/uploads/...`:
 
-```bash
-git init
-git branch -M main
-git remote add origin https://github.com/USERNAME/NAMA-REPOSITORY.git
-git add .
-git status
-git commit -m "Initial project setup"
-git push -u origin main
+```env
+# PHP tetap melayani aset legacy; Laravel menjadi API aktif
+BACKEND_URL=https://domain-anda.id/backend
+LARAVEL_API_URL=http://127.0.0.1:8001
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8001
+NEXT_PUBLIC_ASSET_URL=https://domain-anda.id
+NEXT_PUBLIC_MAIN_WEB_URL=/
 ```
 
-Jika repository lokal sudah terhubung ke GitHub:
+Jika memakai PHP native, hapus atau jangan set `LARAVEL_API_URL`; server
+Next.js akan memakai `BACKEND_URL` sebagai API. Jika API Laravel berada di
+domain lain, ganti kedua URL Laravel dengan origin tersebut. Ikuti CORS dan
+konfigurasi aset pada README aplikasi.
 
-```bash
-git add .
-git status
-git commit -m "Update project"
-git push origin main
+## Pengembangan lokal singkat
+
+Terminal pertama: dari folder aplikasi aktif, jalankan salah satu backend.
+
+```powershell
+cd penggabungan-monorepo
+php -S 127.0.0.1:8000 -t .
 ```
 
-Ganti `USERNAME/NAMA-REPOSITORY` dengan alamat repository GitHubmu. Sebelum menjalankan `git add .`, pastikan tidak ada `.env.local`, password, API key, atau credential lain yang muncul pada `git status`.
-jika anda belum memiliki git, cek di [Prasyarat](#Prasyarat)
+Untuk Laravel, jalankan sebagai gantinya:
 
-## Deploy
+```powershell
+cd penggabungan-monorepo\backend-laravel
+php artisan serve --host=127.0.0.1 --port=8001
+```
 
-Repository publik hanya menyimpan source code dan konfigurasi yang aman. Untuk deploy aplikasi Next.js, gunakan platform yang mendukung Next.js seperti Vercel atau server Node.js. Atur environment variable deployment melalui pengaturan platform tersebut, bukan dengan menulis secret ke source code.
+Terminal kedua: dari `penggabungan-monorepo/`, jalankan frontend:
+
+```powershell
+npm install
+npm run dev
+```
+
+Buka <http://localhost:3000>. Sesuaikan `.env.local` dengan backend yang
+dijalankan. Jangan arahkan operasi tulis lokal ke database produksi.
+
+## Database dan secret
+
+- Untuk database baru, impor `penggabungan-monorepo/backend/database.sql`
+  satu kali ke database yang memang kosong.
+- Untuk database berisi data sekolah, jangan impor ulang `database.sql`.
+  Tinjau migration backend yang dipilih dan buat backup sebelum perubahan
+  schema.
+- Konfigurasi PHP disimpan di `penggabungan-monorepo/backend/.env`;
+  konfigurasi Laravel di `penggabungan-monorepo/backend-laravel/.env`.
+- Gunakan `JWT_SECRET` yang sesuai dengan backend aktif agar token login
+  kompatibel. Simpan credential DB dan kunci AI hanya di environment backend.
+- Kedua backend tidak memiliki guard aplikasi yang menolak operasi tulis
+  berdasarkan environment atau host database. Periksa target database sebelum
+  menjalankan server lokal, CRUD, atau migration.
+- Jangan commit `.env`, `.env.local`, token, password, atau secret.
+
+## Build dan validasi frontend
+
+Jalankan dari `penggabungan-monorepo/`:
+
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run start
+```
+
+README aplikasi aktif memuat detail endpoint, deployment, database, dan
+konfigurasi masing-masing backend.

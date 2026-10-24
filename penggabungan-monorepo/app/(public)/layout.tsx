@@ -1,8 +1,8 @@
 import Navbar from "@/components/layout/Navbar";
 import { Footer } from "@/components/ui/footer-section";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
-import LoadingScreenProvider from "@/components/ui/LoadingScreenProvider";
 import PublicDataRefresh from "@/components/ui/PublicDataRefresh";
+import { SiteLanguageProvider } from "@/lib/i18n/SiteLanguageProvider";
 
 /**
  * Kerangka website publik: Navbar, konten, Footer, dan chatbot.
@@ -15,12 +15,12 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-    <LoadingScreenProvider>
+    <SiteLanguageProvider>
       <PublicDataRefresh />
       <Navbar />
-      <main className="page-motion pt-[112px] md:pt-[120px] lg:pt-[132px] min-h-screen">{children}</main>
+      <main className="min-h-screen pt-[112px] md:pt-[120px] lg:pt-[132px]">{children}</main>
       <Footer />
       <ChatbotWidget />
-    </LoadingScreenProvider>
+    </SiteLanguageProvider>
   );
 }

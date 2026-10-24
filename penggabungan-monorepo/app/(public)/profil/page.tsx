@@ -7,16 +7,17 @@ import HubIndustri from '@/components/profil/HubIndustri';
 import TentangSekolah from '@/components/profil/TentangSekolah';
 import FeaturedNews from '@/components/kabar/FeaturedNews';
 import { Reveal } from '@/components/ui/Reveal';
-import { getAgendaCalendar, getBerita, getFasilitas, getGuru } from '@/lib/api';
+import { getAgendaCalendar, getBerita, getFasilitas, getGuru, getHubIndustri } from '@/lib/api';
 
 export default async function ProfilPage() {
   // Hotnews compact memakai sumber yang sama dengan `/kabar`: `utama: true`.
   // Fetch paralel bersama data profil agar tidak menambah waterfall request.
-  const [guruRes, fasilitasRes, utamaRes, agendaRes] = await Promise.all([
+  const [guruRes, fasilitasRes, utamaRes, agendaRes, hubIndustriRes] = await Promise.all([
     getGuru(),
     getFasilitas({ unggulan: true }),
     getBerita({ utama: true }),
     getAgendaCalendar(),
+    getHubIndustri(),
   ]);
   const guru = guruRes.data ?? [];
   const fasilitas = fasilitasRes.data ?? [];
@@ -46,7 +47,7 @@ export default async function ProfilPage() {
         <DewanGuru guru={guru} error={guruRes.error} />
       </Reveal>
       <Reveal>
-        <HubIndustri />
+        <HubIndustri mitra={hubIndustriRes.data ?? []} error={hubIndustriRes.error} />
       </Reveal>
       <Reveal>
         <FasilitasKampus fasilitas={fasilitas} error={fasilitasRes.error} variant="featured" />

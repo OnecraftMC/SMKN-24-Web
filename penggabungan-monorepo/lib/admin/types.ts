@@ -145,6 +145,18 @@ export interface FasilitasDTO {
   unggulan: boolean;
 }
 
+export interface HubIndustriDTO {
+  id: number;
+  nama: string;
+  logo: string | null;
+  alamat: string;
+  deskripsi: string;
+  linkLabel: string | null;
+  linkHref: string | null;
+  urutan: number;
+  aktif: boolean;
+}
+
 export interface EkstrakurikulerDTO {
   id: number;
   nama: string;

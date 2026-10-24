@@ -7,6 +7,7 @@ import Image from "next/image";
 import MobileMenu from "./MobileMenu";
 import DropdownNav from "./DropdownNav";
 import BKChatModal from "@/components/bk/BKChatModal";
+import { useSiteLanguage } from "@/lib/i18n/SiteLanguageProvider";
 
 /** id dropdown mobile — dipakai tombol toggle untuk `aria-controls`. */
 const MOBILE_MENU_ID = "navbar-mobile-menu";
@@ -16,14 +17,10 @@ export default function Navbar() {
   const [isBKOpen, setIsBKOpen] = useState(false);
   const [indonesiaTime, setIndonesiaTime] = useState("--:--:--");
   const [logoAnimationKey, setLogoAnimationKey] = useState(0);
-  const [language, setLanguage] = useState<"id" | "en">("id");
+  const { language, setLanguage } = useSiteLanguage();
   // Tombol Login mengarah ke `/login` SAME-ORIGIN pada aplikasi gabungan.
   // NEXT_PUBLIC_ADMIN_URL disimpan untuk kasus admin masih dipisah.
   const adminUrl = process.env.NEXT_PUBLIC_ADMIN_URL || '/login';
-
-  useEffect(() => {
-    document.documentElement.lang = language;
-  }, [language]);
 
   useEffect(() => {
     const formatter = new Intl.DateTimeFormat("id-ID", {
@@ -49,19 +46,13 @@ export default function Navbar() {
       ikon: "domain",
       groups: [
         {
-          title: inEnglish ? "About the School" : "Tentang Sekolah",
+          title: inEnglish ? "School Information" : "Informasi Sekolah",
           items: [
             {
               label: inEnglish ? "About the School" : "Tentang Sekolah",
               description: inEnglish ? "School profile, programs, and learning facilities" : "Profil, program, dan fasilitas belajar sekolah",
               href: "/profil#tentang-sekolah",
               ikon: "domain",
-            },
-            {
-              label: inEnglish ? "School Information" : "Informasi Sekolah",
-              description: inEnglish ? "School identity and location" : "Identitas dan lokasi sekolah",
-              href: "/profil#info-sekolah",
-              ikon: "info",
             },
             {
               label: inEnglish ? "School Calendar" : "Kalender Kegiatan",
@@ -89,6 +80,22 @@ export default function Navbar() {
           ],
         },
       ],
+    },
+    {
+      id: "informasi", href: "/berita", label: inEnglish ? "Information" : "Informasi", ikon: "article",
+      groups: [{ title: inEnglish ? "School Information" : "Informasi Sekolah", items: [
+        { label: inEnglish ? "News" : "Berita", description: inEnglish ? "Latest news and school achievements" : "Kabar terbaru dan prestasi sekolah", href: "/berita", ikon: "article" },
+        { label: inEnglish ? "Graduation Information" : "Pengumuman Kelulusan", description: inEnglish ? "Graduation information and alumni records" : "Informasi kelulusan dan data alumni", href: "/pengumuman-kelulusan", ikon: "school" },
+      ] }],
+    },
+    {
+      id: "program", href: "/jurusan", label: inEnglish ? "Programs" : "Program", ikon: "school",
+      groups: [{ title: inEnglish ? "Student Programs" : "Program Siswa", items: [
+        { label: inEnglish ? "Expertise Programs" : "Profil Jurusan / Program Keahlian", description: inEnglish ? "Explore the school's expertise programs" : "Kenali kompetensi keahlian di sekolah", href: "/jurusan", ikon: "school" },
+        { label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler (Eskul)", description: inEnglish ? "Clubs and student activities" : "Klub dan kegiatan pengembangan siswa", href: "/ekstrakurikuler", ikon: "sports_soccer" },
+        { label: inEnglish ? "CCP Education" : "Program Pendidikan CCP", description: "Character, Content & Process", href: "/program/ccp", ikon: "psychology" },
+        { label: "Future Skills Academic", description: inEnglish ? "Industry mentors and future-ready learning" : "Mentor industri dan pengalaman belajar", href: "/program/future-skills", ikon: "lightbulb" },
+      ] }],
     },
     {
       id: "akademik",
@@ -133,22 +140,6 @@ export default function Navbar() {
       ],
     },
     { id: "galeri", href: "/kabar", label: inEnglish ? "Gallery" : "Galeri", ikon: "photo_library" },
-    {
-      id: "program", href: "/jurusan", label: inEnglish ? "Programs" : "Program", ikon: "school",
-      groups: [{ title: inEnglish ? "Student Programs" : "Program Siswa", items: [
-        { label: inEnglish ? "Expertise Programs" : "Profil Jurusan / Program Keahlian", description: inEnglish ? "Explore the school's expertise programs" : "Kenali kompetensi keahlian di sekolah", href: "/jurusan", ikon: "school" },
-        { label: inEnglish ? "Extracurriculars" : "Ekstrakurikuler (Eskul)", description: inEnglish ? "Clubs and student activities" : "Klub dan kegiatan pengembangan siswa", href: "/ekstrakurikuler", ikon: "sports_soccer" },
-        { label: inEnglish ? "CCP Education" : "Program Pendidikan CCP", description: "Character, Content & Process", href: "/program/ccp", ikon: "psychology" },
-        { label: "Future Skills Academic", description: inEnglish ? "Industry mentors and future-ready learning" : "Mentor industri dan pengalaman belajar", href: "/program/future-skills", ikon: "lightbulb" },
-      ] }],
-    },
-    {
-      id: "informasi", href: "/berita", label: inEnglish ? "Information" : "Informasi", ikon: "article",
-      groups: [{ title: inEnglish ? "School Information" : "Informasi Sekolah", items: [
-        { label: inEnglish ? "News" : "Berita", description: inEnglish ? "Latest news and school achievements" : "Kabar terbaru dan prestasi sekolah", href: "/berita", ikon: "article" },
-        { label: inEnglish ? "Graduation Information" : "Pengumuman Kelulusan", description: inEnglish ? "Graduation information and alumni records" : "Informasi kelulusan dan data alumni", href: "/pengumuman-kelulusan", ikon: "school" },
-      ] }],
-    },
   ];
 
   return (
@@ -175,16 +166,23 @@ export default function Navbar() {
             </span>
           </div>
           <div className="flex items-center gap-space-sm">
-            <span className="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold text-[11px] tracking-wide uppercase">
-              {inEnglish ? "Accredited A" : "Terakreditasi A"}
-            </span>
-            <div className="inline-flex rounded-full border border-white/25 p-0.5" aria-label="Pilih bahasa">
+            <div className="language-switcher inline-flex rounded-full border border-white/25 p-0.5" role="group" aria-label="Pilih bahasa">
               {(["id", "en"] as const).map((locale) => (
-                <button key={locale} type="button" lang={locale} aria-pressed={language === locale} onClick={() => setLanguage(locale)} className={`min-h-7 rounded-full px-2 text-[11px] font-bold uppercase transition-colors ${language === locale ? "bg-white text-primary" : "text-surface-container-high hover:bg-white/10"}`}>
+                <button
+                  key={locale}
+                  type="button"
+                  lang={locale}
+                  aria-pressed={language === locale}
+                  onClick={() => setLanguage(locale)}
+                  className={`language-switcher-option min-h-7 rounded-full px-2 text-[11px] font-bold uppercase ${language === locale ? "is-active bg-white text-primary" : "text-surface-container-high hover:bg-white/10"}`}
+                >
                   {locale}
                 </button>
               ))}
             </div>
+            <span className="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-bold text-[11px] tracking-wide uppercase">
+              {inEnglish ? "Accredited A" : "Terakreditasi A"}
+            </span>
             <span className="hidden sm:inline text-surface-container-high">BAN-S/M</span>
             <a
               href={adminUrl}

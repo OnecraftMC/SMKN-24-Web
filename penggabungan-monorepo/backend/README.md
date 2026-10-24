@@ -58,6 +58,10 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    Untuk pilihan berita `Prestasi & Akademik`, jalankan
    `backend/migrations/20261005_add_prestasi_akademik_news_category.sql` satu
    kali setelah migration kategori admin di atas.
+   Untuk Hub Industri, backup dahulu lalu jalankan
+   `backend/migrations/20261023_add_hub_industri.sql` pada database lama.
+   Migration ini hanya menambah tabel mitra; database fresh-install sudah
+   mendapat tabel tersebut dari `database.sql`.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
@@ -173,6 +177,7 @@ backend/
     ├── jadwal/index.php    GET/POST/DELETE (matriks per jurusan & sesi)
     ├── galeri/index.php    GET/POST/PUT/DELETE
     ├── fasilitas/index.php GET/POST/PUT/DELETE
+    ├── hub-industri/index.php GET publik + CRUD admin
     ├── arsip/index.php     CRUD metadata + unduhan arsip publik terkontrol
     ├── prestasi/index.php  POST publik; GET/status + bukti admin-only
     ├── bk/index.php        POST (publik) / GET,PUT,DELETE (admin)

@@ -13,7 +13,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { RefreshCw, TriangleAlert, Phone } from "lucide-react";
+import { Bot, RefreshCw, TriangleAlert, Phone } from "lucide-react";
 import { useAuth } from "@/lib/admin/auth";
 import { apiRequest, getBkWaConfig, isUnauthorized } from "@/lib/admin/api";
 import {
@@ -264,20 +264,20 @@ export default function OverviewPage() {
 
       <ContextStrip units={units} />
 
-      <div className="xl:sticky xl:top-20 xl:self-start">
+      <div className="grid items-stretch gap-space-lg xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,1fr)]">
         <ChatAnalyticsPanel
           state={chatStats}
           periode={periode}
           onPeriodeChange={gantiPeriode}
         />
 
-          {/* Mini ringkasan Chatbot-BK */}
-          <section
-            aria-label="Ringkasan Chatbot-BK untuk Guru BK"
-            className="mt-space-lg rounded-xl border border-outline-variant bg-surface-container-lowest p-space-md"
-          >
-            <h2 className="font-title-sm text-title-sm font-bold text-on-surface mb-space-sm">
-              🤖 {waSummary?.pengirim ?? "Chatbot-BK"}
+        <section
+          aria-label="Ringkasan Chatbot-BK untuk Guru BK"
+          className="flex h-full flex-col rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
+        >
+            <h2 className="mb-space-md flex items-center gap-2 font-title-md text-title-md font-bold text-on-surface">
+              <span className="grid size-9 place-items-center rounded-xl bg-primary/10 text-primary"><Bot aria-hidden className="size-5" /></span>
+              {waSummary?.pengirim ?? "Chatbot-BK"}
             </h2>
             {waSummaryError ? (
               <p className="font-body-sm text-body-sm text-on-error-container">
@@ -288,7 +288,7 @@ export default function OverviewPage() {
                 Memuat…
               </p>
             ) : (
-              <div className="space-y-space-sm">
+              <div className="flex-1 space-y-space-md">
                 <div className="flex items-baseline justify-between gap-space-sm">
                   <span className="font-label-sm text-label-sm text-on-surface-variant">
                     Status
@@ -345,18 +345,17 @@ export default function OverviewPage() {
             )}
             <Link
               href="/admin/bk"
-              className="mt-space-sm inline-flex items-center gap-1 font-label-sm text-label-sm font-bold text-primary underline underline-offset-4 hover:text-secondary"
+              className="mt-space-lg inline-flex min-h-11 items-center gap-1 self-start font-label-sm text-label-sm font-bold text-primary underline underline-offset-4 hover:text-secondary"
             >
               <Phone className="h-3.5 w-3.5" />
               Buka ruang {waSummary?.pengirim ?? "Chatbot-BK"}
             </Link>
-          </section>
-        </div>
+        </section>
+      </div>
 
       <p className="flex items-center gap-1.5 font-body-sm text-body-sm text-on-surface-variant">
         <RefreshCw aria-hidden className="h-3.5 w-3.5" />
-        Ringkasan modul konten dipindahkan ke lencana rail kiri; jumlah di sana
-        mengikuti sumber yang sama dengan halaman ini.
+        Gunakan muat ulang untuk mengambil pembaruan terbaru dari sumber data sekolah.
       </p>
     </div>
   );

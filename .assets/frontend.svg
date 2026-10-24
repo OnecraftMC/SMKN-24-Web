@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="100%" height="100%">
+  <defs>
+    <!-- Dynamic Color Gradient -->
+    <linearGradient id="cyber-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="35%" stop-color="#06B6D4" />
+      <stop offset="70%" stop-color="#3B82F6" />
+      <stop offset="100%" stop-color="#8B5CF6" />
+    </linearGradient>
+
+    <!-- Grid Pattern for Tech Vibe -->
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1" />
+    </pattern>
+
+    <!-- Soft Glow Filter -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    .bg {
+      fill: #0B0F19;
+      rx: 16px;
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 1.5;
+    }
+
+    .grid-bg {
+      fill: url(#grid);
+    }
+
+    .stroke-text {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      font-weight: 900;
+      font-size: 70px;
+      letter-spacing: 12px;
+      fill: none;
+      stroke: url(#cyber-gradient);
+      stroke-width: 2.5;
+      stroke-dasharray: 600;
+      stroke-dashoffset: 600;
+      animation: drawText 2.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .filled-text {
+      font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
+      font-weight: 900;
+      font-size: 70px;
+      letter-spacing: 12px;
+      fill: url(#cyber-gradient);
+      opacity: 0;
+      animation: fadeInText 0.8s ease forwards 2.2s;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+
+    .terminal-title {
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 12px;
+      fill: #64748B;
+      letter-spacing: 1.5px;
+    }
+
+    .tag-text {
+      font-family: 'Fira Code', 'JetBrains Mono', monospace;
+      font-size: 13px;
+      fill: #34D399;
+      letter-spacing: 3px;
+      text-anchor: middle;
+    }
+
+    .cursor {
+      fill: #34D399;
+      animation: blink 0.8s infinite alternate;
+    }
+
+    @keyframes drawText {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes fadeInText {
+      to {
+        opacity: 0.95;
+      }
+    }
+
+    @keyframes blink {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+  </style>
+
+  <!-- Container Base Card -->
+  <rect x="10" y="10" width="780" height="200" class="bg" />
+  
+  <!-- Subtle Tech Grid -->
+  <rect x="10" y="10" width="780" height="200" class="grid-bg" rx="16" />
+
+  <!-- Terminal Window Controls -->
+  <g transform="translate(30, 32)">
+    <circle cx="0" cy="0" r="5" fill="#EF4444" opacity="0.8" />
+    <circle cx="15" cy="0" r="5" fill="#F59E0B" opacity="0.8" />
+    <circle cx="30" cy="0" r="5" fill="#10B981" opacity="0.8" />
+  </g>
+  <text x="400" y="32" class="terminal-title" text-anchor="middle">~/developer/frontend.tsx</text>
+
+  <!-- Main Animated Text -->
+  <g transform="translate(406, 115)">
+    <!-- Stroke Path Drawing -->
+    <text class="stroke-text" filter="url(#glow)">FRONTEND</text>
+    <!-- Smooth Solid Fill Glow -->
+    <text class="filled-text">FRONTEND</text>
+  </g>
+
+  <!-- Terminal Bottom Command Prompt -->
+  <g transform="translate(400, 172)">
+    <text class="tag-text">
+      <tspan fill="#60A5FA">> </tspan>BUILDING MODERN WEB EXPERIENCE
+      <tspan class="cursor">_</tspan>
+    </text>
+  </g>
+</svg>

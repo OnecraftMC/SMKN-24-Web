@@ -1,6 +1,3 @@
-"use client";
-
-import { useScrollReveal } from "@/lib/hooks/useScrollReveal";
 import { ReactNode } from "react";
 
 interface RevealProps {
@@ -9,18 +6,8 @@ interface RevealProps {
   className?: string;
 }
 
-export function Reveal({ children, delay = 0, className = "" }: RevealProps) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-
+export function Reveal({ children, className = "" }: RevealProps) {
   return (
-    <div
-      ref={ref}
-      className={`transition-all duration-700 ease-out ${
-        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-      } ${className}`}
-      style={{ transitionDelay: isVisible ? `${delay}ms` : "0ms" }}
-    >
-      {children}
-    </div>
+    <div className={className}>{children}</div>
   );
 }

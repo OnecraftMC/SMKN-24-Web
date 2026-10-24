@@ -21,11 +21,18 @@ export default function GaleriVisual({
       aria-labelledby="galeri-momen-emas"
       className="w-full bg-surface-container-low px-margin-mobile py-space-3xl md:px-margin-tablet lg:px-margin-desktop"
     >
-      <div className="max-w-container-max mx-auto space-y-space-xl">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
-          <div>
-            <span className="font-label-md uppercase tracking-wider text-secondary font-bold">Galeri Foto &amp; Lensa Kampus</span>
-            <h2 id="galeri-momen-emas" className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Dokumentasi Momen Emas Siswa</h2>
+      <div className="mx-auto max-w-container-max space-y-space-xl">
+        <header className="flex flex-wrap items-end justify-between gap-space-md">
+          <div className="max-w-3xl">
+            <span className="font-label-md font-bold uppercase tracking-wider text-secondary">
+              Galeri foto &amp; lensa kampus
+            </span>
+            <h2 id="galeri-momen-emas" className="mt-2 font-headline-lg text-headline-lg font-bold tracking-tight text-primary">
+              Dokumentasi Kegiatan Sekolah
+            </h2>
+            <p className="mt-3 text-body-md leading-relaxed text-on-surface-variant">
+              Lihat kegiatan, karya, dan pengalaman belajar siswa SMKN 24 Jakarta.
+            </p>
           </div>
         </div>
         <div className={`grid grid-cols-1 ${columns} gap-4`}>

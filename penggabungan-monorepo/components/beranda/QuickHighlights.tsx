@@ -82,7 +82,7 @@ export default function QuickHighlights() {
   }, []);
 
   return (
-    <div className="w-full px-margin-mobile py-space-2xl md:px-margin-tablet lg:px-margin-desktop">
+    <div className="relative z-10 -mt-10 w-full px-margin-mobile pb-space-2xl md:-mt-12 md:px-margin-tablet lg:px-margin-desktop">
       <div className="max-w-container-max mx-auto">
         <div ref={gridRef} className="micro-stagger grid grid-cols-2 lg:grid-cols-4 gap-gutter-sm bg-surface-container-lowest rounded-2xl p-space-md md:p-space-lg shadow-xl shadow-primary/5 border border-surface-container">
           {highlights.map((item, index) => {

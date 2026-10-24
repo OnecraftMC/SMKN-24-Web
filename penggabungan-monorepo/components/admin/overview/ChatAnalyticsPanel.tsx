@@ -258,7 +258,7 @@ export default function ChatAnalyticsPanel({
     return (
       <section
         aria-label="Analisis chatbot"
-        className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
+        className="flex h-full flex-col rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
         aria-busy="true"
       >
         {kepala}
@@ -277,7 +277,7 @@ export default function ChatAnalyticsPanel({
     return (
       <section
         aria-label="Analisis chatbot"
-        className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
+        className="flex h-full flex-col rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
       >
         {kepala}
         <p className="mt-space-sm flex items-start gap-1.5 font-body-sm text-body-sm font-bold text-error">
@@ -306,7 +306,7 @@ export default function ChatAnalyticsPanel({
   return (
     <section
       aria-label="Analisis chatbot"
-      className="flex flex-col gap-space-lg rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
+      className="flex h-full flex-col gap-space-lg rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg"
     >
       {kepala}
 
