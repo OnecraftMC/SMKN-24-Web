@@ -23,9 +23,7 @@ export default async function KabarPage() {
       <Reveal>
         <FeaturedNews berita={utama} error={utamaRes.error} />
       </Reveal>
-      <Reveal>
-        <GaleriVisual galeri={galeri} error={galeriError} />
-      </Reveal>
+      <GaleriVisual galeri={galeri} error={galeriError} />
       <Reveal>
         <FormAspirasi />
       </Reveal>
