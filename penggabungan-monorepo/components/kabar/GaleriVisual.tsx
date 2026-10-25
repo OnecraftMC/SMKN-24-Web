@@ -34,7 +34,7 @@ export default function GaleriVisual({
               Lihat kegiatan, karya, dan pengalaman belajar siswa SMKN 24 Jakarta.
             </p>
           </div>
-        </div>
+        </header>
         <div className={`grid grid-cols-1 ${columns} gap-4`}>
           {galeri.map((item) => {
             const gambarRusak = gagalDimuat[item.id] === true;
