@@ -8,6 +8,7 @@ import {
   mapGuru,
   mapHubIndustri,
   mapPengumuman,
+  assetUrl,
   type AgendaDTO,
   type AgendaView,
   type BeritaDTO,
@@ -199,6 +200,20 @@ export async function getHubIndustri(): Promise<ApiResult<HubIndustriView[]>> {
   const result = await request<HubIndustriDTO[]>("api/hub-industri/index.php?public=1");
   return result.data
     ? { data: result.data.map((item) => mapHubIndustri(item, backendUrl())), error: null }
+    : { data: null, error: result.error };
+}
+
+export async function getStrukturOrganisasi(): Promise<ApiResult<{ gambar: string | null }>> {
+  const result = await request<{ gambar: string | null }>("api/struktur-organisasi/index.php?public=1");
+  return result.data
+    ? {
+        data: {
+          gambar: result.data.gambar?.startsWith("/images/")
+            ? result.data.gambar
+            : assetUrl(result.data.gambar, backendUrl()),
+        },
+        error: null,
+      }
     : { data: null, error: result.error };
 }
 

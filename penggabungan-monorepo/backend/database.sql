@@ -210,6 +210,19 @@ CREATE TABLE IF NOT EXISTS hub_industri (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------------------------
+-- Struktur organisasi sekolah (satu gambar JPEG yang dikelola admin)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS struktur_organisasi (
+  id TINYINT UNSIGNED PRIMARY KEY,
+  gambar VARCHAR(500) DEFAULT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+INSERT INTO struktur_organisasi (id, gambar)
+VALUES (1, '/images/struktur-organisasi.jpeg')
+ON DUPLICATE KEY UPDATE id = VALUES(id);
+
+-- -----------------------------------------------------------------------------
 -- Ekstrakurikuler (kegiatan pengembangan bakat siswa)
 -- `logo` menyimpan path unggahan admin (atau aset contoh di /images).
 -- -----------------------------------------------------------------------------

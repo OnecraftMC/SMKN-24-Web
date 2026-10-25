@@ -132,7 +132,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/akademik/pengajuan-prestasi` | Form pengajuan prestasi (tidak ditautkan di navbar) |
 | `/login` | Login admin (origin sama) |
 | `/admin` | Overview dashboard |
-| `/admin/berita` · `pengumuman` · `agenda` · `guru` · `fasilitas` · `ekstrakurikuler` · `galeri` · `jadwal` | Modul CRUD aktif |
+| `/admin/berita` · `pengumuman` · `agenda` · `guru` · `struktur-organisasi` · `fasilitas` · `ekstrakurikuler` · `galeri` · `jadwal` | Modul konten aktif; gambar struktur organisasi dapat diganti dari admin |
 | `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
 | `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
 | `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
@@ -145,6 +145,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 |---|---|
 | `/profil` hanya menampilkan fasilitas berflag `unggulan`; `/fasilitas` menampilkan semua | Flag dikelola di `/admin/fasilitas` (kolom `fasilitas.unggulan`, default `0`) |
 | Ekstrakurikuler punya logo + info pembina/jadwal/lokasi yang bisa diubah admin | Dikelola di `/admin/ekstrakurikuler`; kartu tampil di `/ekstrakurikuler` dan blok unggulan di `/profil`. Endpoint `backend/api/ekstrakurikuler` membuat tabel + data contoh otomatis bila migrasi belum dijalankan; migrasi manual tetap tersedia di `backend/migrations/20261023_add_ekstrakurikuler.sql`. |
+| Struktur organisasi sekolah ditampilkan sebagai gambar di atas Direktori Guru pada `/profil` | Gambar awal tersimpan di `public/images/struktur-organisasi.jpeg`; admin dapat menggantinya di `/admin/struktur-organisasi`. Untuk database lama, jalankan `backend/migrations/20261025_add_struktur_organisasi.sql` sebelum deploy. |
 | Hotnews ringkas muncul di 5 halaman publik | Berita highlight diambil dari backend (`berita.utama`); `/kabar` tetap memakai hero |
 | Widget chatbot punya tombol fullscreen | Tidak memakai Browser Fullscreen API agar tombol Escape tidak bentrok |
 

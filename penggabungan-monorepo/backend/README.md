@@ -62,6 +62,10 @@ frontend Next.js yang sudah ada (`apps/main-web` & `apps/admin`).
    `backend/migrations/20261023_add_hub_industri.sql` pada database lama.
    Migration ini hanya menambah tabel mitra; database fresh-install sudah
    mendapat tabel tersebut dari `database.sql`.
+   Untuk gambar struktur organisasi, backup dahulu lalu jalankan
+   `backend/migrations/20261025_add_struktur_organisasi.sql` pada database lama.
+   Migration ini membuat satu baris pengaturan dengan gambar awal; database
+   fresh-install sudah mendapat tabel dan seed tersebut dari `database.sql`.
 3. Salin `.env.example` menjadi `.env`, lalu isi:
    ```bash
    cp .env.example .env
