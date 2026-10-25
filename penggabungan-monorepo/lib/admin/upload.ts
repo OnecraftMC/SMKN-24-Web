@@ -7,7 +7,7 @@
 
 import { apiUpload } from "@/lib/admin/api";
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB — sama dengan backend
+export const MAX_IMAGE_BYTES = 20 * 1024 * 1024; // 20 MB — sama dengan backend
 
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",

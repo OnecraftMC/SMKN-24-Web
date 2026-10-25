@@ -2,12 +2,12 @@
  * Upload gambar ke backend (`POST /api/upload.php`, field `gambar`).
  *
  * Validasi klien di sini hanya untuk UX cepat; backend tetap validator final
- * (MIME via finfo + maksimum 5 MB) dan bisa menolak dengan pesan `{ error }`.
+ * (MIME via finfo + maksimum 20 MB) dan bisa menolak dengan pesan `{ error }`.
  */
 
 import { apiUpload } from "@/lib/api";
 
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB — sama dengan backend
+export const MAX_IMAGE_BYTES = 20 * 1024 * 1024; // 20 MB — sama dengan backend
 
 export const ALLOWED_IMAGE_TYPES = [
   "image/jpeg",
@@ -24,7 +24,7 @@ export function validateImageFile(file: File): void {
     throw new Error("Format gambar harus JPG, PNG, WEBP, atau GIF.");
   }
   if (file.size > MAX_IMAGE_BYTES) {
-    throw new Error("Ukuran gambar maksimal 5 MB.");
+    throw new Error("Ukuran gambar maksimal 20 MB.");
   }
 }
 

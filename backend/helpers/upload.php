@@ -26,9 +26,9 @@ function handleImageUpload(string $fieldName = 'gambar'): ?string
         jsonError('Tipe file tidak didukung. Gunakan JPG, PNG, WEBP, atau GIF.', 400);
     }
 
-    $maxSize = 5 * 1024 * 1024; // 5 MB
+    $maxSize = 20 * 1024 * 1024; // 20 MB
     if ($file['size'] > $maxSize) {
-        jsonError('Ukuran file maksimal 5MB.', 400);
+        jsonError('Ukuran file maksimal 20MB.', 400);
     }
 
     if (!is_dir(UPLOAD_DIR)) {

@@ -1,8 +1,9 @@
 "use client";
 
+import { Images } from "lucide-react";
+
 import { useState } from "react";
 import Image from "next/image";
-import { Images } from "lucide-react";
 import type { GaleriView } from "@/lib/shared/mappers";
 
 export default function GaleriVisual({
@@ -12,9 +13,10 @@ export default function GaleriVisual({
   galeri: GaleriView[];
   error: string | null;
 }) {
-  // Key mencakup path gambar supaya foto pengganti dengan id yang sama tidak
-  // mewarisi status rusak dari unggahan sebelumnya.
-  const [gambarGagal, setGambarGagal] = useState<Record<string, boolean>>({});
+  const columns = galeri.length >= 4 ? "md:grid-cols-4" : "md:grid-cols-2";
+  // Foto lama bisa saja sudah tidak ada di server (404). Catat per id agar
+  // kartu menampilkan placeholder, bukan ikon gambar rusak.
+  const [gagalDimuat, setGagalDimuat] = useState<Record<number, boolean>>({});
 
   return (
     <section
@@ -34,55 +36,48 @@ export default function GaleriVisual({
               Lihat kegiatan, karya, dan pengalaman belajar siswa SMKN 24 Jakarta.
             </p>
           </div>
-          {galeri.length > 0 && (
-            <p className="rounded-full bg-surface-container-high px-3 py-1.5 text-sm font-bold text-on-surface-variant">
-              {galeri.length} foto
+        </header>
+        <div className={`grid grid-cols-1 ${columns} gap-4`}>
+          {galeri.map((item) => {
+            const gambarRusak = gagalDimuat[item.id] === true;
+            return (
+              <article
+                key={item.id}
+                className="micro-card micro-shine group relative aspect-[4/5] w-full shrink-0 overflow-hidden rounded-3xl border border-surface-container shadow-md"
+              >
+                {item.image && !gambarRusak ? (
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={600}
+                    height={800}
+                    sizes={galeri.length >= 4 ? "(max-width: 768px) 100vw, 25vw" : "(max-width: 768px) 100vw, 50vw"}
+                    unoptimized
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={() =>
+                      setGagalDimuat((previous) => ({ ...previous, [item.id]: true }))
+                    }
+                  />
+                ) : (
+                  <div className="flex h-full flex-col items-center justify-center gap-2 bg-surface-container-high px-4 text-center text-primary" aria-label={`Foto ${item.title} belum tersedia`}>
+                    <Images aria-hidden="true" className="h-9 w-9" />
+                    <span className="text-xs font-semibold text-on-surface-variant">
+                      Foto belum tersedia
+                    </span>
+                  </div>
+                )}
+                <span className="absolute inset-x-0 bottom-0 bg-primary/80 px-3 py-2 text-sm font-semibold text-surface">
+                  {item.title}
+                </span>
+              </article>
+            );
+          })}
+          {galeri.length === 0 && (
+            <p className="col-span-full rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+              {error ? `Galeri belum dapat dimuat: ${error}` : "Belum ada dokumentasi."}
             </p>
           )}
-        </header>
-
-        {galeri.length > 0 ? (
-          <ul className="grid grid-cols-1 gap-gutter-md sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {galeri.map((item) => {
-              const imageKey = `${item.id}:${item.image ?? ""}`;
-              const imageFailed = gambarGagal[imageKey] === true;
-              return (
-                <li key={item.id}>
-                  <figure className="h-full overflow-hidden rounded-2xl border border-surface-container bg-surface-container-lowest shadow-sm">
-                    <div className="relative aspect-[4/3] overflow-hidden bg-surface-container-high">
-                      {item.image && !imageFailed ? (
-                        <Image
-                          src={item.image}
-                          alt={item.title}
-                          fill
-                          sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
-                          unoptimized
-                          className="object-cover"
-                          onError={() => setGambarGagal((previous) => ({ ...previous, [imageKey]: true }))}
-                        />
-                      ) : (
-                        <div className="flex h-full flex-col items-center justify-center gap-2 px-4 text-center text-on-surface-variant" role="img" aria-label={`Foto ${item.title} tidak tersedia`}>
-                          <Images aria-hidden className="size-9" />
-                          <span className="text-sm font-semibold">Foto tidak tersedia</span>
-                        </div>
-                      )}
-                    </div>
-                    <figcaption className="p-space-md">
-                      <p className="font-title-md font-bold text-primary">{item.title}</p>
-                      <p className="mt-2 inline-flex rounded-full bg-surface-container-high px-2.5 py-1 text-xs font-bold text-on-surface-variant">
-                        {item.category}
-                      </p>
-                    </figcaption>
-                  </figure>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
-            {error ? `Galeri belum dapat dimuat: ${error}` : "Belum ada dokumentasi kegiatan."}
-          </p>
-        )}
+        </div>
       </div>
     </section>
   );
