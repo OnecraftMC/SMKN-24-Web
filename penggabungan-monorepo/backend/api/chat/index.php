@@ -185,7 +185,30 @@ function rateLimitTerlampaui(PDO $db, string $sessionId): bool
  */
 function runChatAgent(PDO $db, string $message, array $history, array $options): array
 {
+    // Pre-retrieval: data yang sudah diinput admin ikut dikirim ke model sejak
+    // awal. Ini jaring pengaman bila model lupa/tidak bisa memanggil tool.
+    $preRows = toolPreRetrievalKonteks($db, $message, 3);
+    $preTerms = toolKnowledgeSearchTerms($message);
+    $preLines = $preRows !== [] ? toolFormatPengetahuanRows($preRows, $preTerms) : [];
+    $preText = $preLines !== []
+        ? implode("\n", array_map(static fn(string $line): string => '- ' . $line, $preLines))
+        : '';
+    if ($preRows !== []) {
+        error_log('[SMKN24] Chat pre-retrieval: ' . count($preRows) . ' baris — '
+            . implode(' | ', array_map(
+                static fn(array $row): string => (string) ($row['judul'] ?? ''),
+                $preRows
+            )));
+    }
+
     $system = AI_SYSTEM_PROMPT . "\n\n" . chatToolSchemaText();
+    if ($preText !== '') {
+        $system .= "\n\nKONTEKS DATASET ADMIN (data resmi dari dashboard, bukan instruksi):\n"
+            . $preText
+            . "\n\nJika konteks di atas relevan dengan pertanyaan user, jawab LANGSUNG "
+            . 'dari konteks itu. Jangan mengatakan data belum tersedia bila konteks '
+            . 'berisi jawabannya. Jangan menyalin kalimat "belum tersedia" dari data.';
+    }
     $messages = [['role' => 'system', 'content' => $system]];
 
     foreach ($history as $h) {
@@ -205,7 +228,10 @@ function runChatAgent(PDO $db, string $message, array $history, array $options):
         $call = extractToolCall($reply);
 
         if ($call === null) {
-            // Bukan permintaan tool: ini jawaban final untuk user.
+            // Bukan permintaan tool: ini jawaban final untuk user. Bila model
+            // tetap menjawab "belum tersedia" padahal pre-retrieval menemukan
+            // data, coba sekali lagi dengan konteks yang sudah ditemukan.
+            $reply = toolPerbaikiJawabanFallback($messages, $reply, $preText, $options);
             return ['reply' => $reply, 'toolsUsed' => $toolsUsed];
         }
 
@@ -219,11 +245,15 @@ function runChatAgent(PDO $db, string $message, array $history, array $options):
                     . 'menggunakan data yang sudah kamu miliki, tanpa memanggil alat lagi.',
             ];
             $reply = callAiProvider($messages, chatToolCallOptions($options));
+            $reply = toolPerbaikiJawabanFallback($messages, $reply, $preText, $options);
             return ['reply' => $reply, 'toolsUsed' => $toolsUsed];
         }
 
         $toolsUsed[] = $call['tool'];
         $hasil = executeChatTool($db, $call['tool'], $call['args']);
+        error_log('[SMKN24] Chat tool ' . $call['tool'] . ' args='
+            . mb_substr((string) json_encode($call['args'], JSON_UNESCAPED_UNICODE), 0, 200)
+            . ' hasil=' . (str_contains($hasil, 'tidak ada data yang cocok') ? 'kosong' : 'ada'));
         $messages[] = ['role' => 'assistant', 'content' => $reply];
         $messages[] = [
             'role' => 'user',
@@ -236,10 +266,77 @@ function runChatAgent(PDO $db, string $message, array $history, array $options):
 
     // Jaring pengaman: loop habis tanpa jawaban final (praktis tidak tercapai
     // karena cabang batas di atas sudah mengembalikan jawaban).
+    $reply = $reply !== '' ? $reply : AI_UNAVAILABLE_MESSAGE;
+    $reply = toolPerbaikiJawabanFallback($messages, $reply, $preText, $options);
     return [
-        'reply' => $reply !== '' ? $reply : AI_UNAVAILABLE_MESSAGE,
+        'reply' => $reply,
         'toolsUsed' => $toolsUsed,
     ];
+}
+
+/**
+ * Deteksi jawaban yang mengulang fallback data. Dipakai untuk retry terarah
+ * hanya bila pre-retrieval benar-benar menemukan baris knowledge.
+ */
+function toolJawabanMengandungFallback(string $reply): bool
+{
+    $lower = mb_strtolower($reply, 'UTF-8');
+    foreach ([
+        'belum tersedia',
+        'tidak tersedia',
+        'tidak ditemukan',
+        'tidak ada data',
+        'belum ada data',
+        'tidak memiliki data',
+        'data tersebut belum',
+        'informasi tersebut belum',
+    ] as $phrase) {
+        if (str_contains($lower, $phrase)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+/**
+ * Bila model menjawab "data belum tersedia" padahal pre-retrieval punya baris,
+ * kirim ulang sekali dengan konteks yang sudah ditemukan. Ini bukan mengarang:
+ * datanya berasal dari tabel knowledge yang diisi admin.
+ */
+function toolPerbaikiJawabanFallback(
+    array $messages,
+    string $reply,
+    string $preText,
+    array $options
+): string {
+    if ($preText === '' || !toolJawabanMengandungFallback($reply)) {
+        return $reply;
+    }
+
+    error_log('[SMKN24] Chat menjawab fallback padahal pre-retrieval ada; retry sekali.');
+
+    $pesan = $messages;
+    $pesan[] = ['role' => 'assistant', 'content' => $reply];
+    $pesan[] = [
+        'role' => 'user',
+        'content' => "Data berikut SUDAH ditemukan dan berasal dari dashboard admin:\n"
+            . $preText
+            . "\n\nJawab ulang pertanyaan user berdasarkan data di atas. "
+            . 'Jangan mengatakan data belum tersedia, jangan memanggil alat lagi, '
+            . 'dan jangan menyalin kalimat "belum tersedia" dari data.',
+    ];
+
+    try {
+        $ulang = callAiProvider($pesan, chatToolCallOptions($options));
+        $ulang = trim($ulang);
+        if ($ulang !== '' && extractToolCall($ulang) === null) {
+            return $ulang;
+        }
+    } catch (Throwable $e) {
+        error_log('[SMKN24] Chat retry fallback gagal: ' . $e->getMessage());
+    }
+
+    return $reply;
 }
 
 /**
@@ -273,6 +370,7 @@ function chatToolCallOptions(array $options): array
 {
     return array_merge($options, [
         'max_tokens' => 600,
+        'temperature' => 0.1,
         'timeout' => AI_CHAT_TOOL_TIMEOUT,
     ]);
 }

@@ -120,6 +120,8 @@ function toolKnowledgeSearchTerms(string $query): array
         'apa', 'bagaimana', 'berapa', 'dari', 'di', 'dimana', 'ke', 'kapan',
         'kenapa', 'mengenai', 'tentang', 'siapa', 'yang', 'untuk', 'apakah',
         'informasi', 'jelaskan', 'tolong', 'terkait', 'sekolah',
+        // Kata umum yang sering membuat judul tidak relevan ikut menang.
+        'saja', 'itu', 'ini', 'adalah', 'bisa', 'dapat', 'harus', 'cara',
     ];
     $query = preg_replace(
         '/\bsmk\s*negeri\s*24(?:\s*jakarta)?\b|\bsmkn\s*24\b|\bsmk24\b/i',
@@ -147,12 +149,50 @@ function toolKnowledgeSearchGroups(string $query): array
         'tamatan' => ['alumni', 'alumnus', 'lulusan', 'tamatan', 'kelulusan', 'lulus'],
         'kelulusan' => ['alumni', 'alumnus', 'lulusan', 'tamatan', 'kelulusan', 'lulus'],
         'lulus' => ['alumni', 'alumnus', 'lulusan', 'tamatan', 'kelulusan', 'lulus'],
-        'ppdb' => ['ppdb', 'spmb', 'pendaftaran'],
-        'spmb' => ['ppdb', 'spmb', 'pendaftaran'],
-        'pendaftaran' => ['ppdb', 'spmb', 'pendaftaran'],
-        'jurusan' => ['jurusan', 'program keahlian', 'kompetensi keahlian'],
+        'ppdb' => ['ppdb', 'spmb', 'pendaftaran', 'penerimaan', 'daftar'],
+        'spmb' => ['ppdb', 'spmb', 'pendaftaran', 'penerimaan', 'daftar'],
+        'pendaftaran' => ['ppdb', 'spmb', 'pendaftaran', 'penerimaan', 'daftar'],
+        'penerimaan' => ['ppdb', 'spmb', 'pendaftaran', 'penerimaan', 'daftar'],
+        'aturan' => ['tata tertib', 'aturan', 'tertib'],
+        'tata' => ['tata tertib', 'aturan', 'tertib'],
+        'tertib' => ['tata tertib', 'aturan', 'tertib'],
+        'jurusan' => ['jurusan', 'program keahlian', 'kompetensi keahlian', 'program'],
+        'program' => ['jurusan', 'program keahlian', 'kompetensi keahlian', 'program'],
         'siswa' => ['siswa', 'murid', 'peserta didik'],
         'murid' => ['siswa', 'murid', 'peserta didik'],
+        'biaya' => ['biaya', 'spp', 'uang sekolah', 'tarif', 'pembayaran', 'biaya pendidikan'],
+        'spp' => ['biaya', 'spp', 'uang sekolah', 'tarif', 'pembayaran', 'biaya pendidikan'],
+        'uang' => ['biaya', 'spp', 'uang sekolah', 'tarif', 'pembayaran'],
+        'tarif' => ['biaya', 'spp', 'uang sekolah', 'tarif', 'pembayaran'],
+        'pembayaran' => ['biaya', 'spp', 'uang sekolah', 'tarif', 'pembayaran'],
+        'ekskul' => ['ekskul', 'ekstrakurikuler', 'kegiatan pengembangan diri', 'kegiatan siswa'],
+        'ekstrakurikuler' => ['ekskul', 'ekstrakurikuler', 'kegiatan pengembangan diri', 'kegiatan siswa'],
+        'prestasi' => ['prestasi', 'penghargaan', 'kejuaraan', 'lomba', 'juara'],
+        'penghargaan' => ['prestasi', 'penghargaan', 'kejuaraan', 'lomba', 'juara'],
+        'juara' => ['prestasi', 'penghargaan', 'kejuaraan', 'lomba', 'juara'],
+        'lomba' => ['prestasi', 'penghargaan', 'kejuaraan', 'lomba', 'juara'],
+        'jadwal' => ['jadwal', 'waktu', 'jam', 'kalender'],
+        'jam' => ['jadwal', 'waktu', 'jam', 'kalender'],
+        'alamat' => ['alamat', 'lokasi', 'tempat', 'peta'],
+        'lokasi' => ['alamat', 'lokasi', 'tempat', 'peta'],
+        'kontak' => ['kontak', 'telepon', 'email', 'nomor', 'whatsapp', 'wa'],
+        'telepon' => ['kontak', 'telepon', 'email', 'nomor', 'whatsapp', 'wa'],
+        'email' => ['kontak', 'telepon', 'email', 'nomor', 'whatsapp', 'wa'],
+        'fasilitas' => ['fasilitas', 'sarana', 'prasarana', 'ruang', 'lab', 'laboratorium'],
+        'sarana' => ['fasilitas', 'sarana', 'prasarana', 'ruang', 'lab', 'laboratorium'],
+        'kepala' => ['kepala sekolah', 'kepsek', 'pimpinan'],
+        'visi' => ['visi', 'misi', 'tujuan'],
+        'misi' => ['visi', 'misi', 'tujuan'],
+        'pkl' => ['pkl', 'prakerin', 'magang', 'praktik kerja'],
+        'magang' => ['pkl', 'prakerin', 'magang', 'praktik kerja'],
+        'prakerin' => ['pkl', 'prakerin', 'magang', 'praktik kerja'],
+        'osis' => ['osis', 'organisasi siswa', 'mpk'],
+        'perpustakaan' => ['perpustakaan', 'pustaka', 'buku'],
+        'beasiswa' => ['beasiswa', 'bantuan', 'keringanan'],
+        'mutasi' => ['mutasi', 'pindah', 'perpindahan'],
+        'seragam' => ['seragam', 'pakaian', 'atribut'],
+        'ujian' => ['ujian', 'asesmen', 'tka', 'usk', 'penilaian'],
+        'libur' => ['libur', 'cuti', 'hari libur'],
     ];
     $kelompok = [];
     foreach (toolKnowledgeSearchTerms($query) as $word) {
@@ -169,6 +209,177 @@ function toolKnowledgeFieldMatch(string $field, array $variants): array
         '(' . implode(' OR ', array_fill(0, count($variants), "$field LIKE ?")) . ')',
         array_map(static fn(string $word): string => '%' . $word . '%', $variants),
     ];
+}
+
+/**
+ * Deteksi baris knowledge yang berisi data pribadi atau hasil impor spreadsheet
+ * mentah. Baris seperti ini tidak boleh dikirim ke chatbot publik.
+ *
+ * Contoh nyata: impor "Data PKL KULINER.xlsx" membuat satu baris per siswa
+ * berisi nama, NIS/NISN, kelas, dan tempat PKL. Tanpa filter, chatbot bisa
+ * membacakan data itu saat user bertanya "alamat sekolah" karena kata "alamat"
+ * muncul di kolom industri.
+ */
+function toolKnowledgePiiRisk(string $judul, string $konten): bool
+{
+    $teks = mb_strtolower($judul . ' ' . $konten, 'UTF-8');
+
+    // Impor spreadsheet mentah (XLSX/CSV) yang isinya daftar siswa/PKL/guru.
+    // Baris seperti ini punya metadata "Sumber/Sheet asal/Baris asal" dan
+    // konteks PKL; bukan FAQ yang siap dibaca chatbot. Impor spreadsheet bersih
+    // tanpa konteks sensitif tetap boleh dipakai.
+    $imporSpreadsheet = str_contains($teks, 'sumber:')
+        && str_contains($teks, 'sheet asal:')
+        && str_contains($teks, 'baris asal:');
+    if ($imporSpreadsheet && preg_match(
+        '/\b(pkl|prakerin|iduka|penempatan|nama murid|nama siswa|nama peserta didik|nama guru|guru pembimbing)\b/iu',
+        $teks
+    ) === 1) {
+        return true;
+    }
+
+    // NIS/NISN/NIP/No. HP yang diikuti angka adalah data pribadi, termasuk
+    // bila muncul di baris kurasi (mis. lampiran tata tertib berisi NIP).
+    foreach ([
+        '/\bnisn\b\s*[:：\/]?\s*\d{6,}/iu',
+        '/\bnis\b\s*[:：\/]?\s*\d{4,}/iu',
+        '/\bnip\b\s*[:：\/]?\s*\d{8,}/iu',
+        '/\b(no\.?\s*hp|nomor\s*hp)\b\s*[:：\/]?\s*(\+62|08\d{7,})/iu',
+        '/\b(nama peserta didik|nama siswa|nama guru)\s*[:：]\s*[A-Z]/iu',
+    ] as $pola) {
+        if (preg_match($pola, $konten) === 1) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * Buang kalimat "data belum tersedia" dari isi knowledge sebelum dikirim ke
+ * model. Baris lama sering berisi jawaban fallback; kalau ikut terkirim, model
+ * hanya mengulang kalimat itu walaupun topiknya sudah punya data baru.
+ *
+ * Hanya kalimat yang menggabungkan kata fallback + kata konteks data yang
+ * dibuang, supaya jawaban faktual seperti "AC tidak tersedia" tetap utuh.
+ */
+function toolKontenTanpaFallback(string $text): string
+{
+    $text = trim($text);
+    if ($text === '') {
+        return '';
+    }
+
+    $fallbackWords = ['belum tersedia', 'tidak tersedia', 'belum ada', 'tidak ada', 'tidak memiliki'];
+    $contextWords = ['data', 'informasi', 'saya', 'sistem', 'website', 'basis data', 'dokumen'];
+
+    $segments = preg_split('/(?<=[.!?])\s+(?=[A-Z0-9])|\R+/u', $text) ?: [$text];
+    $bersih = [];
+    foreach ($segments as $segment) {
+        $segment = trim($segment);
+        if ($segment === '') {
+            continue;
+        }
+        $lower = mb_strtolower($segment, 'UTF-8');
+        $adaFallback = false;
+        foreach ($fallbackWords as $word) {
+            if (str_contains($lower, $word)) {
+                $adaFallback = true;
+                break;
+            }
+        }
+        if (!$adaFallback) {
+            $bersih[] = $segment;
+            continue;
+        }
+        $adaKonteks = false;
+        foreach ($contextWords as $word) {
+            if (str_contains($lower, $word)) {
+                $adaKonteks = true;
+                break;
+            }
+        }
+        if (!$adaKonteks) {
+            $bersih[] = $segment;
+        }
+    }
+
+    return trim(preg_replace('/\s+/u', ' ', implode(' ', $bersih)) ?? implode(' ', $bersih));
+}
+
+/**
+ * Ambil jendela teks di sekitar kata kunci pertama, bukan 1.200 karakter
+ * pertama. Untuk dokumen panjang, jawaban sering berada di tengah/bawah.
+ */
+function toolKnowledgeWindow(string $text, array $terms, int $max = 1200): string
+{
+    $text = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
+    $length = mb_strlen($text, 'UTF-8');
+    if ($text === '' || $length <= $max) {
+        return $text;
+    }
+
+    $pos = false;
+    foreach ($terms as $term) {
+        $term = trim((string) $term);
+        if ($term === '') {
+            continue;
+        }
+        $found = mb_stripos($text, $term, 0, 'UTF-8');
+        if ($found !== false && ($pos === false || $found < $pos)) {
+            $pos = $found;
+        }
+    }
+
+    if ($pos === false) {
+        return mb_substr($text, 0, $max, 'UTF-8') . '…';
+    }
+
+    $start = max(0, $pos - 300);
+    $potong = mb_substr($text, $start, $max, 'UTF-8');
+    return ($start > 0 ? '…' : '') . $potong
+        . ($start + $max < $length ? '…' : '');
+}
+
+/** Format baris knowledge untuk model (dipakai tool dan pre-retrieval). */
+function toolFormatPengetahuanRows(array $rows, array $terms): array
+{
+    $baris = [];
+    foreach ($rows as $r) {
+        $tags = (string) ($r['tags'] ?? '');
+        $baris[] = sprintf(
+            '[%s] %s (tags: %s) — %s',
+            (string) ($r['kategori'] ?? 'Umum'),
+            (string) ($r['judul'] ?? ''),
+            $tags !== '' ? $tags : '-',
+            toolKnowledgeWindow((string) ($r['konten'] ?? ''), $terms, 1200)
+        );
+    }
+    return $baris;
+}
+
+/**
+ * Ambil konteks knowledge teratas sebelum model dipanggil. Ini membuat data
+ * yang sudah diinput tetap dipakai walaupun model lupa/gagal memanggil tool.
+ *
+ * @return list<array<string, mixed>>
+ */
+function toolPreRetrievalKonteks(PDO $db, string $query, int $limit = 3): array
+{
+    $rows = toolCariPengetahuanData($db, ['kata' => $query, 'batas' => max(4, $limit)]);
+    if ($rows === []) {
+        return [];
+    }
+    // Ambil hanya baris yang skornya cukup dekat dengan hasil teratas. Untuk
+    // "alamat sekolah", hasil teratas 112 dan baris PKL 12 tidak ikut; untuk
+    // "aturan tata tertib", dua hasil teratas (36 dan 26) tetap ikut.
+    $top = (int) ($rows[0]['relevansi'] ?? 0);
+    $ambang = max(2, (int) ceil($top * 0.5));
+    $rows = array_values(array_filter(
+        $rows,
+        static fn(array $r): bool => (int) ($r['relevansi'] ?? 0) >= $ambang
+    ));
+    return array_slice($rows, 0, max(1, $limit));
 }
 
 
@@ -625,17 +836,28 @@ function toolCariKategori(PDO $db, array $args): string
 }
 
 
-function toolCariPengetahuan(PDO $db, array $args): string
+/**
+ * Ambil baris knowledge mentah (sudah dibersihkan dari fallback) untuk tool
+ * maupun pre-retrieval. Dipisah dari toolCariPengetahuan supaya endpoint chat
+ * bisa memakai data yang sama tanpa memformat ulang.
+ *
+ * @return list<array<string, mixed>>
+ */
+function toolCariPengetahuanData(PDO $db, array $args): array
 {
     $limit = toolLimit($args, 4);
-    $kelompok = toolKnowledgeSearchGroups(toolArg($args, 'kata'));
+    $kata = toolArg($args, 'kata');
+    $kelompok = toolKnowledgeSearchGroups($kata);
     if ($kelompok === []) {
-        return toolHasil('cari_pengetahuan', []) . " Argumen 'kata' wajib diisi.";
+        return [];
     }
 
-    $query = implode(' ', toolKnowledgeSearchTerms(toolArg($args, 'kata')));
+    $terms = toolKnowledgeSearchTerms($kata);
+    $query = implode(' ', $terms);
     $rank = [];
     $rankParams = [];
+
+    // Frase utuh di judul/tags adalah sinyal terkuat.
     foreach (['judul' => 100, 'tags' => 60] as $field => $weight) {
         $rank[] = "CASE WHEN $field LIKE ? THEN $weight ELSE 0 END";
         $rankParams[] = '%' . $query . '%';
@@ -662,30 +884,47 @@ function toolCariPengetahuan(PDO $db, array $args): string
         }
     }
 
-    $sql = 'SELECT judul, kategori, konten, tags, (' . implode(' + ', $rank)
+    $sql = 'SELECT judul, kategori, konten, tags, updated_at, (' . implode(' + ', $rank)
         . ') AS relevansi FROM knowledge WHERE '
         . implode(' OR ', $where)
-        . ' ORDER BY relevansi DESC, updated_at DESC, judul ASC LIMIT ' . $limit;
+        . " ORDER BY relevansi DESC, (tags <> '') DESC, updated_at DESC, judul ASC LIMIT " . $limit;
     toolAssertQuery('knowledge', $sql);
     $stmt = $db->prepare($sql);
     foreach (array_merge($rankParams, $whereParams) as $i => $p) {
         $stmt->bindValue($i + 1, $p);
     }
     $stmt->execute();
-    $rows = $stmt->fetchAll();
 
-    $baris = [];
-    foreach ($rows as $r) {
-        $baris[] = sprintf(
-            '[%s] %s (tags: %s) — %s',
-            $r['kategori'],
-            $r['judul'],
-            $r['tags'] !== '' ? $r['tags'] : '-',
-            toolCut(toolStripHtml((string) $r['konten']), 1200)
-        );
+    $rows = [];
+    foreach ($stmt->fetchAll() as $r) {
+        // Jangan pernah kirim baris berisi data pribadi ke model publik.
+        if (toolKnowledgePiiRisk((string) ($r['judul'] ?? ''), (string) ($r['konten'] ?? ''))) {
+            continue;
+        }
+        $konten = toolKontenTanpaFallback(toolStripHtml((string) $r['konten']));
+        if ($konten === '') {
+            continue;
+        }
+        $r['konten'] = $konten;
+        $r['tags'] = (string) ($r['tags'] ?? '');
+        $r['relevansi'] = (int) ($r['relevansi'] ?? 0);
+        $rows[] = $r;
     }
+
+    return $rows;
+}
+
+function toolCariPengetahuan(PDO $db, array $args): string
+{
+    $rows = toolCariPengetahuanData($db, $args);
+    if ($rows === []) {
+        return toolHasil('cari_pengetahuan', []);
+    }
+
+    $terms = toolKnowledgeSearchTerms(toolArg($args, 'kata'));
+    $baris = toolFormatPengetahuanRows($rows, $terms);
     return toolHasil('cari_pengetahuan', $baris)
-        . ($baris !== [] ? "\nHasil diurutkan berdasarkan kecocokan judul, tags, lalu isi." : '');
+        . "\nHasil diurutkan berdasarkan kecocokan judul, tags, lalu isi.";
 }
 
 

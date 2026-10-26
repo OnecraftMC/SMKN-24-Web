@@ -250,7 +250,7 @@ function callAiGemini(array $messages, array $options = []): string
 function httpPostJson(string $url, array $payload, array $extraHeaders = [], int $timeoutSeconds = 20): array
 {
     $ch = curl_init($url);
-    curl_setopt_array($ch, [
+    $curlOptions = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST => true,
         CURLOPT_POSTFIELDS => json_encode($payload),
@@ -260,7 +260,19 @@ function httpPostJson(string $url, array $payload, array $extraHeaders = [], int
         // lebih pendek per putaran) supaya provider lambat tetap sempat dibalas
         // dari sini, bukan dipotong proxy menjadi 504.
         CURLOPT_TIMEOUT => max(1, $timeoutSeconds),
-    ]);
+    ];
+
+    // PHP di Windows/local sering tidak punya curl.cainfo sehingga request
+    // provider gagal "unable to get local issuer certificate". Pakai bundle
+    // yang ikut repository bila tersedia; verifikasi TLS tetap AKTIF.
+    if (defined('AI_CA_BUNDLE')) {
+        $caBundle = (string) AI_CA_BUNDLE;
+        if ($caBundle !== '' && is_file($caBundle)) {
+            $curlOptions[CURLOPT_CAINFO] = $caBundle;
+        }
+    }
+
+    curl_setopt_array($ch, $curlOptions);
 
     $responseBody = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);

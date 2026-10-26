@@ -12,6 +12,7 @@ import type {
   KnowledgeKategori,
   KnowledgeListResponse,
   KnowledgePreviewResponse,
+  KnowledgeTestResponse,
 } from "@/lib/admin/types";
 import Badge from "@/components/ui/Badge";
 import {
@@ -256,6 +257,35 @@ export default function DatasetChatbotPage() {
     }
   }
 
+  // --------------------------------------------------------- uji retrieval
+  const [ujiKata, setUjiKata] = useState("");
+  const [ujiBusy, setUjiBusy] = useState(false);
+  const [ujiError, setUjiError] = useState<string | null>(null);
+  const [ujiHasil, setUjiHasil] = useState<KnowledgeTestResponse | null>(null);
+
+  async function jalankanUji() {
+    const kata = ujiKata.trim();
+    if (kata === "") return;
+    setUjiBusy(true);
+    setUjiError(null);
+    setUjiHasil(null);
+    try {
+      const data = await apiRequest<KnowledgeTestResponse>("/api/knowledge/test.php", {
+        method: "POST",
+        body: { kata },
+      });
+      setUjiHasil(data);
+    } catch (err: unknown) {
+      if (isUnauthorized(err)) {
+        logout();
+        return;
+      }
+      setUjiError(err instanceof Error ? err.message : "Gagal menguji retrieval.");
+    } finally {
+      setUjiBusy(false);
+    }
+  }
+
   const totalSelebihnya = total > rows.length;
 
   return (
@@ -283,6 +313,95 @@ export default function DatasetChatbotPage() {
           {error}
         </p>
       )}
+
+      {/* --------------------------------------------------------- uji retrieval */}
+      <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
+        <div className="mb-space-md flex items-center gap-2">
+          <Search aria-hidden className="h-4 w-4 text-secondary" />
+          <h2 className="font-title-sm text-title-sm font-bold text-primary">
+            Uji Retrieval
+          </h2>
+        </div>
+        <p className="mb-space-md font-body-sm text-body-sm text-on-surface-variant">
+          Cek baris data yang akan dibaca chatbot untuk sebuah pertanyaan. Alat ini
+          memakai pencarian yang sama dengan chatbot, tanpa memanggil AI.
+        </p>
+
+        <form
+          className="flex flex-col gap-space-sm sm:flex-row"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void jalankanUji();
+          }}
+        >
+          <label htmlFor="dataset-uji" className="sr-only">
+            Pertanyaan uji
+          </label>
+          <input
+            id="dataset-uji"
+            className={`${fieldClass} flex-1`}
+            placeholder="Contoh: berapa biaya sekolah?"
+            value={ujiKata}
+            onChange={(event) => setUjiKata(event.target.value)}
+            maxLength={500}
+          />
+          <button
+            type="submit"
+            className={buttonPrimaryClass}
+            disabled={ujiBusy || ujiKata.trim() === ""}
+          >
+            {ujiBusy && <Loader2 aria-hidden className="h-4 w-4 animate-spin" />}
+            Uji sekarang
+          </button>
+        </form>
+
+        {ujiError && (
+          <p
+            role="alert"
+            className="mt-space-md rounded-lg bg-error-container px-space-md py-space-sm font-body-sm text-body-sm text-on-error-container"
+          >
+            {ujiError}
+          </p>
+        )}
+
+        {ujiHasil && (
+          <div className="mt-space-md space-y-space-sm" role="status" aria-live="polite">
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              {ujiHasil.total > 0
+                ? `${ujiHasil.total} baris cocok untuk “${ujiHasil.kata}”.`
+                : `Tidak ada baris yang cocok untuk “${ujiHasil.kata}”. Chatbot akan menganggap data ini belum tersedia.`}
+            </p>
+            {ujiHasil.hasil.length > 0 && (
+              <ul className="divide-y divide-surface-container overflow-hidden rounded-lg border border-surface-container bg-surface-container-lowest">
+                {ujiHasil.hasil.map((row, i) => (
+                  <li
+                    key={`${row.judul}-${i}`}
+                    className="flex flex-col gap-1 px-space-md py-space-sm"
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-body-sm text-body-sm font-bold text-primary">
+                        {row.judul}
+                      </span>
+                      <Badge label={row.kategori} variant={VARIANT_KATEGORI[row.kategori]} />
+                      <span className="font-label-sm text-label-sm text-on-surface-variant">
+                        skor {row.relevansi}
+                      </span>
+                    </div>
+                    <p className="font-body-sm text-body-sm text-on-surface-variant">
+                      {row.potongan}
+                    </p>
+                    {row.tags && (
+                      <p className="font-label-sm text-label-sm text-on-surface-variant">
+                        Tags: {row.tags}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+      </section>
 
       {/* ------------------------------------------------------------- unggah */}
       <section className="rounded-2xl border border-surface-container bg-surface-container-lowest p-space-lg shadow-sm">
