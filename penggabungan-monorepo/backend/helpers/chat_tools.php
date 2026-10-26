@@ -400,6 +400,7 @@ function chatToolSchemaText(): string
         . "- cari_galeri {kata?, kategori?, batas?} -> daftar koleksi galeri foto.\n"
         . "- cari_kategori {modul? (berita|pengumuman|guru|galeri|arsip)} -> daftar kategori per modul.\n"
         . "- cari_pengetahuan {kata, batas?} -> dokumen prosedur/fakta sekolah; pencarian memperluas sinonim umum dan mengurutkan hasil paling relevan. Wajib ada argumen 'kata'.\n"
+        . "- cari_spmb {kata} -> informasi SPMB dari cache halaman sumber yang dikonfigurasi. Wajib ada argumen 'kata'.\n"
         . "- baca_halaman_situs {path} -> isi teks halaman publik website (mis. '/', '/profil', '/akademik', '/jurusan/pplg').\n\n"
         . "Contoh pemakaian: balas HANYA dengan {\"tool\": \"cari_agenda\", \"args\": {\"kata\": \"ujian\"}} lalu tunggu hasil.";
 }
@@ -411,6 +412,7 @@ function chatToolRegistry(): array
         'cari_berita' => true, 'cari_pengumuman' => true, 'cari_agenda' => true,
         'cari_guru' => true, 'cari_jadwal' => true, 'cari_fasilitas' => true,
         'cari_galeri' => true, 'cari_kategori' => true, 'cari_pengetahuan' => true,
+        'cari_spmb' => true,
         'baca_halaman_situs' => true,
     ];
 }
@@ -479,6 +481,8 @@ function executeChatTool(PDO $db, string $tool, array $args): string
                 return toolCariKategori($db, $args);
             case 'cari_pengetahuan':
                 return toolCariPengetahuan($db, $args);
+            case 'cari_spmb':
+                return toolCariSpmb($args);
             case 'baca_halaman_situs':
                 return toolBacaHalamanSitus($args);
         }
@@ -498,6 +502,54 @@ function executeChatTool(PDO $db, string $tool, array $args): string
 //   2. memanggil toolAssertQuery() (allowlist + penolak SQL berbahaya);
 //   3. mengembalikan teks lewat toolHasil() (penanda data-bukan-instruksi).
 // -----------------------------------------------------------------------------
+
+/** Cari hanya pada cache SPMB lokal; tool ini tidak melakukan permintaan jaringan. */
+function toolCariSpmb(array $args): string
+{
+    $kata = toolKata(toolArg($args, 'kata'));
+    if ($kata === []) {
+        return toolHasil('cari_spmb', []) . " Argumen 'kata' wajib diisi.";
+    }
+    $cache = function_exists('spmbBacaCache') ? spmbBacaCache() : null;
+    if ($cache === null) {
+        return toolHasil('cari_spmb', []) . ' Cache SPMB belum tersedia.';
+    }
+    $fetchedAt = (string) $cache['fetched_at'];
+    $timestamp = strtotime($fetchedAt);
+    if ($timestamp === false) {
+        return toolHasil('cari_spmb', []) . ' Waktu cache SPMB tidak valid.';
+    }
+    $hoursAgo = max(0, (int) floor((time() - $timestamp) / 3600));
+    $baris = [];
+    foreach ($cache['items'] as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        $text = is_string($item['text'] ?? null) ? $item['text'] : '';
+        $source = is_string($item['source'] ?? null) ? $item['source'] : 'sumber tidak diketahui';
+        if ($text === '') {
+            continue;
+        }
+        $haystack = $text . ' ' . $source;
+        $matched = false;
+        foreach ($kata as $word) {
+            if (stripos($haystack, $word) !== false) {
+                $matched = true;
+                break;
+            }
+        }
+        if ($matched) {
+            $baris[] = sprintf(
+                'Data diambil %s (%d jam lalu) dari %s — %s',
+                $fetchedAt,
+                $hoursAgo,
+                $source,
+                toolCut($text, 1200)
+            );
+        }
+    }
+    return toolHasil('cari_spmb', $baris);
+}
 
 function toolCariBerita(PDO $db, array $args): string
 {
