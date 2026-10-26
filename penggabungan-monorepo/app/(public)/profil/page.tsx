@@ -36,6 +36,12 @@ export default async function ProfilPage() {
         <VisiMisi />
       </Reveal>
       <Reveal>
+        <StrukturOrganisasi gambar={strukturRes.data?.gambar ?? null} />
+      </Reveal>
+      <Reveal>
+        <DewanGuru guru={guru} error={guruRes.error} />
+      </Reveal>
+      <Reveal>
         <KalenderKegiatan events={agendaRes.data ?? []} error={agendaRes.error} />
       </Reveal>
       <Reveal>
@@ -44,12 +50,6 @@ export default async function ProfilPage() {
           berita={utamaRes.data?.[0] ?? null}
           error={utamaRes.error}
         />
-      </Reveal>
-      <Reveal>
-        <StrukturOrganisasi gambar={strukturRes.data?.gambar ?? null} />
-      </Reveal>
-      <Reveal>
-        <DewanGuru guru={guru} error={guruRes.error} />
       </Reveal>
       <Reveal>
         <HubIndustri mitra={hubIndustriRes.data ?? []} error={hubIndustriRes.error} />
