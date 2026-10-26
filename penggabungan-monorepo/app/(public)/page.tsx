@@ -5,17 +5,19 @@ import BeritaTerkini from '@/components/beranda/BeritaTerkini';
 import PapanPengumuman from '@/components/beranda/PapanPengumuman';
 import AgendaKegiatan from '@/components/beranda/AgendaKegiatan';
 import LokasiSekolahBanner from '@/components/beranda/LokasiSekolahBanner';
+import FasilitasKampus from '@/components/profil/FasilitasKampus';
 import { Reveal } from '@/components/ui/Reveal';
-import { getAgenda, getBerita, getPengumuman } from '@/lib/api';
+import { getAgenda, getBerita, getFasilitas, getPengumuman } from '@/lib/api';
 import AlasanMemilih from '@/components/beranda/AlasanMemilih';
 
 // Backend adalah sumber kebenaran; setiap bagian menampilkan error/konfigurasi
 // kosong, bukan menggantinya dengan konten contoh arsip.
 export default async function Home() {
-  const [beritaRes, pengumumanRes, agendaRes] = await Promise.all([
+  const [beritaRes, pengumumanRes, agendaRes, fasilitasRes] = await Promise.all([
     getBerita({ utama: false, limit: 2 }),
     getPengumuman({ beranda: true }),
     getAgenda(),
+    getFasilitas({ unggulan: true }),
   ]);
   const berita = beritaRes.data ?? [];
   const pengumuman = [...(pengumumanRes.data ?? [])].sort(
@@ -44,6 +46,13 @@ export default async function Home() {
       </Reveal>
       <Reveal>
         <AlasanMemilih />
+      </Reveal>
+      <Reveal>
+        <FasilitasKampus
+          fasilitas={fasilitasRes.data ?? []}
+          error={fasilitasRes.error}
+          variant="featured"
+        />
       </Reveal>
       <Reveal>
         <PapanPengumuman pengumuman={pengumuman} error={pengumumanRes.error} />
