@@ -18,6 +18,7 @@ require_once __DIR__ . '/helpers/ai.php';
 require_once __DIR__ . '/helpers/chat_analytics.php';
 require_once __DIR__ . '/helpers/sanitize_html.php';
 require_once __DIR__ . '/helpers/website.php';
+require_once __DIR__ . '/helpers/spmb_cache.php';
 require_once __DIR__ . '/helpers/chat_tools.php';
 require_once __DIR__ . '/helpers/whatsapp.php';
 
