@@ -540,3 +540,18 @@ export interface KnowledgeListResponse {
   entri: KnowledgeDTO[];
   total: number;
 }
+
+/** Satu baris hasil uji retrieval admin (POST /api/knowledge/test.php). */
+export interface KnowledgeTestRow {
+  judul: string;
+  kategori: KnowledgeKategori;
+  tags: string;
+  relevansi: number;
+  potongan: string;
+}
+
+export interface KnowledgeTestResponse {
+  kata: string;
+  total: number;
+  hasil: KnowledgeTestRow[];
+}

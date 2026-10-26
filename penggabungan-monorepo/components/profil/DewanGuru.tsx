@@ -23,7 +23,7 @@ export default function DewanGuru({
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-sm">
           <div>
             <span className="font-label-md text-label-md uppercase tracking-wider text-secondary font-bold">Pendidik Berdedikasi</span>
-            <h2 className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Direktori Guru &amp; Manajemen</h2>
+            <h2 id="direktori-guru-heading" className="font-headline-lg text-headline-lg text-primary font-bold tracking-tight">Direktori Guru &amp; Manajemen</h2>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {["semua", ...categories].map((category) => (
@@ -39,9 +39,14 @@ export default function DewanGuru({
             ))}
           </div>
         </div>
-        <div className="micro-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter-md">
+        <div
+          aria-labelledby="direktori-guru-heading"
+          className="micro-stagger flex snap-x snap-mandatory gap-gutter-md overflow-x-auto overscroll-x-contain pb-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          role="region"
+          tabIndex={0}
+        >
           {filteredGuru.map((guru) => (
-            <div key={guru.id} className="micro-card micro-shine bg-surface-container-lowest rounded-2xl overflow-hidden p-space-md border border-surface-container shadow-sm text-center space-y-3">
+            <div key={guru.id} className="micro-card micro-shine w-[min(82vw,22rem)] shrink-0 snap-start bg-surface-container-lowest rounded-2xl overflow-hidden p-space-md border border-surface-container shadow-sm text-center space-y-3">
                 {guru.image ? (
                   <Image src={guru.image} alt={guru.name} width={112} height={112} className="micro-icon w-28 h-28 mx-auto rounded-full object-cover ring-4 ring-primary/10" />
                 ) : (
@@ -57,7 +62,7 @@ export default function DewanGuru({
             </div>
           ))}
           {filteredGuru.length === 0 && (
-            <p className="sm:col-span-2 lg:col-span-4 rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+            <p className="w-full rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
               {error ? `Direktori guru belum dapat dimuat: ${error}` : "Belum ada data guru untuk kategori ini."}
             </p>
           )}

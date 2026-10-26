@@ -138,8 +138,8 @@ export default function AgendaKegiatan({
           </div>
         </div>
 
-        <div className="micro-stagger grid grid-cols-1 md:grid-cols-3 gap-gutter-md">
-          {agenda.map((item) => (
+        <div className="micro-stagger grid grid-cols-1 md:grid-cols-2 gap-gutter-md">
+          {agenda.slice(0, 2).map((item) => (
             <div
               key={item.id}
               className="micro-shine group relative bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm hover:-translate-y-1 hover:shadow-md transition-all duration-300 flex items-start gap-space-md border border-surface-container motion-reduce:transform-none motion-reduce:transition-none"
@@ -164,7 +164,7 @@ export default function AgendaKegiatan({
             </div>
           ))}
           {agenda.length === 0 && (
-            <p className="md:col-span-3 rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
+            <p className="md:col-span-2 rounded-xl border border-surface-container bg-surface-container-lowest p-space-md text-body-sm text-on-surface-variant" role="status">
               {error ? `Agenda belum dapat dimuat: ${error}` : "Belum ada agenda yang ditampilkan."}
             </p>
           )}

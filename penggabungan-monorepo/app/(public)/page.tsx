@@ -20,9 +20,7 @@ export default async function Home() {
     getFasilitas({ unggulan: true }),
   ]);
   const berita = beritaRes.data ?? [];
-  const pengumuman = [...(pengumumanRes.data ?? [])].sort(
-    (a, b) => Number(b.penting) - Number(a.penting),
-  );
+  const semuaPengumuman = pengumumanRes.data ?? [];
   const allAgenda = agendaRes.data ?? [];
   const today = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Jakarta",
@@ -30,7 +28,16 @@ export default async function Home() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
-  const agenda = allAgenda.filter((item) => (item.tglSelesai || item.tglMulai) >= today);
+  const pengumumanTersusun = [...semuaPengumuman].sort(
+    (a, b) => (a.tanggalIso ?? "").localeCompare(b.tanggalIso ?? ""),
+  );
+  const pengumumanMendatang = pengumumanTersusun.filter((item) => item.tanggalIso >= today);
+  const pengumumanLampau = pengumumanTersusun
+    .filter((item) => item.tanggalIso < today)
+    .sort((a, b) => (b.tanggalIso ?? "").localeCompare(a.tanggalIso ?? ""));
+  const agenda = allAgenda
+    .filter((item) => (item.tglSelesai || item.tglMulai) >= today)
+    .sort((a, b) => a.tglMulai.localeCompare(b.tglMulai));
   const pastAgenda = allAgenda
     .filter((item) => (item.tglSelesai || item.tglMulai) < today)
     .sort((a, b) => b.tglMulai.localeCompare(a.tglMulai));
@@ -55,7 +62,14 @@ export default async function Home() {
         />
       </Reveal>
       <Reveal>
-        <PapanPengumuman pengumuman={pengumuman} error={pengumumanRes.error} />
+        <PapanPengumuman
+          pengumuman={pengumumanMendatang.slice(0, 2)}
+          pengumumanLampau={pengumumanLampau}
+          error={pengumumanRes.error}
+        />
+      </Reveal>
+      <Reveal>
+        <AgendaKegiatan agenda={agenda} pastAgenda={pastAgenda} error={agendaRes.error} />
       </Reveal>
       <Reveal>
         <section className="w-full px-margin-mobile py-space-4xl md:px-margin-tablet lg:px-margin-desktop">
@@ -63,9 +77,6 @@ export default async function Home() {
             <BeritaTerkini berita={berita} error={beritaRes.error} />
           </div>
         </section>
-      </Reveal>
-      <Reveal>
-        <AgendaKegiatan agenda={agenda} pastAgenda={pastAgenda} error={agendaRes.error} />
       </Reveal>
       <Reveal>
         <LokasiSekolahBanner />
