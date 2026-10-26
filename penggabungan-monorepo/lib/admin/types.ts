@@ -248,6 +248,19 @@ export interface ArsipDTO {
   downloadUrl: string;
 }
 
+export interface KelulusanDTO {
+  id: number;
+  nisn: string;
+  namaSiswa: string;
+  kelas: string;
+  jurusan: string;
+  tahunLulus: number;
+  status: "Lulus" | "Tidak Lulus";
+  aktif: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type StatusPrestasi = "Baru" | "Ditinjau" | "Disetujui" | "Ditolak";
 
 export interface PrestasiDTO {

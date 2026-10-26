@@ -550,3 +550,34 @@ export async function proxyPublicGet(
     },
   });
 }
+
+/** Proxy pemeriksaan kelulusan dengan body privat; NISN tidak ditempatkan di URL/log query. */
+export async function proxyPublicGraduationCheck(nisn: string): Promise<Response> {
+  const { url: baseUrl, error: configError } = backendBaseUrl();
+  if (configError) return Response.json({ error: configError }, { status: 503 });
+  if (!baseUrl) return Response.json({ error: "Backend belum dikonfigurasi. Atur BACKEND_URL." }, { status: 503 });
+
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}/api/kelulusan/index.php?action=cek`, {
+      method: "POST",
+      headers: { Accept: "application/json", "Content-Type": "application/json" },
+      body: JSON.stringify({ nisn }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+      cache: "no-store",
+    });
+  } catch (error) {
+    const message = error instanceof Error && error.name === "TimeoutError"
+      ? "Backend tidak merespons dalam 5 detik."
+      : "Tidak dapat menghubungi backend. Periksa koneksi dan konfigurasi.";
+    return Response.json({ error: message }, { status: error instanceof Error && error.name === "TimeoutError" ? 504 : 502 });
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    headers: {
+      "Content-Type": response.headers.get("Content-Type") ?? "application/json",
+      "Cache-Control": "no-store, private",
+    },
+  });
+}

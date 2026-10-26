@@ -84,6 +84,11 @@ dan `JWT_SECRET` acak — kalau tidak, `bootstrap.php` menolak semua request.
 **Database yang sudah berisi data sekolah:** jangan impor ulang
 `backend/database.sql`; pertahankan skema dan data yang sudah ada.
 
+Fitur pemeriksaan kelulusan memakai tabel baru. Setelah schema dasar siap,
+backup dahulu dan gunakan migrasi `backend/migrations/20261026_add_kelulusan.sql`
+untuk backend PHP atau `backend-laravel/database/migrations/2026_10_26_000001_create_kelulusan_table.php`
+untuk backend Laravel. Jalankan hanya migrasi yang sesuai dengan backend aktif.
+
 Setelah skema siap, isi `backend/.env` (DB_HOST/DB_NAME/DB_USER/DB_PASS sesuai
 lingkungan). Untuk pemasangan baru, akun admin **tidak** di-seed skema
 (keamanan); buat akun pertama:
@@ -135,6 +140,7 @@ Dua server berbeda origin, jadi CORS backend (`ALLOWED_ORIGINS` di
 | `/admin/berita` · `pengumuman` · `agenda` · `guru` · `struktur-organisasi` · `fasilitas` · `ekstrakurikuler` · `galeri` · `jadwal` | Modul konten aktif; gambar struktur organisasi dapat diganti dari admin |
 | `/admin/bk` | Inbox pesan BK (daftar/filter/status/hapus; backend `backend/api/bk`) |
 | `/admin/arsip` | CRUD metadata + upload dokumen resmi; berkas privat disajikan dengan unduhan terkontrol |
+| `/pengumuman-kelulusan` · `/admin/kelulusan` | Cek hasil memakai NISN dan CRUD data kelulusan; hasil publik hanya muncul setelah diterbitkan admin |
 | `/admin/prestasi` | Moderasi pengajuan; NISN/bukti hanya untuk admin, tanpa publikasi otomatis |
 | `/api/bk`, `/api/bk/chat`, `/api/bk/history`, `/api/chat` | Proxy publik ke backend (status dipertahankan) |
 | `/api/prestasi` | Proxy multipart pengajuan publik ke backend |

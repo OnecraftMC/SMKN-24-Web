@@ -39,8 +39,8 @@ class AiController
         if ($notes === '') {
             return response()->json(['error' => 'Tuliskan catatan singkat dulu, lalu klik buat draf.'], 400);
         }
-        if (mb_strlen($notes, 'UTF-8') > 2000) {
-            return response()->json(['error' => 'Catatan terlalu panjang. Maksimal 2000 karakter.'], 400);
+        if (mb_strlen($notes, 'UTF-8') > 4000) {
+            return response()->json(['error' => 'Catatan terlalu panjang. Maksimal 4000 karakter.'], 400);
         }
 
         $options = aiFeatureOptions('content');
@@ -74,7 +74,7 @@ class AiController
 
         try {
             $raw = callAiProvider($messages, array_merge($options, [
-                'max_tokens' => 1600,
+                'max_tokens' => 2200,
                 'temperature' => 0.7,
             ]));
             $parsed = extractJsonObject($raw);
@@ -116,12 +116,12 @@ class AiController
         return match ($module) {
             'berita' => [
                 'judul' => $this->cleanText($data['judul'] ?? '', 255),
-                'ringkasan' => $this->cleanText($data['ringkasan'] ?? '', 1000),
+                'ringkasan' => $this->cleanText($data['ringkasan'] ?? '', 1500),
                 'isi' => sanitizeBeritaHtml($data['isi'] ?? '', 20000),
             ],
             'pengumuman' => [
                 'judul' => $this->cleanText($data['judul'] ?? '', 255),
-                'isi' => $this->cleanText($data['isi'] ?? '', 5000),
+                'isi' => $this->cleanText($data['isi'] ?? '', 8000),
                 'badge' => $this->cleanText($data['badge'] ?? '', 100),
                 'status' => $this->cleanText($data['status'] ?? '', 50),
             ],
@@ -129,15 +129,15 @@ class AiController
                 'judul' => $this->cleanText($data['judul'] ?? '', 255),
                 'badge' => $this->cleanText($data['badge'] ?? '', 100),
                 'lokasi' => $this->cleanText($data['lokasi'] ?? '', 255),
-                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 2000),
+                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 4000),
             ],
             'fasilitas' => [
                 'judul' => $this->cleanText($data['judul'] ?? '', 255),
-                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 1000),
+                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 2500),
             ],
             'guru' => [
                 'jabatan' => $this->cleanText($data['jabatan'] ?? '', 255),
-                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 1000),
+                'deskripsi' => $this->cleanText($data['deskripsi'] ?? '', 2500),
             ],
             'galeri' => ['judul' => $this->cleanText($data['judul'] ?? '', 255)],
         };
