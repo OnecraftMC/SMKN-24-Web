@@ -70,8 +70,8 @@ if ($catatan === '') {
 }
 // Admin menulis catatan event, bukan artikel utuh. Batas ini juga menjaga
 // request dan token ke provider tetap masuk akal.
-if (mb_strlen($catatan) > 2000) {
-    jsonError('Catatan terlalu panjang. Maksimal 2000 karakter.', 400);
+if (mb_strlen($catatan) > 4000) {
+    jsonError('Catatan terlalu panjang. Maksimal 4000 karakter.', 400);
 }
 
 if (!aiProviderConfigured(aiFeatureOptions('content'))) {
@@ -113,7 +113,7 @@ try {
         $messages,
         array_merge(
             aiFeatureOptions('content'),
-            ['max_tokens' => 1600, 'temperature' => 0.7],
+            ['max_tokens' => 2200, 'temperature' => 0.7],
         )
     );
     $parsed = extractJsonObject($raw);
@@ -193,7 +193,7 @@ function normaliseBeritaDraft(array $data): array
 {
     return [
         'judul' => cleanText($data['judul'] ?? '', 255),
-        'ringkasan' => cleanText($data['ringkasan'] ?? '', 1000),
+        'ringkasan' => cleanText($data['ringkasan'] ?? '', 1500),
         // Isi berita berupa HTML terstruktur dari model (Fase editor rich-text);
         // bersihkan via sanitizer allowlist, bukan cleanText yang membuang tag.
         'isi' => sanitizeBeritaHtml($data['isi'] ?? '', 20000),
@@ -206,7 +206,7 @@ function normaliseAgendaDraft(array $data): array
         'judul' => cleanText($data['judul'] ?? '', 255),
         'badge' => cleanText($data['badge'] ?? '', 100),
         'lokasi' => cleanText($data['lokasi'] ?? '', 255),
-        'deskripsi' => cleanText($data['deskripsi'] ?? '', 2000),
+        'deskripsi' => cleanText($data['deskripsi'] ?? '', 4000),
     ];
 }
 
@@ -219,7 +219,7 @@ function normalisePengumumanDraft(array $data): array
 {
     return [
         'judul' => cleanText($data['judul'] ?? '', 255),
-        'isi' => cleanText($data['isi'] ?? '', 5000),
+        'isi' => cleanText($data['isi'] ?? '', 8000),
         'badge' => cleanText($data['badge'] ?? '', 100),
         'status' => cleanText($data['status'] ?? '', 50),
     ];
@@ -229,7 +229,7 @@ function normaliseFasilitasDraft(array $data): array
 {
     return [
         'judul' => cleanText($data['judul'] ?? '', 255),
-        'deskripsi' => cleanText($data['deskripsi'] ?? '', 1000),
+        'deskripsi' => cleanText($data['deskripsi'] ?? '', 2500),
     ];
 }
 
@@ -243,7 +243,7 @@ function normaliseGuruDraft(array $data): array
 {
     return [
         'jabatan' => cleanText($data['jabatan'] ?? '', 255),
-        'deskripsi' => cleanText($data['deskripsi'] ?? '', 1000),
+        'deskripsi' => cleanText($data['deskripsi'] ?? '', 2500),
     ];
 }
 

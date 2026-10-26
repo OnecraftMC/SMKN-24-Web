@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\CanteenSellerOrdersController;
 use App\Http\Controllers\Api\ChatExportController;
 use App\Http\Controllers\Api\ChatHistoryController;
 use App\Http\Controllers\Api\ArsipController;
+use App\Http\Controllers\Api\KelulusanController;
 use App\Http\Controllers\Api\FasilitasController;
 use App\Http\Controllers\Api\EkstrakurikulerController;
 use App\Http\Controllers\Api\GaleriController;
@@ -67,6 +68,8 @@ Route::post('bk/chat/index.php', BkChatController::class)
     ->name('api.bk.chat.compatibility');
 Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'arsip/index.php', ArsipController::class)
     ->name('api.arsip.compatibility');
+Route::match(['GET', 'POST', 'PUT', 'DELETE'], 'kelulusan/index.php', KelulusanController::class)
+    ->name('api.kelulusan.compatibility');
 Route::match(['GET', 'POST', 'PUT'], 'prestasi/index.php', PrestasiController::class)
     ->name('api.prestasi.compatibility');
 Route::post('upload.php', UploadController::class)->name('api.upload.compatibility');

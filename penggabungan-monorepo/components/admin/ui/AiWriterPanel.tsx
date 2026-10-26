@@ -107,42 +107,42 @@ const COPY: Record<AiDraftModule, { title: string; placeholder: string; hint: st
     placeholder:
       "Contoh: Pameran karya siswa kelas XII TKU di aula sekolah, dibuka untuk umum.",
     hint:
-      "Tuliskan inti acaranya. AI menyusun judul, ringkasan, dan isi berita. Tanggal tetap Anda yang isi.",
+      "Sebutkan fakta utama. Tambahkan arahan panjang, nada, pembaca, atau susunan yang Anda inginkan. Tanggal tetap Anda yang isi.",
   },
   pengumuman: {
     title: "Susun draf pengumuman dengan AI",
     placeholder:
       "Contoh: Pendaftaran ujian remedial kelas X dibuka sampai akhir bulan.",
     hint:
-      "Tuliskan isi pengumuman. AI menyusun judul, isi, dan label singkat. Tanggal tetap Anda yang isi.",
+      "Sebutkan fakta dan tujuan pengumuman. Tambahkan arahan panjang, nada, dan pembaca yang Anda inginkan. Tanggal tetap Anda yang isi.",
   },
   agenda: {
     title: "Susun draf agenda dengan AI",
     placeholder:
       "Contoh: Lomba antar kelas untuk siswa kelas X, terbuka untuk seluruh warga sekolah.",
     hint:
-      "Tuliskan jenis kegiatan dan pesertanya. AI menyusun judul, badge, lokasi, dan deskripsi.",
+      "Tuliskan fakta kegiatan serta arahan panjang, nada, pembaca, atau fokus yang Anda inginkan.",
   },
   fasilitas: {
     title: "Susun draf fasilitas dengan AI",
     placeholder:
       "Contoh: Laboratorium komputer untuk praktikum Syntax Graphic.",
     hint:
-      "Tuliskan nama dan fungsi fasilitas. AI menyusun judul dan deskripsi singkat.",
+      "Tuliskan nama dan fungsi fasilitas serta arahan tentang fokus dan panjang deskripsi.",
   },
   guru: {
     title: "Susun draf profil guru dengan AI",
     placeholder:
       "Contoh: Guru Bahasa Indonesia dengan pengalaman mengajar 12 tahun.",
     hint:
-      "Tuliskan jabatan dan pengalaman. AI menyusun deskripsi profil. Nama dan foto tetap Anda yang isi.",
+      "Tuliskan jabatan dan fakta yang boleh dimuat, lalu arahkan nada atau panjang profil. Nama dan foto tetap Anda yang isi.",
   },
   galeri: {
     title: "Susun judul galeri dengan AI",
     placeholder:
       "Contoh: Guru dan siswa saat-Upacara Bendera bersama di lapangan sekolah.",
     hint:
-      "Tuliskan isi kegiatan dalam foto. AI menyusun judul foto. Gambar tetap Anda yang unggah.",
+      "Tuliskan isi foto serta gaya judul yang Anda inginkan. Gambar tetap Anda yang unggah.",
   },
 };
 
@@ -217,7 +217,7 @@ export default function AiWriterPanel<D extends AiDraft>({
         .trim();
 
       if (spokenText) {
-        setCatatan((current) => `${current.trim()}${current.trim() ? " " : ""}${spokenText}`.slice(0, 2000));
+        setCatatan((current) => `${current.trim()}${current.trim() ? " " : ""}${spokenText}`.slice(0, 4000));
         setVoiceStatus("Ucapan sudah ditambahkan ke catatan. Periksa teksnya, lalu jalankan AI.");
       }
     };
@@ -346,21 +346,21 @@ export default function AiWriterPanel<D extends AiDraft>({
 
       <div className="mt-space-sm">
         <label htmlFor={catatanId} className={labelClass}>
-          Catatan untuk AI
+          Catatan dan arahan admin untuk AI
         </label>
         <textarea
           id={catatanId}
           rows={3}
           className={fieldClass}
           value={catatan}
-          maxLength={2000}
-          placeholder={copy.placeholder}
+          maxLength={4000}
+          placeholder={`${copy.placeholder} Tambahkan arahan seperti panjang tulisan, nada, pembaca, dan informasi yang perlu ditonjolkan.`}
           aria-describedby={statusId}
           disabled={disabled || busy}
           onChange={(e) => setCatatan(e.target.value)}
         />
         <p className="mt-1 font-body-sm text-body-sm text-on-surface-variant">
-          Dikte memakai layanan suara browser/perangkat. Browser akan meminta izin mikrofon; pemrosesan audio mengikuti kebijakan browser/perangkat.
+          Maksimal 4.000 karakter. Arahan tentang panjang, gaya bahasa, target pembaca, dan susunan tulisan akan diikuti selama tidak meminta AI mengarang fakta. Dikte memakai layanan suara browser/perangkat dan memerlukan izin mikrofon.
         </p>
       </div>
 

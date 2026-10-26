@@ -75,6 +75,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: `${ADMIN_BASE}/jadwal`, label: "Jadwal Pembelajaran", icon: CalendarClock, ready: true },
       { href: `${ADMIN_BASE}/arsip`, label: "Pusat Arsip", icon: FolderOpen, ready: true },
+      { href: `${ADMIN_BASE}/kelulusan`, label: "Data Kelulusan", icon: GraduationCap, ready: true },
     ],
   },
   {
