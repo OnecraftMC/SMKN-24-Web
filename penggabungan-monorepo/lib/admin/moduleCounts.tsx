@@ -9,10 +9,15 @@
  * setiap sumber menyimpan statusnya sendiri sehingga kegagalannya terbaca di
  * tempat (lencana rail dan strip konteks), bukan diterjemahkan menjadi angka 0.
  *
- * Catatan privasi: yang disimpan adalah jumlah, dan data kerja yang TIDAK
- * memuat identitas siswa (tanpa nama, kelas, nomor HP, isi pesan, dan NISN).
- * Kartu kerja di Overview bersifat anonim; detail tetap eksklusif di
- * /admin/bk dan /admin/prestasi.
+ * Catatan privasi: yang disimpan adalah data modul untuk hitungan, dan data
+ * kerja yang TIDAK memuat identitas siswa (tanpa nama, kelas, nomor HP, isi
+ * pesan, dan NISN). Kartu kerja di Overview bersifat anonim; detail tetap
+ * eksklusif di /admin/bk dan /admin/prestasi.
+ *
+ * Sejak Overview “Meja Moderasi” (2026-10), snapshot menyimpan array berita,
+ * pengumuman, agenda, guru, fasilitas, ekstrakurikuler, dan galeri — bukan
+ * hanya jumlahnya — supaya ledger konten, ritme terbit, dan antrean draft
+ * dihitung dari respons yang sama tanpa request tambahan.
  */
 
 import {
@@ -55,7 +60,7 @@ export type SumberState<T> =
   | { kind: "error"; message: string }
   | { kind: "ok"; value: T };
 
-export type PengumumanRingkas = { total: number; tampilBeranda: number };
+export type PengumumanRingkas = { items: PengumumanDTO[]; tampilBeranda: number };
 /** Antrean prestasi: yang menunggu + yang sudah ditinjau. */
 export type PrestasiAntrean = { items: PrestasiDTO[]; baru: number; ditinjau: number };
 
@@ -63,13 +68,13 @@ export type PrestasiAntrean = { items: PrestasiDTO[]; baru: number; ditinjau: nu
 type PrestasiResponse = { items: PrestasiDTO[]; page: number; pageSize: number; total: number };
 
 export type ModulSnapshot = {
-  berita: SumberState<number>;
+  berita: SumberState<BeritaDTO[]>;
   pengumuman: SumberState<PengumumanRingkas>;
   agenda: SumberState<AgendaDTO[]>;
-  guru: SumberState<number>;
-  fasilitas: SumberState<number>;
-  ekstrakurikuler: SumberState<number>;
-  galeri: SumberState<number>;
+  guru: SumberState<GuruDTO[]>;
+  fasilitas: SumberState<FasilitasDTO[]>;
+  ekstrakurikuler: SumberState<EkstrakurikulerDTO[]>;
+  galeri: SumberState<GaleriDTO[]>;
   bk: SumberState<PesanBKDTO[]>;
   prestasi: SumberState<PrestasiAntrean>;
 };
@@ -161,16 +166,18 @@ export function ModulProvider({ children }: { children: ReactNode }) {
       const next: ModulSnapshot = {
         berita:
           berita.status === "fulfilled"
-            ? { kind: "ok", value: berita.value.length }
+            ? { kind: "ok", value: berita.value }
             : gagal(berita.reason, "Gagal memuat data berita."),
         // Pengumuman butuh dua request: total dan yang tampil di beranda.
-        // Salah satu gagal = sumber gagal, bukan angka setengah.
+        // Salah satu gagal = sumber gagal, bukan angka setengah. Snapshot
+        // menyimpan daftar (untuk aktivitas terbaru) dan jumlah beranda
+        // (untuk “tidak tayang”); flag per-item tidak dipercaya.
         pengumuman:
           pengumuman.status === "fulfilled" && pengumumanBeranda.status === "fulfilled"
             ? {
                 kind: "ok",
                 value: {
-                  total: pengumuman.value.length,
+                  items: pengumuman.value,
                   tampilBeranda: pengumumanBeranda.value.length,
                 },
               }
@@ -188,19 +195,19 @@ export function ModulProvider({ children }: { children: ReactNode }) {
             : gagal(agenda.reason, "Gagal memuat data agenda."),
         guru:
           guru.status === "fulfilled"
-            ? { kind: "ok", value: guru.value.length }
+            ? { kind: "ok", value: guru.value }
             : gagal(guru.reason, "Gagal memuat jumlah data guru."),
         fasilitas:
           fasilitas.status === "fulfilled"
-            ? { kind: "ok", value: fasilitas.value.length }
+            ? { kind: "ok", value: fasilitas.value }
             : gagal(fasilitas.reason, "Gagal memuat jumlah data fasilitas."),
         ekstrakurikuler:
           ekstrakurikuler.status === "fulfilled"
-            ? { kind: "ok", value: ekstrakurikuler.value.length }
+            ? { kind: "ok", value: ekstrakurikuler.value }
             : gagal(ekstrakurikuler.reason, "Gagal memuat jumlah data ekstrakurikuler."),
         galeri:
           galeri.status === "fulfilled"
-            ? { kind: "ok", value: galeri.value.length }
+            ? { kind: "ok", value: galeri.value }
             : gagal(galeri.reason, "Gagal memuat jumlah data galeri."),
         bk:
           bk.status === "fulfilled"
