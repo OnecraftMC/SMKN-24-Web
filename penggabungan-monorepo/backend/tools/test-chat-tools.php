@@ -70,6 +70,28 @@ foreach (['pesan_bk', 'prestasi', 'admin_users', 'chat_sessions', 'chat_messages
 cek('allowlist tidak memuat tabel privat', !$adaTabelPrivat);
 cek('registry memuat 10 alat', count($daftarAlat) === 10, implode(', ', $daftarAlat));
 
+$kataLulusan = toolKnowledgeSearchTerms('Siapa lulusan dari SMKN 24?');
+$kelompokLulusan = toolKnowledgeSearchGroups('Siapa lulusan dari SMKN 24?');
+$sinonimLulusan = $kelompokLulusan[0] ?? [];
+cek(
+    'stopword dan nama sekolah dibersihkan dari kueri',
+    $kataLulusan === ['lulusan'],
+    implode(', ', $kataLulusan)
+);
+cek(
+    'pencarian memori mengenali sinonim lulusan',
+    in_array('alumni', $sinonimLulusan, true)
+        && in_array('tamatan', $sinonimLulusan, true)
+        && count($kelompokLulusan) === 1,
+    implode(', ', $sinonimLulusan)
+);
+$kelompokJurusan = toolKnowledgeSearchGroups('informasi jurusan');
+cek(
+    'stopword dihapus dan sinonim jurusan diperluas',
+    count($kelompokJurusan) === 1
+        && in_array('program keahlian', $kelompokJurusan[0], true)
+);
+
 // --- 2. Tool database (butuh koneksi DB aktif) -------------------------------
 try {
     $db = getDB();

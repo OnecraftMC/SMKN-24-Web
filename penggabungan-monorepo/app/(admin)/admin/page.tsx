@@ -26,8 +26,11 @@ import DecisionQueues from "@/components/admin/overview/DecisionQueues";
 import ContentLedger from "@/components/admin/overview/ContentLedger";
 import AgendaActivity from "@/components/admin/overview/AgendaActivity";
 import SystemHealth from "@/components/admin/overview/SystemHealth";
+import ChatAnalyticsChart, {
+  type StatistikChatState,
+} from "@/components/admin/overview/ChatAnalyticsChart";
 import { formatNumber } from "@/components/admin/overview/ringkasan";
-import type { ChatAnalyticsResponse, ChatMetrik } from "@/lib/admin/types";
+import type { ChatAnalyticsResponse } from "@/lib/admin/types";
 
 const LABEL_SUMBER: Record<ModulKey, string> = {
   berita: "Berita",
@@ -41,11 +44,6 @@ const LABEL_SUMBER: Record<ModulKey, string> = {
   prestasi: "Pengajuan Prestasi",
 };
 
-type StatistikState =
-  | { kind: "loading" }
-  | { kind: "error"; message: string }
-  | { kind: "ok"; metrik: ChatMetrik };
-
 type RingkasanWA = {
   aktif: boolean;
   jumlah: number;
@@ -58,7 +56,7 @@ const HARI_STATISTIK = 7;
 export default function OverviewPage() {
   const modul = useModul();
   const { logout } = useAuth();
-  const [statistik, setStatistik] = useState<StatistikState>({ kind: "loading" });
+  const [statistik, setStatistik] = useState<StatistikChatState>({ kind: "loading" });
   const [statistikAttempt, setStatistikAttempt] = useState(0);
 
   // ---------- Mini ringkasan Chatbot-BK (WhatsApp Guru BK) ----------
@@ -101,7 +99,13 @@ export default function OverviewPage() {
         const data = await apiRequest<ChatAnalyticsResponse>(
           `/api/chat/analytics.php?dari=${tanggalLocal(mulai)}&sampai=${tanggalLocal(akhir)}`,
         );
-        if (!cancelled) setStatistik({ kind: "ok", metrik: data.metrik });
+        if (!cancelled) {
+          setStatistik({
+            kind: "ok",
+            metrik: data.metrik,
+            tren: data.tren,
+          });
+        }
       } catch (err) {
         if (cancelled) return;
         if (isUnauthorized(err)) {
@@ -294,6 +298,8 @@ export default function OverviewPage() {
           prestasi={modul.prestasi}
         />
       </div>
+
+      <ChatAnalyticsChart state={statistik} />
 
       <SystemHealth statistik={statistik} wa={waSummary} waError={waError} />
     </div>
