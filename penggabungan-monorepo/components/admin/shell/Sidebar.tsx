@@ -140,17 +140,17 @@ function dariSumber<T>(sumber: SumberState<T>, angka: (nilai: T) => number): Len
 function hitungLencana(modul: ModulContextValue, key?: ModulKey): Lencana | null {
   switch (key) {
     case "berita":
-      return dariSumber(modul.berita, (n) => n);
+      return dariSumber(modul.berita, (n) => n.length);
     case "guru":
-      return dariSumber(modul.guru, (n) => n);
+      return dariSumber(modul.guru, (n) => n.length);
     case "fasilitas":
-      return dariSumber(modul.fasilitas, (n) => n);
+      return dariSumber(modul.fasilitas, (n) => n.length);
     case "ekstrakurikuler":
-      return dariSumber(modul.ekstrakurikuler, (n) => n);
+      return dariSumber(modul.ekstrakurikuler, (n) => n.length);
     case "galeri":
-      return dariSumber(modul.galeri, (n) => n);
+      return dariSumber(modul.galeri, (n) => n.length);
     case "pengumuman":
-      return dariSumber(modul.pengumuman, (n) => n.total);
+      return dariSumber(modul.pengumuman, (n) => n.items.length);
     case "agenda":
       return dariSumber(modul.agenda, (n) => n.length);
     case "bk":
