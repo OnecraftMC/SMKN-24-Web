@@ -73,8 +73,8 @@ export default function Navbar() {
             },
             {
               label: inEnglish ? "School Facilities" : "Fasilitas Sekolah",
-              description: inEnglish ? "Campus facilities and learning spaces" : "Sorotan sarana prasarana kampus",
-              href: "/profil#fasilitas",
+              description: inEnglish ? "School facilities and learning spaces" : "Sorotan sarana prasarana sekolah",
+              href: "/fasilitas",
               ikon: "apartment",
             },
           ],

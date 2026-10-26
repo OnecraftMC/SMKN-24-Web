@@ -62,6 +62,7 @@ export default function FasilitasKampus({
               height={720}
               sizes="(max-width: 768px) 100vw, 768px"
               className="h-full w-full object-cover"
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center text-primary" aria-hidden="true">
@@ -149,6 +150,7 @@ export default function FasilitasKampus({
                           height={192}
                           sizes="112px"
                           className="h-full w-full object-cover"
+                          unoptimized
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-primary" aria-hidden="true">
@@ -200,7 +202,7 @@ export default function FasilitasKampus({
             >
               <div className="h-52 overflow-hidden">
                 {item.image ? (
-                  <Image src={item.image} alt={item.title} width={640} height={420} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={item.image} alt={item.title} width={640} height={420} sizes="(max-width: 768px) 100vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" unoptimized />
                 ) : (
                   <div className="w-full h-full bg-surface-container-high flex items-center justify-center text-primary" aria-hidden="true">
                     <Building2 aria-hidden="true" className="h-9 w-9" />
