@@ -10,6 +10,7 @@ interface LoadingScreenProviderProps {
 
 export default function LoadingScreenProvider({ children }: LoadingScreenProviderProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -26,7 +27,7 @@ export default function LoadingScreenProvider({ children }: LoadingScreenProvide
   }, []);
 
   const handleLoadingComplete = () => {
-    setIsLoading(false);
+    setIsFadingOut(true);
   };
 
   return (
@@ -36,7 +37,13 @@ export default function LoadingScreenProvider({ children }: LoadingScreenProvide
       </div>
       {isLoading && (
         <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-white"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-white transition-opacity duration-700 ease-in-out"
+          style={{ opacity: isFadingOut ? 0 : 1 }}
+          onTransitionEnd={(event) => {
+            if (event.target !== event.currentTarget || event.propertyName !== "opacity") return;
+            setIsLoading(false);
+            setIsFadingOut(false);
+          }}
           role="status"
           aria-label="Memuat website SMKN 24 Jakarta"
         >
